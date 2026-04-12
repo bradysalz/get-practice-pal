@@ -8,6 +8,7 @@ import {
   createExercisesBatch,
   createSection,
   createSong,
+  reorderBookSections,
   updateArtist,
   updateBook,
   updateExercise,
@@ -180,5 +181,10 @@ export async function saveSectionBuilderAction(formData: FormData) {
     );
   }
 
+  finishLibraryAction();
+}
+
+export async function reorderBookSectionsAction(bookId: string, sectionIds: string[]) {
+  await reorderBookSections(bookId, sectionIds);
   finishLibraryAction();
 }

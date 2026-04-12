@@ -388,3 +388,35 @@ export async function replaceSetlistItems(setlistId: string, items: SetlistItemI
   if (error) throw error;
   return data ?? [];
 }
+
+export async function reorderBookSections(bookId: string, sectionIds: string[]) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+
+  await Promise.all(
+    sectionIds.map((sectionId, index) =>
+      client
+        .from("book_sections")
+        .update({ position: index + 1 })
+        .eq("id", sectionId)
+        .eq("book_id", bookId)
+        .eq("user_id", user.id),
+    ),
+  );
+}
+
+export async function reorderSetlistItems(setlistId: string, itemIds: string[]) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+
+  await Promise.all(
+    itemIds.map((itemId, index) =>
+      client
+        .from("setlist_items")
+        .update({ position: index + 1 })
+        .eq("id", itemId)
+        .eq("setlist_id", setlistId)
+        .eq("user_id", user.id),
+    ),
+  );
+}

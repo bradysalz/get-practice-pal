@@ -71,107 +71,102 @@ export function StatsDashboard({
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
-          <section className="page-panel p-6">
-            <h2 className="font-display text-xl font-semibold text-base-content">Progress to goal tempo</h2>
-            <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
-              <FormSelect
-                label="Exercise or song"
-                name="item"
-                defaultValue={selectedItemKey ?? ""}
-                emptyLabel="Select an item"
-                options={itemOptions}
-              />
-              <FormSelect
-                label="Range"
-                name="range"
-                defaultValue={selectedRange}
-                options={ranges.map((range) => ({ value: range.value, label: range.label }))}
-              />
-              <button className="btn btn-primary">Show progress</button>
-            </form>
+      <section className="space-y-6">
+        <section className="page-panel p-6">
+          <h2 className="font-display text-xl font-semibold text-base-content">Progress to goal tempo</h2>
+          <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
+            <FormSelect
+              label="Exercise or song"
+              name="item"
+              defaultValue={selectedItemKey ?? ""}
+              emptyLabel="Select an item"
+              options={itemOptions}
+            />
+            <FormSelect
+              label="Range"
+              name="range"
+              defaultValue={selectedRange}
+              options={ranges.map((range) => ({ value: range.value, label: range.label }))}
+            />
+            <button className="btn btn-primary btn-sm">Show progress</button>
+          </form>
 
-            {itemProgress ? (
-              <div className="mt-6 space-y-4">
-                <div className="grid gap-3 md:grid-cols-2">
-                  <StatCard label="Current max tempo" value={`${itemProgress.currentMaxTempo} BPM`} />
-                  <StatCard label="Goal tempo" value={`${itemProgress.goalTempo} BPM`} />
-                </div>
-                <div className="section-panel p-4">
-                  <p className="text-sm font-medium text-base-content">Progress points</p>
-                  <div className="mt-4 space-y-3">
-                    {itemProgress.progress.length ? (
-                      itemProgress.progress.map((point) => (
-                        <div key={`${point.recordedAt}-${point.maxTempo}`} className="space-y-2">
-                          <div className="flex items-center justify-between gap-3 text-sm">
-                            <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
-                            <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
-                          </div>
-                          <progress
-                            className="progress progress-primary w-full"
-                            value={Math.min(point.progressRatio * 100, 100)}
-                            max={100}
-                          />
+          {itemProgress ? (
+            <div className="mt-6 space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
+                <StatCard label="Current max tempo" value={`${itemProgress.currentMaxTempo} BPM`} />
+                <StatCard label="Goal tempo" value={`${itemProgress.goalTempo} BPM`} />
+              </div>
+              <div className="space-y-3">
+                {itemProgress.progress.length ? (
+                  itemProgress.progress.map((point) => (
+                    <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                          <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
+                          <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
                         </div>
-                      ))
-                    ) : (
-                      <EmptyBox label="No progress points found in the selected range." />
-                    )}
-                  </div>
-                </div>
+                        <progress
+                          className="progress progress-primary w-full"
+                          value={Math.min(point.progressRatio * 100, 100)}
+                          max={100}
+                        />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <EmptyBox label="No progress points found in the selected range." />
+                )}
               </div>
-            ) : (
-              <div className="mt-6">
-                <EmptyBox label="Choose an exercise or song to see progress." />
-              </div>
-            )}
-          </section>
+            </div>
+          ) : (
+            <div className="mt-6">
+              <EmptyBox label="Choose an exercise or song to see progress." />
+            </div>
+          )}
+        </section>
 
-          <section className="page-panel p-6">
-            <h2 className="font-display text-xl font-semibold text-base-content">Book completion</h2>
-            <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
-              <FormSelect
-                label="Book"
-                name="book"
-                defaultValue={selectedBookId ?? ""}
-                emptyLabel="Select a book"
-                options={snapshot.books.map((book) => ({ value: book.id, label: book.title }))}
-              />
-              <FormSelect
-                label="Range"
-                name="range"
-                defaultValue={selectedRange}
-                options={ranges.map((range) => ({ value: range.value, label: range.label }))}
-              />
-              <button className="btn btn-primary">Show completion</button>
-            </form>
+        <section className="page-panel p-6">
+          <h2 className="font-display text-xl font-semibold text-base-content">Book completion</h2>
+          <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
+            <FormSelect
+              label="Book"
+              name="book"
+              defaultValue={selectedBookId ?? ""}
+              emptyLabel="Select a book"
+              options={snapshot.books.map((book) => ({ value: book.id, label: book.title }))}
+            />
+            <FormSelect
+              label="Range"
+              name="range"
+              defaultValue={selectedRange}
+              options={ranges.map((range) => ({ value: range.value, label: range.label }))}
+            />
+            <button className="btn btn-primary btn-sm">Show completion</button>
+          </form>
 
-            {bookCompletion ? (
-              <div className="mt-6 space-y-4">
-                <div className="grid gap-3 md:grid-cols-3">
-                  <StatCard label="Exercises with goals" value={String(bookCompletion.totalExercisesWithGoals)} />
-                  <StatCard label="Completed" value={String(bookCompletion.completedExercises)} />
-                  <StatCard
-                    label="Completion"
-                    value={`${Math.round(bookCompletion.completionRatio * 100)}%`}
-                  />
-                </div>
-                <progress
-                  className="progress progress-secondary w-full"
-                  value={Math.round(bookCompletion.completionRatio * 100)}
-                  max={100}
+          {bookCompletion ? (
+            <div className="mt-6 space-y-4">
+              <div className="grid gap-3 md:grid-cols-3">
+                <StatCard label="Exercises with goals" value={String(bookCompletion.totalExercisesWithGoals)} />
+                <StatCard label="Completed" value={String(bookCompletion.completedExercises)} />
+                <StatCard
+                  label="Completion"
+                  value={`${Math.round(bookCompletion.completionRatio * 100)}%`}
                 />
               </div>
-            ) : (
-              <div className="mt-6">
-                <EmptyBox label="Choose a book to see completion." />
-              </div>
-            )}
-          </section>
-        </div>
-
-        <div className="space-y-6" />
+              <progress
+                className="progress progress-secondary w-full"
+                value={Math.round(bookCompletion.completionRatio * 100)}
+                max={100}
+              />
+            </div>
+          ) : (
+            <div className="mt-6">
+              <EmptyBox label="Choose a book to see completion." />
+            </div>
+          )}
+        </section>
       </section>
     </div>
   );

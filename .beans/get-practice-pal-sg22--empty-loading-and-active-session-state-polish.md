@@ -5,8 +5,8 @@ status: todo
 type: epic
 priority: normal
 created_at: 2026-04-12T00:23:08Z
-updated_at: 2026-04-12T00:23:27Z
-parent: get-practice-pal-shf7
+updated_at: 2026-04-12T23:46:52Z
+parent: gpp-mmn0
 ---
 
 Polish the states users will frequently encounter while practicing.

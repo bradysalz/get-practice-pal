@@ -238,7 +238,7 @@ export function Input({
     <label className="form-control w-full">
       <span className="label-text mb-2 text-sm font-medium text-base-content">{label}</span>
       <input
-        className="input input-bordered w-full"
+        className="input app-field w-full"
         defaultValue={defaultValue ?? ""}
         min={min}
         name={name}
@@ -272,11 +272,7 @@ export function EditBookForm({
       <CardForm title="Edit book" description="">
         <Input label="Title" name="title" defaultValue={book.title} />
         <Input label="Composer or author" name="composer" defaultValue={book.composer} />
-        <FormSubmitButton
-          label="Save book"
-          pendingLabel="Saving book..."
-          className="btn btn-secondary btn-sm"
-        />
+        <FormSubmitButton label="Save book" pendingLabel="Saving book..." variant="secondary" />
       </CardForm>
     </form>
   );
@@ -286,12 +282,12 @@ export function CreateSectionForm({ bookId }: { bookId: string }) {
   return (
     <form action={createSectionAction}>
       <input type="hidden" name="bookId" value={bookId} />
+      <input type="hidden" name="position" value="1" />
       <CardForm
         title="Add section"
         description=""
       >
         <Input label="Section title" name="title" placeholder="Triplet Grid" />
-        <Input label="Position" name="position" defaultValue={1} type="number" />
         <Input
           label="Default goal tempo"
           name="defaultGoalTempo"
@@ -299,11 +295,7 @@ export function CreateSectionForm({ bookId }: { bookId: string }) {
           min={1}
           placeholder="132"
         />
-        <FormSubmitButton
-          label="Create section"
-          className="btn btn-accent btn-sm"
-          pendingLabel="Creating..."
-        />
+        <FormSubmitButton label="Create section" pendingLabel="Creating..." variant="accent" />
       </CardForm>
     </form>
   );
@@ -317,9 +309,9 @@ export function EditSectionForm({
   return (
     <form action={updateSectionAction}>
       <input type="hidden" name="sectionId" value={section.id} />
+      <input type="hidden" name="position" value={String(section.position)} />
       <CardForm title="Edit section" description="">
         <Input label="Section title" name="title" defaultValue={section.title} />
-        <Input label="Position" name="position" defaultValue={section.position} type="number" />
         <Input
           label="Default goal tempo"
           name="defaultGoalTempo"
@@ -327,11 +319,7 @@ export function EditSectionForm({
           type="number"
           min={1}
         />
-        <FormSubmitButton
-          label="Save section"
-          className="btn btn-secondary btn-sm"
-          pendingLabel="Saving..."
-        />
+        <FormSubmitButton label="Save section" pendingLabel="Saving..." variant="secondary" />
       </CardForm>
     </form>
   );
@@ -347,12 +335,12 @@ export function CreateExerciseForm({
   return (
     <form action={createExerciseAction}>
       <input type="hidden" name="sectionId" value={sectionId} />
+      <input type="hidden" name="position" value="1" />
       <CardForm
         title="Add exercise"
         description=""
       >
         <Input label="Exercise title" name="title" placeholder="Exercise 1" />
-        <Input label="Position" name="position" defaultValue={1} type="number" />
         <Input
           label="Goal tempo"
           name="goalTempo"
@@ -360,11 +348,7 @@ export function CreateExerciseForm({
           min={1}
           placeholder="Override if needed"
         />
-        <FormSubmitButton
-          label="Create exercise"
-          className="btn btn-accent btn-sm"
-          pendingLabel="Creating..."
-        />
+        <FormSubmitButton label="Create exercise" pendingLabel="Creating..." variant="accent" />
       </CardForm>
     </form>
   );
@@ -382,15 +366,14 @@ export function EditExerciseForm({
   return (
     <form action={updateExerciseAction} className="section-panel p-4">
       <input type="hidden" name="exerciseId" value={exercise.id} />
+      <input type="hidden" name="position" value={String(exercise.position)} />
       <div className="mb-3 flex flex-wrap gap-2">
-        <span className="chip chip-neutral text-[0.72rem]">Position {exercise.position}</span>
         <span className="chip text-[0.72rem]">
           Inherited {inheritedTempo ? `${inheritedTempo} BPM` : "none"}
         </span>
       </div>
-      <div className="grid gap-3 md:grid-cols-[1.2fr_0.6fr_0.8fr_auto] md:items-end">
+      <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr_auto] md:items-end">
         <Input label="Exercise" name="title" defaultValue={exercise.title} />
-        <Input label="Position" name="position" defaultValue={exercise.position} type="number" />
         <Input
           label={`Goal tempo${inheritedTempo ? ` (${inheritedTempo} BPM inherited)` : ""}`}
           name="goalTempo"
@@ -401,7 +384,7 @@ export function EditExerciseForm({
         <FormSubmitButton
           label="Save"
           pendingLabel="Saving..."
-          className="btn btn-ghost btn-sm border border-base-300 md:mb-[0.35rem]"
+          className="btn btn-outline btn-sm md:mb-[0.35rem]"
         />
       </div>
     </form>
@@ -416,11 +399,7 @@ export function CreateArtistForm() {
         description=""
       >
         <Input label="Artist name" name="name" placeholder="John Coltrane" />
-        <FormSubmitButton
-          label="Create artist"
-          className="btn btn-primary btn-sm"
-          pendingLabel="Creating..."
-        />
+        <FormSubmitButton label="Create artist" pendingLabel="Creating..." />
       </CardForm>
     </form>
   );
@@ -436,11 +415,7 @@ export function EditArtistForm({
       <input type="hidden" name="artistId" value={artist.id} />
       <CardForm title="Edit artist" description="">
         <Input label="Artist name" name="name" defaultValue={artist.name} />
-        <FormSubmitButton
-          label="Save artist"
-          className="btn btn-secondary btn-sm"
-          pendingLabel="Saving..."
-        />
+        <FormSubmitButton label="Save artist" pendingLabel="Saving..." variant="secondary" />
       </CardForm>
     </form>
   );
@@ -453,11 +428,7 @@ export function CreateSongForm({ artistId }: { artistId: string }) {
       <CardForm title="Add song" description="">
         <Input label="Song title" name="title" placeholder="Giant Steps" />
         <Input label="Goal tempo" name="goalTempo" type="number" min={1} placeholder="220" />
-        <FormSubmitButton
-          label="Create song"
-          className="btn btn-accent btn-sm"
-          pendingLabel="Creating..."
-        />
+        <FormSubmitButton label="Create song" pendingLabel="Creating..." variant="accent" />
       </CardForm>
     </form>
   );
@@ -482,7 +453,7 @@ export function EditSongForm({
         <FormSubmitButton
           label="Save"
           pendingLabel="Saving..."
-          className="btn btn-ghost btn-sm border border-base-300 md:mb-[0.35rem]"
+          className="btn btn-outline btn-sm md:mb-[0.35rem]"
         />
       </div>
     </form>

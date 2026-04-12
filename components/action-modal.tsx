@@ -35,7 +35,7 @@ export function ActionModal({
                   <p className="mt-2 text-sm leading-6 text-base-content/70">{description}</p>
                 ) : null}
               </div>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setIsOpen(false)}>
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => setIsOpen(false)}>
                 Close
               </button>
             </div>

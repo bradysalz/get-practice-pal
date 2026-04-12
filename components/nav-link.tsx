@@ -20,7 +20,7 @@ export function NavLink({ href, icon, label, onNavigate }: NavLinkProps) {
       onClick={onNavigate}
       className={`group flex items-center gap-3 rounded-[1.15rem] border px-4 py-3 transition ${
         isActive
-          ? "border-primary/18 bg-red-50 text-base-content"
+          ? "border-primary/20 bg-primary/8 text-base-content"
           : "border-transparent text-base-content/75 hover:border-base-300/70 hover:bg-base-200/85 hover:text-base-content"
       }`}
     >

@@ -4,6 +4,7 @@
 
 - Track work in `beans` before changing code.
 - Commit and open a PR for all code changes.
+- Open normal PRs, not draft PRs.
 - It is fine to group several related changes into one PR when they belong to the same milestone or workflow.
 - Keep local-only files such as editor swap files and private env files out of commits and PRs.
 

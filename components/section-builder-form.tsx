@@ -44,32 +44,23 @@ export function SectionBuilderForm({
       <input type="hidden" name="bookId" value={bookId} />
       {section ? <input type="hidden" name="sectionId" value={section.id} /> : null}
       <input type="hidden" name="existingExerciseCount" value={existingCount} />
+      <input type="hidden" name="position" value={String(section?.position ?? 1)} />
 
       <div className="page-panel p-5">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4">
           <label className="form-control w-full">
             <span className="label-text mb-2 text-sm font-medium text-base-content">Section title</span>
             <input
-              className="input input-bordered w-full"
+              className="input app-field w-full"
               name="title"
               defaultValue={section?.title ?? ""}
               placeholder="Triplet Grid"
             />
           </label>
           <label className="form-control w-full">
-            <span className="label-text mb-2 text-sm font-medium text-base-content">Position</span>
-            <input
-              className="input input-bordered w-full"
-              name="position"
-              type="number"
-              min={1}
-              defaultValue={section?.position ?? 1}
-            />
-          </label>
-          <label className="form-control w-full">
             <span className="label-text mb-2 text-sm font-medium text-base-content">Default goal tempo</span>
             <input
-              className="input input-bordered w-full"
+              className="input app-field w-full"
               name="defaultGoalTempo"
               type="number"
               min={1}
@@ -96,7 +87,7 @@ export function SectionBuilderForm({
           <label className="form-control w-full">
             <span className="label-text mb-2 text-sm font-medium text-base-content">New exercises</span>
             <input
-              className="input input-bordered w-full"
+              className="input app-field w-full"
               name="exerciseCount"
               type="number"
               min={0}
@@ -118,7 +109,7 @@ export function SectionBuilderForm({
           <label className="form-control w-full">
             <span className="label-text mb-2 text-sm font-medium text-base-content">Prefix</span>
             <input
-              className="input input-bordered w-full"
+              className="input app-field w-full"
               name="exercisePrefix"
               value={prefix}
               onChange={(event) => setPrefix(event.target.value)}
