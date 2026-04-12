@@ -5,7 +5,13 @@ import { ReactNode, useState } from "react";
 import { NavLink } from "@/components/nav-link";
 import { navigationItems } from "@/lib/navigation";
 
-export function AppShell({ children }: { children: ReactNode }) {
+type AppShellProps = {
+  authConfigured: boolean;
+  children: ReactNode;
+  userEmail: string | null;
+};
+
+export function AppShell({ authConfigured, children, userEmail }: AppShellProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -43,8 +49,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                 />
               ))}
             </nav>
-            <div className="mt-auto rounded-[1.5rem] bg-secondary/10 p-4 text-sm leading-6 text-base-content/80">
-              Active session recovery, auth, and persistent user state will slot into this shell next.
+            <div className="mt-auto space-y-4">
+              <div className="rounded-[1.5rem] bg-secondary/10 p-4 text-sm leading-6 text-base-content/80">
+                {authConfigured
+                  ? userEmail ?? "Signed in"
+                  : "Supabase not configured yet. Add env vars to test the authenticated shell."}
+              </div>
+              {authConfigured && userEmail ? (
+                <form action="/auth/signout" method="post">
+                  <button className="btn btn-ghost w-full justify-start rounded-[1.15rem] border border-base-300">
+                    Sign out
+                  </button>
+                </form>
+              ) : null}
             </div>
           </div>
         </aside>

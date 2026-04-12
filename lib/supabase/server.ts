@@ -23,3 +23,17 @@ export async function getSupabaseServerClient() {
     },
   });
 }
+
+export async function getSupabaseUser() {
+  const client = await getSupabaseServerClient();
+
+  if (!client) {
+    return null;
+  }
+
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+
+  return user;
+}
