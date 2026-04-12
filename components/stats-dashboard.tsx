@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { LibrarySnapshot } from "@/lib/data/library";
+import { FormSelect } from "@/components/form-select";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
 type StatsDashboardProps = {
@@ -57,19 +57,15 @@ export function StatsDashboard({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-base-300/70 bg-base-100/85 p-6 shadow-sm backdrop-blur md:p-8">
+      <section className="page-hero p-6 md:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-secondary">Stats</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              See what is actually improving.
+            <p className="eyebrow">Stats</p>
+            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
+              See what is improving.
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-base-content/75 md:text-base">
-              Stats now read from the live backend. Choose an exercise or song for progress-to-goal, or a
-              book to measure how much of it has crossed its target tempos.
-            </p>
           </div>
-          <div className="rounded-[1.5rem] bg-base-200/70 px-5 py-4 text-sm text-base-content/75">
+          <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
             {snapshot.books.length} books · {snapshot.artists.length} artists
           </div>
         </div>
@@ -77,30 +73,22 @@ export function StatsDashboard({
 
       <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/85 p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-base-content">Progress to goal tempo</h2>
+          <section className="page-panel p-6">
+            <h2 className="font-display text-xl font-semibold text-base-content">Progress to goal tempo</h2>
             <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
-              <label className="form-control w-full">
-                <span className="label-text mb-2 text-sm font-medium text-base-content">Exercise or song</span>
-                <select className="select select-bordered w-full" name="item" defaultValue={selectedItemKey ?? ""}>
-                  <option value="">Select an item</option>
-                  {itemOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-control w-full">
-                <span className="label-text mb-2 text-sm font-medium text-base-content">Range</span>
-                <select className="select select-bordered w-full" name="range" defaultValue={selectedRange}>
-                  {ranges.map((range) => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <FormSelect
+                label="Exercise or song"
+                name="item"
+                defaultValue={selectedItemKey ?? ""}
+                emptyLabel="Select an item"
+                options={itemOptions}
+              />
+              <FormSelect
+                label="Range"
+                name="range"
+                defaultValue={selectedRange}
+                options={ranges.map((range) => ({ value: range.value, label: range.label }))}
+              />
               <button className="btn btn-primary">Show progress</button>
             </form>
 
@@ -110,7 +98,7 @@ export function StatsDashboard({
                   <StatCard label="Current max tempo" value={`${itemProgress.currentMaxTempo} BPM`} />
                   <StatCard label="Goal tempo" value={`${itemProgress.goalTempo} BPM`} />
                 </div>
-                <div className="rounded-[1.25rem] bg-base-200/55 p-4">
+                <div className="section-panel p-4">
                   <p className="text-sm font-medium text-base-content">Progress points</p>
                   <div className="mt-4 space-y-3">
                     {itemProgress.progress.length ? (
@@ -135,35 +123,27 @@ export function StatsDashboard({
               </div>
             ) : (
               <div className="mt-6">
-                <EmptyBox label="Choose an exercise or song to view progress toward its goal tempo." />
+                <EmptyBox label="Choose an exercise or song to see progress." />
               </div>
             )}
           </section>
 
-          <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/85 p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-base-content">Book completion</h2>
+          <section className="page-panel p-6">
+            <h2 className="font-display text-xl font-semibold text-base-content">Book completion</h2>
             <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
-              <label className="form-control w-full">
-                <span className="label-text mb-2 text-sm font-medium text-base-content">Book</span>
-                <select className="select select-bordered w-full" name="book" defaultValue={selectedBookId ?? ""}>
-                  <option value="">Select a book</option>
-                  {snapshot.books.map((book) => (
-                    <option key={book.id} value={book.id}>
-                      {book.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-control w-full">
-                <span className="label-text mb-2 text-sm font-medium text-base-content">Range</span>
-                <select className="select select-bordered w-full" name="range" defaultValue={selectedRange}>
-                  {ranges.map((range) => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <FormSelect
+                label="Book"
+                name="book"
+                defaultValue={selectedBookId ?? ""}
+                emptyLabel="Select a book"
+                options={snapshot.books.map((book) => ({ value: book.id, label: book.title }))}
+              />
+              <FormSelect
+                label="Range"
+                name="range"
+                defaultValue={selectedRange}
+                options={ranges.map((range) => ({ value: range.value, label: range.label }))}
+              />
               <button className="btn btn-primary">Show completion</button>
             </form>
 
@@ -185,22 +165,13 @@ export function StatsDashboard({
               </div>
             ) : (
               <div className="mt-6">
-                <EmptyBox label="Choose a book to see how many exercises have reached their goal tempos." />
+                <EmptyBox label="Choose a book to see completion." />
               </div>
             )}
           </section>
         </div>
 
-        <div className="space-y-6">
-          <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/80 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-base-content">Data source</h2>
-            <p className="mt-3 text-sm leading-6 text-base-content/75">
-              These stats read from recorded session items. If you do not see useful output yet, log material
-              in <Link href="/sessions" className="link">Sessions</Link> and define goal tempos in
-              <Link href="/library" className="link ml-1">Library</Link>.
-            </p>
-          </section>
-        </div>
+        <div className="space-y-6" />
       </section>
     </div>
   );
@@ -208,7 +179,7 @@ export function StatsDashboard({
 
 function EmptyBox({ label }: { label: string }) {
   return (
-    <div className="rounded-[1.25rem] border border-dashed border-base-300 bg-base-100 px-4 py-4 text-sm text-base-content/65">
+    <div className="empty-box px-4 py-4 text-sm">
       {label}
     </div>
   );
@@ -216,7 +187,7 @@ function EmptyBox({ label }: { label: string }) {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[1.25rem] bg-base-200/70 px-4 py-4">
+    <div className="soft-stat px-4 py-4">
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-base-content/55">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-base-content">{value}</p>
     </div>

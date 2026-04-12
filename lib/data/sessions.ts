@@ -60,6 +60,37 @@ export async function startSession(input: SessionStartInput = {}) {
     .single();
 
   if (error) throw error;
+
+  if (input.sourceSetlistId) {
+    const { data: setlistItems, error: setlistItemsError } = await client
+      .from("setlist_items")
+      .select("item_type, exercise_id, song_id, position, exercise:exercises(goal_tempo), song:songs(goal_tempo)")
+      .eq("user_id", user.id)
+      .eq("setlist_id", input.sourceSetlistId)
+      .order("position");
+
+    if (setlistItemsError) throw setlistItemsError;
+
+    if (setlistItems?.length) {
+      const { error: preloadError } = await client.from("practice_session_items").insert(
+        setlistItems.map((item) => ({
+          user_id: user.id,
+          practice_session_id: data.id,
+          item_type: item.item_type,
+          exercise_id: item.exercise_id,
+          song_id: item.song_id,
+          display_order: item.position,
+          tempo:
+            item.item_type === "exercise"
+              ? item.exercise?.[0]?.goal_tempo ?? 60
+              : item.song?.[0]?.goal_tempo ?? 60,
+        })),
+      );
+
+      if (preloadError) throw preloadError;
+    }
+  }
+
   return data;
 }
 

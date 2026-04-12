@@ -5,8 +5,9 @@ import {
   pauseSessionAction,
   resumeSessionAction,
   startSessionAction,
-  updateSessionNotesAction,
+  updateSessionItemAction,
 } from "@/app/(app)/sessions/actions";
+import { FormSelect } from "@/components/form-select";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
@@ -67,34 +68,28 @@ export function SessionsDashboard({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-base-300/70 bg-base-100/85 p-6 shadow-sm backdrop-blur md:p-8">
+      <section className="page-hero p-6 md:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-secondary">Sessions</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              Start fast, log clearly, edit later.
+            <p className="eyebrow">Sessions</p>
+            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
+              Log practice as you go.
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-base-content/75 md:text-base">
-              Sessions now run against the real backend. You can start from scratch or from a setlist,
-              attach exercises and songs, update tempos, and close the session with notes.
-            </p>
           </div>
-          <div className="rounded-[1.5rem] bg-base-200/70 px-5 py-4 text-sm text-base-content/75">
+          <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
             {currentSession ? "An active session is in progress." : "No active session right now."}
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+      <section className="grid gap-6">
         <div className="space-y-6">
           {currentSession ? (
-            <section className="rounded-[1.75rem] border border-primary/20 bg-base-100/85 p-6 shadow-sm">
+            <section className="page-panel p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary">
-                    Active Session
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-base-content">
+                  <p className="eyebrow">Active Session</p>
+                  <h2 className="font-display mt-2 text-2xl font-semibold text-base-content">
                     Started {formatDateTime(currentSession.started_at)}
                   </h2>
                   <p className="mt-2 text-sm text-base-content/70">
@@ -117,30 +112,65 @@ export function SessionsDashboard({
                 </div>
               </div>
 
-              <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-                <div className="space-y-4 rounded-[1.5rem] bg-base-200/55 p-4">
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-base-content/60">
-                    Logged Items
-                  </h3>
+              <div className="mt-6 space-y-6">
+                <div className="section-panel space-y-4 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-base-content">Logged items</h3>
+                    <span className="text-sm text-base-content/50">Ordered by slot</span>
+                  </div>
                   {currentSession.session_items?.length ? (
                     currentSession.session_items
                       .slice()
                       .sort((left, right) => left.display_order - right.display_order)
                       .map((item) => (
-                        <div key={item.id} className="rounded-[1rem] bg-base-100 p-4 shadow-sm">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
+                        <div key={item.id} className="accent-card p-4">
+                          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                            <div className="min-w-0">
                               <p className="font-medium text-base-content">{labelSessionItem(item, itemMaps)}</p>
-                              <p className="text-sm text-base-content/65">{item.tempo} BPM</p>
                             </div>
-                            <form action={deleteSessionItemAction}>
-                              <input type="hidden" name="sessionItemId" value={item.id} />
-                              <FormSubmitButton
-                                label="Remove"
-                                pendingLabel="Removing..."
-                                className="btn btn-ghost btn-xs border border-base-300"
-                              />
-                            </form>
+                            <div className="flex flex-col gap-3 lg:items-end">
+                              <div className="grid gap-3 sm:grid-cols-[8rem_8rem_auto_auto] sm:items-end">
+                                <form action={updateSessionItemAction} className="contents">
+                                <input type="hidden" name="sessionId" value={currentSession.id} />
+                                <input type="hidden" name="itemType" value={item.item_type} />
+                                <input type="hidden" name="exerciseId" value={item.exercise_id ?? ""} />
+                                <input type="hidden" name="songId" value={item.song_id ?? ""} />
+                                <label className="form-control w-full">
+                                  <span className="label-text mb-2 text-sm font-medium text-base-content">Tempo</span>
+                                  <input
+                                    className="input input-bordered w-full"
+                                    name="tempo"
+                                    type="number"
+                                    min={1}
+                                    defaultValue={item.tempo}
+                                  />
+                                </label>
+                                <label className="form-control w-full">
+                                  <span className="label-text mb-2 text-sm font-medium text-base-content">Slot</span>
+                                  <input
+                                    className="input input-bordered w-full"
+                                    name="displayOrder"
+                                    type="number"
+                                    min={0}
+                                    defaultValue={item.display_order}
+                                  />
+                                </label>
+                                <FormSubmitButton
+                                  label="Save"
+                                  pendingLabel="Saving..."
+                                  className="btn btn-secondary btn-sm sm:mb-[0.15rem]"
+                                />
+                                </form>
+                              <form action={deleteSessionItemAction} className="sm:mb-[0.15rem]">
+                                <input type="hidden" name="sessionItemId" value={item.id} />
+                                <FormSubmitButton
+                                  label="Remove"
+                                  pendingLabel="Removing..."
+                                  className="btn btn-ghost btn-xs border border-base-300"
+                                />
+                              </form>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))
@@ -149,150 +179,93 @@ export function SessionsDashboard({
                   )}
                 </div>
 
-                <div className="space-y-4">
-                  <form action={addSessionItemAction} className="rounded-[1.5rem] border border-base-300/70 bg-base-100 p-4">
-                    <input type="hidden" name="sessionId" value={currentSession.id} />
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-base-content/60">
-                      Add item and tempo
-                    </h3>
-                    <div className="mt-4 space-y-3">
-                      <label className="form-control w-full">
-                        <span className="label-text mb-2 text-sm font-medium text-base-content">Library item</span>
-                        <select className="select select-bordered w-full" name="itemKey" defaultValue="">
-                          <option disabled value="">
-                            Select exercise or song
-                          </option>
-                          {itemOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <label className="form-control w-full">
-                          <span className="label-text mb-2 text-sm font-medium text-base-content">Tempo</span>
-                          <input className="input input-bordered w-full" name="tempo" type="number" min={1} />
-                        </label>
-                        <label className="form-control w-full">
-                          <span className="label-text mb-2 text-sm font-medium text-base-content">Display order</span>
-                          <input
-                            className="input input-bordered w-full"
-                            name="displayOrder"
-                            type="number"
-                            min={0}
-                            defaultValue={currentSession.session_items?.length ?? 0}
-                          />
-                        </label>
-                      </div>
-                      <FormSubmitButton label="Log item" pendingLabel="Logging..." />
-                    </div>
-                  </form>
-
-                  <form action={updateSessionNotesAction} className="rounded-[1.5rem] border border-base-300/70 bg-base-100 p-4">
-                    <input type="hidden" name="sessionId" value={currentSession.id} />
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-base-content/60">
-                      Session notes
-                    </h3>
-                    <textarea
-                      className="textarea textarea-bordered mt-4 min-h-32 w-full"
-                      name="notes"
-                      defaultValue={currentSession.notes ?? ""}
-                      placeholder="How did the session feel?"
+                <form action={addSessionItemAction} className="accent-card p-4">
+                  <input type="hidden" name="sessionId" value={currentSession.id} />
+                  <h3 className="text-lg font-semibold text-primary">Add item</h3>
+                  <div className="mt-4 space-y-3">
+                    <FormSelect
+                      label="Library item"
+                      name="itemKey"
+                      emptyLabel="Select exercise or song"
+                      options={itemOptions}
                     />
-                    <div className="mt-3">
-                      <FormSubmitButton label="Save notes" pendingLabel="Saving..." className="btn btn-secondary btn-sm" />
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <label className="form-control w-full">
+                        <span className="label-text mb-2 text-sm font-medium text-base-content">Tempo</span>
+                        <input className="input input-bordered w-full" name="tempo" type="number" min={1} />
+                      </label>
+                      <label className="form-control w-full">
+                        <span className="label-text mb-2 text-sm font-medium text-base-content">Display order</span>
+                        <input
+                          className="input input-bordered w-full"
+                          name="displayOrder"
+                          type="number"
+                          min={0}
+                          defaultValue={currentSession.session_items?.length ?? 0}
+                        />
+                      </label>
                     </div>
-                  </form>
+                    <FormSubmitButton label="Log item" pendingLabel="Logging..." />
+                  </div>
+                </form>
 
-                  <form action={endSessionAction} className="rounded-[1.5rem] border border-error/20 bg-error/5 p-4">
-                    <input type="hidden" name="sessionId" value={currentSession.id} />
-                    <input type="hidden" name="notes" value={currentSession.notes ?? ""} />
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-base-content/60">
-                      End session
-                    </h3>
-                    <p className="mt-2 text-sm text-base-content/70">
-                      Ends the active session and preserves the latest saved notes.
-                    </p>
-                    <div className="mt-4">
-                      <FormSubmitButton label="End session" pendingLabel="Ending..." className="btn btn-error btn-sm" />
+                <form action={endSessionAction} className="accent-card p-4">
+                  <input type="hidden" name="sessionId" value={currentSession.id} />
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-primary">Session notes</h3>
+                      <textarea
+                        className="textarea textarea-bordered mt-4 min-h-32 w-full"
+                        name="notes"
+                        defaultValue={currentSession.notes ?? ""}
+                        placeholder="How did the session feel?"
+                      />
                     </div>
-                  </form>
-                </div>
+                    <div className="md:pt-[2.7rem]">
+                      <FormSubmitButton label="End session" pendingLabel="Ending..." className="btn btn-error" />
+                    </div>
+                  </div>
+                </form>
               </div>
             </section>
           ) : (
-            <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/85 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-base-content">Start a session</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-base-content/75">
-                Start with a blank session or use a setlist as the starting point. You can still add more
-                items once the session is active.
-              </p>
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <form action={startSessionAction} className="rounded-[1.5rem] border border-base-300/70 bg-base-200/50 p-4">
-                  <h3 className="font-medium text-base-content">Start from scratch</h3>
-                  <p className="mt-2 text-sm text-base-content/70">
-                    Opens a session immediately with no starting setlist.
-                  </p>
-                  <div className="mt-4">
-                    <FormSubmitButton label="Start blank session" pendingLabel="Starting..." />
-                  </div>
-                </form>
-                <form action={startSessionAction} className="rounded-[1.5rem] border border-base-300/70 bg-base-200/50 p-4">
-                  <h3 className="font-medium text-base-content">Start from setlist</h3>
-                  <p className="mt-2 text-sm text-base-content/70">
-                    Use one of your saved setlists as the source for the session.
-                  </p>
-                  <label className="form-control mt-4 w-full">
-                    <span className="label-text mb-2 text-sm font-medium text-base-content">Setlist</span>
-                    <select className="select select-bordered w-full" name="sourceSetlistId" defaultValue="">
-                      <option value="">No setlist selected</option>
-                      {librarySnapshot.setlists.map((setlist) => (
-                        <option key={setlist.id} value={setlist.id}>
-                          {setlist.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <div className="mt-4">
-                    <FormSubmitButton label="Start from setlist" pendingLabel="Starting..." />
-                  </div>
-                </form>
-              </div>
+            <section className="page-panel p-6">
+              <h2 className="font-display text-xl font-semibold text-base-content">Start a session</h2>
+              <form action={startSessionAction} className="mt-5 accent-card p-5">
+                <FormSelect
+                  label="Setlist"
+                  name="sourceSetlistId"
+                  emptyLabel="Scratch"
+                  options={librarySnapshot.setlists.map((setlist) => ({
+                    value: setlist.id,
+                    label: setlist.name,
+                  }))}
+                />
+                <div className="mt-4">
+                  <FormSubmitButton label="Start session" pendingLabel="Starting..." />
+                </div>
+              </form>
             </section>
           )}
 
-          <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/85 p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-base-content">Recent sessions</h2>
+          {!currentSession ? (
+          <section className="page-panel p-6">
+            <h2 className="font-display text-xl font-semibold text-base-content">Recent sessions</h2>
             <div className="mt-5 space-y-3">
               {recentSessions.length ? (
                 recentSessions.map((session) => (
-                  <div key={session.id} className="rounded-[1.25rem] bg-base-200/55 p-4">
-                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                  <div key={session.id} className="accent-card p-4">
+                    <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-medium text-base-content">{formatDateTime(session.started_at)}</p>
-                        <p className="text-sm text-base-content/65">
-                          {session.ended_at ? `Ended ${formatDateTime(session.ended_at)}` : "Still active"}
-                        </p>
+                        <p className="text-sm text-base-content/65">{formatDurationLabel(session.started_at, session.ended_at)}</p>
                       </div>
-                      <span className="badge badge-outline">
+                      <span className="chip chip-neutral">
                         {(session.session_items?.length ?? 0)} item{(session.session_items?.length ?? 0) === 1 ? "" : "s"}
                       </span>
                     </div>
                     {session.notes ? (
                       <p className="mt-3 text-sm leading-6 text-base-content/75">{session.notes}</p>
-                    ) : null}
-                    {session.session_items?.length ? (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {session.session_items
-                          .slice()
-                          .sort((left, right) => left.display_order - right.display_order)
-                          .map((item) => (
-                            <span key={item.id} className="badge badge-neutral badge-outline">
-                              {labelSessionItem(item, itemMaps)} · {item.tempo}
-                            </span>
-                          ))}
-                      </div>
                     ) : null}
                   </div>
                 ))
@@ -301,24 +274,7 @@ export function SessionsDashboard({
               )}
             </div>
           </section>
-        </div>
-
-        <div className="space-y-6">
-          <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/80 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-base-content">Available material</h2>
-            <p className="mt-2 text-sm leading-6 text-base-content/75">
-              Sessions pull from your library. Add more books, exercises, artists, and songs from the Library page.
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <StatCard label="Books" value={String(librarySnapshot.books.length)} />
-              <StatCard
-                label="Exercises"
-                value={String(Array.from(itemMaps.exerciseMap.keys()).length)}
-              />
-              <StatCard label="Setlists" value={String(librarySnapshot.setlists.length)} />
-              <StatCard label="Songs" value={String(Array.from(itemMaps.songMap.keys()).length)} />
-            </div>
-          </section>
+          ) : null}
         </div>
       </section>
     </div>
@@ -327,17 +283,8 @@ export function SessionsDashboard({
 
 function EmptyBox({ label }: { label: string }) {
   return (
-    <div className="rounded-[1.25rem] border border-dashed border-base-300 bg-base-100 px-4 py-4 text-sm text-base-content/65">
+    <div className="empty-box px-4 py-4 text-sm">
       {label}
-    </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[1.25rem] bg-base-200/70 px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-base-content/55">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-base-content">{value}</p>
     </div>
   );
 }
@@ -366,4 +313,18 @@ function formatDateTime(value: string) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function formatDurationLabel(startedAt: string, endedAt: string | null) {
+  const start = new Date(startedAt).getTime();
+  const end = new Date(endedAt ?? Date.now()).getTime();
+  const totalMinutes = Math.max(1, Math.round((end - start) / 60000));
+
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+
+  return `${totalMinutes}m`;
 }

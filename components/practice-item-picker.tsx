@@ -52,13 +52,11 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
   const selectedItems = Object.keys(selected).filter((key) => selected[key]);
 
   return (
-    <section className="rounded-[1.75rem] border border-base-300/70 bg-base-100/80 p-6 shadow-sm">
+    <section className="page-panel p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-secondary">
-            Nested Picker
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-base-content">
+          <p className="eyebrow">Nested Picker</p>
+          <h2 className="font-display mt-2 text-xl font-semibold text-base-content">
             Reusable practice item selector
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-base-content/75">
@@ -76,7 +74,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
           />
         </label>
       </div>
-      <div className="mt-4 rounded-[1.25rem] bg-base-200/70 px-4 py-3 text-sm text-base-content/75">
+      <div className="soft-stat mt-4 px-4 py-3 text-sm text-base-content/75">
         {selectedItems.length
           ? `${selectedItems.length} item${selectedItems.length === 1 ? "" : "s"} selected`
           : "Select a few exercises or songs to preview later session and setlist behavior."}
@@ -88,12 +86,12 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
           </h3>
           {filtered.books.length ? (
             filtered.books.map((book) => (
-              <div key={book.id} className="rounded-[1.5rem] border border-base-300/70 bg-base-100 p-4">
+              <div key={book.id} className="accent-card p-4">
                 <p className="text-base font-semibold text-base-content">{book.title}</p>
                 <p className="text-sm text-base-content/65">{book.composer || "No composer set"}</p>
                 <div className="mt-3 space-y-3">
                   {book.sections.map((section) => (
-                    <div key={section.id} className="rounded-[1rem] bg-base-200/70 p-3">
+                    <div key={section.id} className="section-panel p-3">
                       <p className="text-sm font-semibold text-base-content">{section.title}</p>
                       <div className="mt-2 space-y-2">
                         {section.exercises.map((exercise) => {
@@ -102,7 +100,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
                           return (
                             <label
                               key={exercise.id}
-                              className="flex items-center justify-between gap-3 rounded-xl bg-base-100 px-3 py-2 text-sm"
+                                className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 text-sm"
                             >
                               <span>{exercise.title}</span>
                               <input
@@ -126,7 +124,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
               </div>
             ))
           ) : (
-            <div className="rounded-[1.5rem] border border-dashed border-base-300 bg-base-100 p-5 text-sm text-base-content/65">
+            <div className="empty-box p-5 text-sm">
               No matching exercises yet.
             </div>
           )}
@@ -137,7 +135,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
           </h3>
           {filtered.artists.length ? (
             filtered.artists.map((artist) => (
-              <div key={artist.id} className="rounded-[1.5rem] border border-base-300/70 bg-base-100 p-4">
+              <div key={artist.id} className="accent-card p-4">
                 <p className="text-base font-semibold text-base-content">{artist.name}</p>
                 <div className="mt-3 space-y-2">
                   {artist.songs.map((song) => {
@@ -146,7 +144,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
                     return (
                       <label
                         key={song.id}
-                        className="flex items-center justify-between gap-3 rounded-xl bg-base-200/70 px-3 py-2 text-sm"
+                        className="flex items-center justify-between gap-3 rounded-xl bg-base-200/85 px-3 py-2 text-sm"
                       >
                         <span>{song.title}</span>
                         <input
@@ -167,7 +165,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
               </div>
             ))
           ) : (
-            <div className="rounded-[1.5rem] border border-dashed border-base-300 bg-base-100 p-5 text-sm text-base-content/65">
+            <div className="empty-box p-5 text-sm">
               No matching songs yet.
             </div>
           )}

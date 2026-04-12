@@ -1,10 +1,11 @@
 ---
 # get-practice-pal-shf7
 title: Beautification
-status: todo
+status: in-progress
 type: milestone
+priority: normal
 created_at: 2026-04-12T00:22:22Z
-updated_at: 2026-04-12T00:22:22Z
+updated_at: 2026-04-12T07:08:37Z
 ---
 
 Polish the MVP UI with better CSS, stronger consistency, and a cleaner practice-first experience across devices.

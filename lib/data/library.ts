@@ -152,6 +152,30 @@ export async function createExercise(input: ExerciseInsert) {
   return data;
 }
 
+export async function createExercisesBatch(inputs: ExerciseInsert[]) {
+  if (!inputs.length) {
+    return [];
+  }
+
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("exercises")
+    .insert(
+      inputs.map((input) => ({
+        user_id: user.id,
+        section_id: input.sectionId,
+        title: input.title,
+        position: input.position,
+        goal_tempo: input.goalTempo ?? null,
+      })),
+    )
+    .select();
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function updateExercise(
   exerciseId: string,
   input: {
