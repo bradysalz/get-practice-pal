@@ -28,16 +28,11 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
             isOpen ? "translate-x-0" : "-translate-x-[120%] md:translate-x-0"
           }`}
         >
-          <div className="flex h-full flex-col rounded-[2rem] border border-base-300/70 bg-base-100/92 p-5 shadow-sm backdrop-blur md:sticky md:top-6 md:min-h-[calc(100vh-3rem)]">
+          <div className="app-shell-surface flex h-full flex-col rounded-[2rem] p-5 md:sticky md:top-6 md:min-h-[calc(100vh-3rem)]">
             <Link href="/sessions" className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-secondary">
-                PracticePal
-              </p>
-              <h1 className="text-2xl font-semibold text-base-content">Practice-first tracking</h1>
+              <p className="eyebrow">PracticePal</p>
+              <h1 className="font-display text-3xl font-semibold text-base-content">Practice tracking</h1>
             </Link>
-            <p className="mt-3 text-sm leading-6 text-base-content/70">
-              A focused shell for sessions, setlists, library structure, and progress.
-            </p>
             <nav className="mt-8 flex flex-col gap-2">
               {navigationItems.map((item) => (
                 <NavLink
@@ -50,14 +45,14 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
               ))}
             </nav>
             <div className="mt-auto space-y-4">
-              <div className="rounded-[1.5rem] bg-secondary/10 p-4 text-sm leading-6 text-base-content/80">
+              <div className="rounded-[1.25rem] border border-base-300/70 bg-base-200/70 p-4 text-sm leading-6 text-base-content/80">
                 {authConfigured
                   ? userEmail ?? "Signed in"
-                  : "Supabase not configured yet. Add env vars to test the authenticated shell."}
+                  : "Supabase is not configured yet."}
               </div>
               {authConfigured && userEmail ? (
                 <form action="/auth/signout" method="post">
-                  <button className="btn btn-ghost w-full justify-start rounded-[1.15rem] border border-base-300">
+                  <button className="btn btn-ghost w-full justify-start border-base-300/80">
                     Sign out
                   </button>
                 </form>
@@ -66,16 +61,14 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
           </div>
         </aside>
         <main className="flex-1 md:pl-0">
-          <div className="mb-4 flex items-center justify-between rounded-[1.5rem] border border-base-300/70 bg-base-100/75 px-4 py-3 shadow-sm backdrop-blur md:hidden">
+          <div className="app-shell-surface mb-4 flex items-center justify-between rounded-[1.5rem] px-4 py-3 md:hidden">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary">
-                PracticePal
-              </p>
-              <p className="text-sm text-base-content/70">Menu-based side rail</p>
+              <p className="eyebrow">PracticePal</p>
+              <p className="text-sm text-base-content/70">Responsive side rail</p>
             </div>
             <button
               type="button"
-              className="btn btn-ghost btn-sm rounded-xl border border-base-300"
+              className="btn btn-ghost btn-sm border-base-300/80"
               onClick={() => setIsOpen((open) => !open)}
             >
               {isOpen ? "Close" : "Menu"}

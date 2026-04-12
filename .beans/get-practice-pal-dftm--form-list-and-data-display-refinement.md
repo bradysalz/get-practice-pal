@@ -1,11 +1,11 @@
 ---
 # get-practice-pal-dftm
 title: Form, list, and data-display refinement
-status: todo
+status: in-progress
 type: epic
 priority: normal
 created_at: 2026-04-12T00:23:08Z
-updated_at: 2026-04-12T00:23:27Z
+updated_at: 2026-04-12T07:54:26Z
 parent: get-practice-pal-shf7
 ---
 

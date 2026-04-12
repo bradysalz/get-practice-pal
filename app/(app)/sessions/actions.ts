@@ -73,6 +73,22 @@ export async function addSessionItemAction(formData: FormData) {
   revalidateSessions();
 }
 
+export async function updateSessionItemAction(formData: FormData) {
+  const itemType = String(formData.get("itemType") ?? "");
+  const displayOrder = Number(String(formData.get("displayOrder") ?? "0"));
+
+  await upsertSessionItem({
+    sessionId: String(formData.get("sessionId") ?? ""),
+    itemType: itemType === "song" ? "song" : "exercise",
+    exerciseId: itemType === "exercise" ? String(formData.get("exerciseId") ?? "") || null : null,
+    songId: itemType === "song" ? String(formData.get("songId") ?? "") || null : null,
+    tempo: parseTempo(formData.get("tempo")),
+    displayOrder: Number.isFinite(displayOrder) ? displayOrder : 0,
+  });
+
+  revalidateSessions();
+}
+
 export async function deleteSessionItemAction(formData: FormData) {
   await deleteSessionItem(String(formData.get("sessionItemId") ?? ""));
   revalidateSessions();

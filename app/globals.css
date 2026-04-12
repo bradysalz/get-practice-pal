@@ -6,34 +6,38 @@
   default: true;
   prefersdark: false;
   color-scheme: light;
-  --color-base-100: #f6f4ee;
-  --color-base-200: #ece8de;
-  --color-base-300: #ddd6c6;
-  --color-base-content: #1f2937;
-  --color-primary: #31525b;
-  --color-primary-content: #f7fbfb;
-  --color-secondary: #8b6f47;
-  --color-secondary-content: #fffaf2;
-  --color-accent: #7a9e7e;
-  --color-accent-content: #102014;
-  --color-neutral: #2a2d34;
-  --color-neutral-content: #f5f5f5;
-  --color-info: #5c8db8;
-  --color-success: #5b8f69;
-  --color-warning: #d19d3f;
-  --color-error: #c85d4a;
+  --color-base-100: #ffffff;
+  --color-base-200: #f8fafc;
+  --color-base-300: #e2e8f0;
+  --color-base-content: #1e293b;
+  --color-primary: #ef4444;
+  --color-primary-content: #fffaf9;
+  --color-secondary: #ffedd5;
+  --color-secondary-content: #7c2d12;
+  --color-accent: #3b82f6;
+  --color-accent-content: #eff6ff;
+  --color-neutral: #0f172a;
+  --color-neutral-content: #f8fafc;
+  --color-info: #3b82f6;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
   --radius-selector: 1rem;
-  --radius-field: 0.9rem;
-  --radius-box: 1.25rem;
+  --radius-field: 1rem;
+  --radius-box: 1.5rem;
 }
 
 @theme inline {
-  --font-sans: "Instrument Sans", "Segoe UI", sans-serif;
+  --font-sans: "Inter", "Aptos", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Avenir Next", "Inter", "Segoe UI", sans-serif;
 }
 
 :root {
   --page-gutter: 1rem;
-  --page-max-width: 84rem;
+  --page-max-width: 90rem;
+  --app-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  --card-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  --soft-border: rgba(148, 163, 184, 0.22);
 }
 
 html,
@@ -43,10 +47,11 @@ body {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top left, rgba(122, 158, 126, 0.12), transparent 32%),
-    linear-gradient(180deg, #f6f4ee 0%, #efebe2 100%);
-  color: #1f2937;
+  background: #f8fafc;
+  color: #1e293b;
+  font-family: "Inter", "Aptos", "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 a {
@@ -56,4 +61,233 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: "Space Grotesk", "Avenir Next", "Inter", "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+::selection {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.app-shell-surface {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--soft-border);
+  box-shadow: var(--app-shadow);
+}
+
+.page-hero {
+  border-radius: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+  box-shadow: var(--card-shadow);
+}
+
+.page-panel {
+  border-radius: 1.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #ffffff;
+  box-shadow: var(--card-shadow);
+}
+
+.section-panel {
+  border-radius: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #f8fafc;
+}
+
+.accent-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: white;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+.soft-stat {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(251, 146, 60, 0.12);
+  background: #fff7ed;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #dc2626;
+}
+
+.empty-box {
+  border-radius: 1.25rem;
+  border: 1px dashed rgba(148, 163, 184, 0.42);
+  background: rgba(248, 250, 252, 0.9);
+  color: rgba(30, 41, 59, 0.68);
+}
+
+.section-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  background: transparent;
+  padding: 0;
+  color: #dc2626;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 146, 60, 0.22);
+  background: #fff7ed;
+  padding: 0.38rem 0.72rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #7c2d12;
+}
+
+.chip-neutral {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(248, 250, 252, 0.92);
+  color: #334155;
+}
+
+.btn {
+  border-radius: 1rem;
+  border-width: 1px;
+  font-weight: 600;
+  box-shadow: none;
+  font-size: 0.98rem;
+  min-height: 3rem;
+  padding-inline: 1rem;
+}
+
+.btn-primary {
+  border-color: rgba(220, 38, 38, 0.18);
+  background: #ef4444;
+}
+
+.btn-secondary {
+  border-color: rgba(249, 115, 22, 0.2);
+  background: #f97316;
+  color: #fff7ed;
+}
+
+.btn-accent {
+  border-color: rgba(59, 130, 246, 0.18);
+  background: #3b82f6;
+  color: #eff6ff;
+}
+
+.btn-ghost {
+  background: #ffffff;
+}
+
+.input,
+.select,
+.textarea {
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.96);
+  font-size: 1rem;
+  min-height: 3.25rem;
+  padding-inline: 1rem;
+  border-radius: 1rem;
+}
+
+.textarea {
+  padding-block: 0.9rem;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.22rem rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.label-text {
+  font-size: 0.95rem;
+}
+
+.form-select-trigger {
+  display: flex;
+  min-height: 3.25rem;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  color: #1e293b;
+  list-style: none;
+}
+
+.form-select-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.form-select-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.22rem rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.form-select-chevron {
+  flex: 0 0 auto;
+  color: rgba(30, 41, 59, 0.48);
+}
+
+.form-select-menu {
+  margin-top: 0.3rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.form-select-menu li > button {
+  min-height: 2.7rem;
+  border-radius: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.form-select-active {
+  background: rgba(239, 68, 68, 0.08);
+  color: #991b1b;
+}
+
+.progress {
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.88);
+}
+
+.progress::-webkit-progress-bar {
+  background: rgba(226, 232, 240, 0.88);
+}
+
+.progress::-webkit-progress-value {
+  border-radius: 999px;
+}
+
+.progress-primary::-webkit-progress-value {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.progress-secondary::-webkit-progress-value {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ef4444, #f97316);
 }

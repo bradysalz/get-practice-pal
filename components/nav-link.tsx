@@ -18,13 +18,21 @@ export function NavLink({ href, icon, label, onNavigate }: NavLinkProps) {
     <Link
       href={href}
       onClick={onNavigate}
-      className={`flex items-center gap-3 rounded-[1.15rem] px-4 py-3 transition ${
+      className={`group flex items-center gap-3 rounded-[1.15rem] border px-4 py-3 transition ${
         isActive
-          ? "bg-primary text-primary-content shadow-sm"
-          : "text-base-content/75 hover:bg-base-200 hover:text-base-content"
+          ? "border-primary/18 bg-red-50 text-base-content"
+          : "border-transparent text-base-content/75 hover:border-base-300/70 hover:bg-base-200/85 hover:text-base-content"
       }`}
     >
-      <span className="text-lg">{icon}</span>
+      <span
+        className={`flex h-9 w-9 items-center justify-center rounded-full text-lg transition ${
+          isActive
+            ? "bg-primary text-primary-content"
+            : "bg-base-200 text-base-content/75 group-hover:bg-white group-hover:text-primary"
+        }`}
+      >
+        {icon}
+      </span>
       <span className="font-medium">{label}</span>
     </Link>
   );

@@ -13,6 +13,14 @@ function revalidateSetlists() {
   revalidatePath("/sessions");
 }
 
+function revalidateSetlistsForPath(path: string | null) {
+  revalidateSetlists();
+
+  if (path) {
+    revalidatePath(path);
+  }
+}
+
 export async function createSetlistAction(formData: FormData) {
   await createSetlist({
     name: String(formData.get("name") ?? "").trim(),
@@ -23,18 +31,21 @@ export async function createSetlistAction(formData: FormData) {
 }
 
 export async function updateSetlistAction(formData: FormData) {
+  const returnPath = String(formData.get("returnPath") ?? "").trim() || null;
+
   await updateSetlist(String(formData.get("setlistId") ?? ""), {
     name: String(formData.get("name") ?? "").trim(),
     description: String(formData.get("description") ?? "").trim() || null,
   });
 
-  revalidateSetlists();
+  revalidateSetlistsForPath(returnPath);
 }
 
 export async function addSetlistItemAction(formData: FormData) {
   const rawItem = String(formData.get("itemKey") ?? "");
   const [itemType, itemId] = rawItem.split(":");
   const position = Number(String(formData.get("position") ?? "0"));
+  const returnPath = String(formData.get("returnPath") ?? "").trim() || null;
 
   await addSetlistItem({
     setlistId: String(formData.get("setlistId") ?? ""),
@@ -44,10 +55,11 @@ export async function addSetlistItemAction(formData: FormData) {
     position: Number.isFinite(position) ? position : 0,
   });
 
-  revalidateSetlists();
+  revalidateSetlistsForPath(returnPath);
 }
 
 export async function deleteSetlistItemAction(formData: FormData) {
+  const returnPath = String(formData.get("returnPath") ?? "").trim() || null;
   await deleteSetlistItem(String(formData.get("setlistItemId") ?? ""));
-  revalidateSetlists();
+  revalidateSetlistsForPath(returnPath);
 }
