@@ -1,18 +1,23 @@
-import { HostPage } from "@/components/host-page";
+import { SessionsDashboard } from "@/components/sessions-dashboard";
+import { getLibrarySnapshot } from "@/lib/data/library";
+import { getCurrentSession, getSessionById, listRecentSessions } from "@/lib/data/sessions";
 
-export default function SessionsPage() {
+export default async function SessionsPage() {
+  const [librarySnapshot, recentSessions, currentSessionSummary] = await Promise.all([
+    getLibrarySnapshot(),
+    listRecentSessions(),
+    getCurrentSession(),
+  ]);
+
+  const currentSession = currentSessionSummary
+    ? await getSessionById(currentSessionSummary.id)
+    : null;
+
   return (
-    <HostPage
-      eyebrow="Sessions"
-      title="Practice sessions should start fast."
-      description="This host page is ready for the timer, resume flow, and post-session editing work that lands in the next milestone."
-      primaryCta="Start session"
-      secondaryCta="Resume active session"
-      highlights={[
-        "Quick entry point for a new session",
-        "Reserved slot for active-session recovery",
-        "Recent sessions list and edit surface",
-      ]}
+    <SessionsDashboard
+      currentSession={currentSession}
+      librarySnapshot={librarySnapshot}
+      recentSessions={recentSessions}
     />
   );
 }

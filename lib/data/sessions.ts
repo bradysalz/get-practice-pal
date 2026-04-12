@@ -32,6 +32,20 @@ export async function listRecentSessions(limit = 10) {
   return data ?? [];
 }
 
+export async function getSessionById(sessionId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("practice_sessions")
+    .select("id, started_at, ended_at, paused_at, is_paused, notes, source_setlist_id, session_items:practice_session_items(id, item_type, exercise_id, song_id, tempo, display_order)")
+    .eq("id", sessionId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function startSession(input: SessionStartInput = {}) {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -85,27 +99,59 @@ export async function upsertSessionItem(input: SessionItemUpsertInput) {
   validateTempo(input.tempo);
   assertPracticeItemReference(input);
 
-  const { data, error } = await client
+  const itemPatch = {
+    user_id: user.id,
+    practice_session_id: input.sessionId,
+    item_type: input.itemType,
+    exercise_id: input.exerciseId ?? null,
+    song_id: input.songId ?? null,
+    tempo: input.tempo,
+    display_order: input.displayOrder,
+  };
+
+  let existingQuery = client
     .from("practice_session_items")
-    .upsert(
-      {
-        user_id: user.id,
-        practice_session_id: input.sessionId,
-        item_type: input.itemType,
-        exercise_id: input.exerciseId ?? null,
-        song_id: input.songId ?? null,
-        tempo: input.tempo,
-        display_order: input.displayOrder,
-      },
-      {
-        onConflict: "practice_session_id,item_type,exercise_id,song_id",
-      },
-    )
-    .select()
-    .single();
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("practice_session_id", input.sessionId)
+    .eq("item_type", input.itemType);
+
+  existingQuery =
+    input.itemType === "exercise"
+      ? existingQuery.eq("exercise_id", input.exerciseId!).is("song_id", null)
+      : existingQuery.eq("song_id", input.songId!).is("exercise_id", null);
+
+  const { data: existingItem, error: existingError } = await existingQuery.maybeSingle();
+
+  if (existingError) throw existingError;
+
+  const mutation = existingItem
+    ? client
+        .from("practice_session_items")
+        .update({
+          tempo: input.tempo,
+          display_order: input.displayOrder,
+        })
+        .eq("id", existingItem.id)
+        .eq("user_id", user.id)
+    : client.from("practice_session_items").insert(itemPatch);
+
+  const { data, error } = await mutation.select().single();
 
   if (error) throw error;
   return data;
+}
+
+export async function deleteSessionItem(sessionItemId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("practice_session_items")
+    .delete()
+    .eq("id", sessionItemId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
 }
 
 async function updateSessionState(sessionId: string, patch: Record<string, string | boolean | null>) {

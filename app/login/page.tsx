@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { sendMagicLinkAction } from "@/lib/auth/actions";
+import {
+  sendMagicLinkAction,
+  signInWithPasswordAction,
+  signUpWithPasswordAction,
+} from "@/lib/auth/actions";
 import { getAuthState } from "@/lib/auth/session";
 
 type LoginPageProps = {
@@ -13,6 +17,7 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const auth = await getAuthState();
   const params = (await searchParams) ?? {};
+  const isDevPasswordLoginEnabled = process.env.ENABLE_DEV_PASSWORD_LOGIN === "true";
 
   if (auth.user) {
     redirect("/sessions");
@@ -26,27 +31,77 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             PracticePal
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-base-content">
-            Sign in with a magic link.
+            Sign in to PracticePal.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-base-content/75">
             Backend MVP uses Supabase email magic links so every book, session, setlist, and stat is
             scoped to a real user from the start.
           </p>
-          <form action={sendMagicLinkAction} className="mt-8 space-y-4">
-            <label className="form-control w-full">
-              <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
-              <input
-                required
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-                className="input input-bordered w-full"
-              />
-            </label>
-            <button className="btn btn-primary w-full sm:w-auto" type="submit">
-              Send magic link
-            </button>
-          </form>
+          <div className="mt-8 grid gap-5 lg:grid-cols-2">
+            <form action={sendMagicLinkAction} className="space-y-4 rounded-[1.5rem] border border-base-300/70 bg-base-200/45 p-5">
+              <div>
+                <h2 className="text-lg font-semibold text-base-content">Magic link</h2>
+                <p className="mt-2 text-sm leading-6 text-base-content/70">
+                  Primary sign-in flow for real usage and deployment.
+                </p>
+              </div>
+              <label className="form-control w-full">
+                <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
+                <input
+                  required
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  className="input input-bordered w-full"
+                />
+              </label>
+              <button className="btn btn-primary w-full sm:w-auto" type="submit">
+                Send magic link
+              </button>
+            </form>
+
+            {isDevPasswordLoginEnabled ? (
+              <div className="space-y-4 rounded-[1.5rem] border border-secondary/35 bg-secondary/8 p-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-base-content">Dev password fallback</h2>
+                  <p className="mt-2 text-sm leading-6 text-base-content/70">
+                    Enabled only because `ENABLE_DEV_PASSWORD_LOGIN=true`. Use this for local testing when
+                    Supabase rate-limits email delivery.
+                  </p>
+                </div>
+
+                <form action={signInWithPasswordAction} className="space-y-3">
+                  <label className="form-control w-full">
+                    <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
+                    <input required type="email" name="email" className="input input-bordered w-full" />
+                  </label>
+                  <label className="form-control w-full">
+                    <span className="label-text mb-2 text-sm font-medium text-base-content">Password</span>
+                    <input required type="password" name="password" className="input input-bordered w-full" />
+                  </label>
+                  <button className="btn btn-secondary w-full sm:w-auto" type="submit">
+                    Sign in with password
+                  </button>
+                </form>
+
+                <div className="divider my-1">or</div>
+
+                <form action={signUpWithPasswordAction} className="space-y-3">
+                  <label className="form-control w-full">
+                    <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
+                    <input required type="email" name="email" className="input input-bordered w-full" />
+                  </label>
+                  <label className="form-control w-full">
+                    <span className="label-text mb-2 text-sm font-medium text-base-content">Password</span>
+                    <input required type="password" name="password" className="input input-bordered w-full" />
+                  </label>
+                  <button className="btn btn-ghost border border-base-300 w-full sm:w-auto" type="submit">
+                    Create dev password account
+                  </button>
+                </form>
+              </div>
+            ) : null}
+          </div>
           {params.success ? (
             <p className="mt-4 rounded-xl bg-success/15 px-4 py-3 text-sm text-base-content">
               {params.success}
@@ -60,6 +115,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           {!auth.isConfigured ? (
             <p className="mt-4 rounded-xl bg-warning/15 px-4 py-3 text-sm text-base-content">
               Supabase env vars are not configured yet. Add them to `.env.local` to test auth.
+            </p>
+          ) : null}
+          {auth.isConfigured && !isDevPasswordLoginEnabled ? (
+            <p className="mt-4 rounded-xl bg-base-200/70 px-4 py-3 text-sm text-base-content/75">
+              If Supabase email rate limits block testing, set `ENABLE_DEV_PASSWORD_LOGIN=true` locally to
+              expose a temporary password fallback on this page.
             </p>
           ) : null}
         </section>

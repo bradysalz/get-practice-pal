@@ -50,3 +50,13 @@ Once the repo is connected, Vercel will create preview deployments for pull requ
 2. Apply the SQL migration in [supabase/migrations/20260412011000_backend_mvp.sql](/home/brady/devel/get-practice-pal/supabase/migrations/20260412011000_backend_mvp.sql).
 3. In Supabase auth settings, enable email magic links and set the site URL to your deployed app URL.
 4. Add the same Supabase env vars to local `.env.local` and to Vercel.
+
+## Dev auth fallback
+
+If Supabase magic-link rate limits make local iteration painful, set:
+
+`ENABLE_DEV_PASSWORD_LOGIN=true`
+
+in `.env.local`.
+
+That exposes a password sign-in and password sign-up fallback on `/login` for local testing only. Keep it off in normal deployments unless you intentionally want the fallback visible.
