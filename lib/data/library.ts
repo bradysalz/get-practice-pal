@@ -9,6 +9,8 @@ import type {
   SongInsert,
 } from "@/lib/data/types";
 
+export type LibrarySnapshot = Awaited<ReturnType<typeof getLibrarySnapshot>>;
+
 export async function getLibrarySnapshot() {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -60,6 +62,32 @@ export async function createBook(input: BookInsert) {
   return data;
 }
 
+export async function updateBook(
+  bookId: string,
+  input: {
+    title: string;
+    composer?: string | null;
+    defaultGoalTempo?: number | null;
+  },
+) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("books")
+    .update({
+      title: input.title,
+      composer: input.composer ?? null,
+      default_goal_tempo: input.defaultGoalTempo ?? null,
+    })
+    .eq("id", bookId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function createSection(input: SectionInsert) {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -72,6 +100,32 @@ export async function createSection(input: SectionInsert) {
       position: input.position,
       default_goal_tempo: input.defaultGoalTempo ?? null,
     })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateSection(
+  sectionId: string,
+  input: {
+    title: string;
+    position: number;
+    defaultGoalTempo?: number | null;
+  },
+) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("book_sections")
+    .update({
+      title: input.title,
+      position: input.position,
+      default_goal_tempo: input.defaultGoalTempo ?? null,
+    })
+    .eq("id", sectionId)
+    .eq("user_id", user.id)
     .select()
     .single();
 
@@ -98,6 +152,32 @@ export async function createExercise(input: ExerciseInsert) {
   return data;
 }
 
+export async function updateExercise(
+  exerciseId: string,
+  input: {
+    title: string;
+    position: number;
+    goalTempo?: number | null;
+  },
+) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("exercises")
+    .update({
+      title: input.title,
+      position: input.position,
+      goal_tempo: input.goalTempo ?? null,
+    })
+    .eq("id", exerciseId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function createArtist(input: ArtistInsert) {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -107,6 +187,28 @@ export async function createArtist(input: ArtistInsert) {
       user_id: user.id,
       name: input.name,
     })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateArtist(
+  artistId: string,
+  input: {
+    name: string;
+  },
+) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("artists")
+    .update({
+      name: input.name,
+    })
+    .eq("id", artistId)
+    .eq("user_id", user.id)
     .select()
     .single();
 
@@ -132,6 +234,30 @@ export async function createSong(input: SongInsert) {
   return data;
 }
 
+export async function updateSong(
+  songId: string,
+  input: {
+    title: string;
+    goalTempo?: number | null;
+  },
+) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("songs")
+    .update({
+      title: input.title,
+      goal_tempo: input.goalTempo ?? null,
+    })
+    .eq("id", songId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function createSetlist(input: SetlistInsert) {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -147,6 +273,62 @@ export async function createSetlist(input: SetlistInsert) {
 
   if (error) throw error;
   return data;
+}
+
+export async function updateSetlist(
+  setlistId: string,
+  input: {
+    name: string;
+    description?: string | null;
+  },
+) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("setlists")
+    .update({
+      name: input.name,
+      description: input.description ?? null,
+    })
+    .eq("id", setlistId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function addSetlistItem(input: SetlistItemInsert & { setlistId: string }) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("setlist_items")
+    .insert({
+      user_id: user.id,
+      setlist_id: input.setlistId,
+      item_type: input.itemType,
+      exercise_id: input.exerciseId ?? null,
+      song_id: input.songId ?? null,
+      position: input.position,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteSetlistItem(setlistItemId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("setlist_items")
+    .delete()
+    .eq("id", setlistItemId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
 }
 
 export async function replaceSetlistItems(setlistId: string, items: SetlistItemInsert[]) {

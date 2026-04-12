@@ -1,18 +1,8 @@
-import { HostPage } from "@/components/host-page";
+import { SetlistsDashboard } from "@/components/setlists-dashboard";
+import { getLibrarySnapshot } from "@/lib/data/library";
 
-export default function SetlistsPage() {
-  return (
-    <HostPage
-      eyebrow="Setlists"
-      title="Plan a session before you sit down to practice."
-      description="This page gives the product a dedicated setlist area from day one instead of burying it inside the library."
-      primaryCta="Create setlist"
-      secondaryCta="Start from setlist"
-      highlights={[
-        "Dedicated setlist management route",
-        "Mixed library item support planned",
-        "Session launch path reserved in the shell",
-      ]}
-    />
-  );
+export default async function SetlistsPage() {
+  const snapshot = await getLibrarySnapshot();
+
+  return <SetlistsDashboard snapshot={snapshot} />;
 }
