@@ -3,8 +3,8 @@ import {
   reorderBookSectionsAction,
   saveSectionBuilderAction,
   updateArtistAction,
-  updateBookAction,
 } from "@/app/(app)/library/actions";
+import { BookHeroEditor } from "@/components/book-hero-editor";
 import { DraggableBookSections } from "@/components/draggable-book-sections";
 import { SectionBuilderForm } from "@/components/section-builder-form";
 import { FormSubmitButton } from "@/components/form-submit-button";
@@ -39,7 +39,7 @@ export function BookDetailPage({
         backHref="/library"
         backLabel="Back to library"
         eyebrow="Book"
-        title={book.title}
+        title=""
         stats={
           <div className="grid grid-cols-2 gap-3 md:min-w-[18rem]">
             <StatCard label="Sections" value={String(sectionCount)} />
@@ -47,30 +47,10 @@ export function BookDetailPage({
           </div>
         }
       >
-        <div className="flex flex-wrap gap-2">
-          <span className="chip chip-neutral">{book.composer || "No composer set"}</span>
-        </div>
+        <BookHeroEditor bookId={book.id} composer={book.composer} title={book.title} />
       </PageHero>
 
       <section className="space-y-6">
-        <PagePanel>
-          <form action={updateBookAction} className="max-w-3xl space-y-4">
-            <input type="hidden" name="bookId" value={book.id} />
-            <TextInput
-              className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-4xl"
-              name="title"
-              defaultValue={book.title}
-            />
-            <TextInput
-              className="w-full border-0 bg-transparent p-0 text-lg text-base-content/70 outline-none"
-              name="composer"
-              defaultValue={book.composer ?? ""}
-              placeholder="Composer or author"
-            />
-            <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
-          </form>
-        </PagePanel>
-
         <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader

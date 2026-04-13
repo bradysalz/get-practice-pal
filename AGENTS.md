@@ -3,6 +3,7 @@
 ## Workflow
 
 - Track work in `beans` before changing code.
+- Open a branch before editing any code. If already on a branch, continue to use that.
 - Commit and open a PR for all code changes.
 - Open normal PRs, not draft PRs.
 - Do not commit directly to `master`; always use a branch and land changes through the PR flow.
