@@ -67,7 +67,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
         <label className="form-control w-full md:max-w-sm">
           <span className="label-text mb-2 text-sm font-medium text-base-content">Search items</span>
           <input
-            className="input input-bordered w-full"
+            className="input app-field w-full"
             placeholder="Search books, sections, exercises, artists, or songs"
             value={query}
             onChange={(event) => setQuery(event.target.value)}

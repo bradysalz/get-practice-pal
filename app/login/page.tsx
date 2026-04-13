@@ -52,7 +52,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   type="email"
                   name="email"
                   placeholder="you@example.com"
-                  className="input input-bordered w-full"
+                  className="input app-field w-full"
                 />
               </label>
               <button className="btn btn-primary w-full sm:w-auto" type="submit">
@@ -73,11 +73,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <form action={signInWithPasswordAction} className="space-y-3">
                   <label className="form-control w-full">
                     <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
-                    <input required type="email" name="email" className="input input-bordered w-full" />
+                    <input required type="email" name="email" className="input app-field w-full" />
                   </label>
                   <label className="form-control w-full">
                     <span className="label-text mb-2 text-sm font-medium text-base-content">Password</span>
-                    <input required type="password" name="password" className="input input-bordered w-full" />
+                    <input required type="password" name="password" className="input app-field w-full" />
                   </label>
                   <button className="btn btn-secondary w-full sm:w-auto" type="submit">
                     Sign in with password
@@ -89,13 +89,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <form action={signUpWithPasswordAction} className="space-y-3">
                   <label className="form-control w-full">
                     <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
-                    <input required type="email" name="email" className="input input-bordered w-full" />
+                    <input required type="email" name="email" className="input app-field w-full" />
                   </label>
                   <label className="form-control w-full">
                     <span className="label-text mb-2 text-sm font-medium text-base-content">Password</span>
-                    <input required type="password" name="password" className="input input-bordered w-full" />
+                    <input required type="password" name="password" className="input app-field w-full" />
                   </label>
-                  <button className="btn btn-ghost border border-base-300 w-full sm:w-auto" type="submit">
+                  <button className="btn btn-outline w-full sm:w-auto" type="submit">
                     Create dev password account
                   </button>
                 </form>

@@ -5,6 +5,7 @@ import {
   addSetlistItem,
   createSetlist,
   deleteSetlistItem,
+  reorderSetlistItems,
   updateSetlist,
 } from "@/lib/data/library";
 
@@ -62,4 +63,9 @@ export async function deleteSetlistItemAction(formData: FormData) {
   const returnPath = String(formData.get("returnPath") ?? "").trim() || null;
   await deleteSetlistItem(String(formData.get("setlistItemId") ?? ""));
   revalidateSetlistsForPath(returnPath);
+}
+
+export async function reorderSetlistItemsAction(setlistId: string, itemIds: string[], returnPath?: string | null) {
+  await reorderSetlistItems(setlistId, itemIds);
+  revalidateSetlistsForPath(returnPath ?? null);
 }

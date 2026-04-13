@@ -109,6 +109,12 @@ h4,
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
 }
 
+.list-row {
+  border-radius: 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #ffffff;
+}
+
 .soft-stat {
   border-radius: 1.25rem;
   border: 1px solid rgba(251, 146, 60, 0.12);
@@ -172,6 +178,7 @@ h4,
 .btn-primary {
   border-color: rgba(220, 38, 38, 0.18);
   background: #ef4444;
+  color: #fffaf9;
 }
 
 .btn-secondary {
@@ -186,8 +193,24 @@ h4,
   color: #eff6ff;
 }
 
+.btn-error {
+  color: #fffaf9;
+}
+
 .btn-ghost {
   background: #ffffff;
+}
+
+.btn-outline {
+  border-color: rgba(148, 163, 184, 0.28);
+  background: #ffffff;
+  color: #334155;
+}
+
+.btn-outline:hover {
+  border-color: rgba(239, 68, 68, 0.22);
+  background: #fff7ed;
+  color: #1e293b;
 }
 
 .input,
@@ -211,6 +234,16 @@ h4,
   outline: none;
   box-shadow: 0 0 0 0.22rem rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.35);
+}
+
+.app-field,
+.app-textarea {
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.app-textarea {
+  min-height: 7.5rem;
 }
 
 .label-text {

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import {
+  reorderBookSectionsAction,
   saveSectionBuilderAction,
   updateArtistAction,
   updateBookAction,
 } from "@/app/(app)/library/actions";
+import { DraggableBookSections } from "@/components/draggable-book-sections";
 import { SectionBuilderForm } from "@/components/section-builder-form";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import type { LibrarySnapshot } from "@/lib/data/library";
@@ -64,7 +66,7 @@ export function BookDetailPage({
               defaultValue={book.composer ?? ""}
               placeholder="Composer or author"
             />
-            <FormSubmitButton label="Save" pendingLabel="Saving..." className="btn btn-secondary btn-sm" />
+            <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
           </form>
         </section>
 
@@ -78,58 +80,20 @@ export function BookDetailPage({
             </Link>
           </div>
 
-          <div className="mt-5 space-y-4">
+          <div className="mt-5">
             {sectionCount ? (
-              (book.sections ?? []).map((section) => (
-                <details key={section.id} className="section-panel p-5">
-                  <summary className="cursor-pointer list-none">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                      <div>
-                        <h2 className="text-lg font-semibold text-base-content">{section.title}</h2>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          <span className="chip chip-neutral text-[0.72rem]">
-                            Position {section.position}
-                          </span>
-                          <span className="chip text-[0.72rem]">
-                            Default {section.default_goal_tempo ? `${section.default_goal_tempo} BPM` : "unset"}
-                          </span>
-                          <span className="chip chip-neutral text-[0.72rem]">
-                            {(section.exercises ?? []).length} exercise
-                            {(section.exercises ?? []).length === 1 ? "" : "s"}
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-sm font-medium text-primary">Open</span>
-                    </div>
-                  </summary>
-
-                  <div className="mt-4 space-y-3 border-t border-base-300/70 pt-4">
-                    {(section.exercises ?? []).length ? (
-                      <div className="flex flex-wrap gap-2">
-                        {section.exercises?.slice(0, 8).map((exercise) => (
-                          <span key={exercise.id} className="chip chip-neutral text-[0.72rem]">
-                            {exercise.title}
-                          </span>
-                        ))}
-                        {(section.exercises?.length ?? 0) > 8 ? (
-                          <span className="chip chip-neutral text-[0.72rem]">
-                            +{(section.exercises?.length ?? 0) - 8} more
-                          </span>
-                        ) : null}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-base-content/60">No exercises yet.</p>
-                    )}
-
-                    <Link
-                      href={`/library/books/${book.id}/sections/${section.id}`}
-                      className="btn btn-ghost btn-sm border border-base-300"
-                    >
-                      Edit section
-                    </Link>
-                  </div>
-                </details>
-              ))
+              <DraggableBookSections
+                bookId={book.id}
+                onReorder={reorderBookSectionsAction}
+                sections={(book.sections ?? [])
+                  .slice()
+                  .sort((left, right) => left.position - right.position)
+                  .map((section) => ({
+                    exerciseCount: section.exercises?.length ?? 0,
+                    id: section.id,
+                    title: section.title,
+                  }))}
+              />
             ) : (
               <EmptyBox label="No sections yet. Add your first section." />
             )}
@@ -175,7 +139,7 @@ export function ArtistDetailPage({
               name="name"
               defaultValue={artist.name}
             />
-            <FormSubmitButton label="Save" pendingLabel="Saving..." className="btn btn-secondary btn-sm" />
+            <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
           </form>
         </section>
 
@@ -238,12 +202,9 @@ export function SectionDetailPage({
             <div className="mt-5 space-y-3">
               {section.exercises?.length ? (
                 section.exercises.map((exercise) => (
-                  <div key={exercise.id} className="accent-card p-4">
+                  <div key={exercise.id} className="list-row p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium text-base-content">{exercise.title}</p>
-                      <span className="chip chip-neutral text-[0.72rem]">
-                        Position {exercise.position}
-                      </span>
                       <span className="chip text-[0.72rem]">
                         Goal {exercise.goal_tempo ? `${exercise.goal_tempo} BPM` : "unset"}
                       </span>

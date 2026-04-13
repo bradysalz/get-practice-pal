@@ -32,7 +32,7 @@ export function HostPage({
           </div>
           <div className="flex flex-wrap gap-3">
             <button className="btn btn-primary">{primaryCta}</button>
-            <button className="btn btn-ghost border border-base-300">{secondaryCta}</button>
+            <button className="btn btn-outline">{secondaryCta}</button>
           </div>
         </div>
       </section>

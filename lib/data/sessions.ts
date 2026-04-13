@@ -185,6 +185,22 @@ export async function deleteSessionItem(sessionItemId: string) {
   if (error) throw error;
 }
 
+export async function reorderSessionItems(sessionId: string, itemIds: string[]) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+
+  await Promise.all(
+    itemIds.map((itemId, index) =>
+      client
+        .from("practice_session_items")
+        .update({ display_order: index })
+        .eq("id", itemId)
+        .eq("practice_session_id", sessionId)
+        .eq("user_id", user.id),
+    ),
+  );
+}
+
 async function updateSessionState(sessionId: string, patch: Record<string, string | boolean | null>) {
   const client = await requireSupabaseClient();
   const user = await requireUser();

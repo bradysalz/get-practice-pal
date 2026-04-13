@@ -5,6 +5,7 @@ import {
   deleteSessionItem,
   endSession,
   pauseSession,
+  reorderSessionItems,
   resumeSession,
   startSession,
   updateSessionNotes,
@@ -91,5 +92,10 @@ export async function updateSessionItemAction(formData: FormData) {
 
 export async function deleteSessionItemAction(formData: FormData) {
   await deleteSessionItem(String(formData.get("sessionItemId") ?? ""));
+  revalidateSessions();
+}
+
+export async function reorderSessionItemsAction(sessionId: string, itemIds: string[]) {
+  await reorderSessionItems(sessionId, itemIds);
   revalidateSessions();
 }

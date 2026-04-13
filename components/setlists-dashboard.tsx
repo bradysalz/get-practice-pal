@@ -2,10 +2,11 @@ import Link from "next/link";
 import {
   addSetlistItemAction,
   createSetlistAction,
-  deleteSetlistItemAction,
+  reorderSetlistItemsAction,
   updateSetlistAction,
 } from "@/app/(app)/setlists/actions";
 import { ActionModal } from "@/components/action-modal";
+import { DraggableSetlistItems } from "@/components/draggable-setlist-items";
 import { FormSelect } from "@/components/form-select";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import {
@@ -143,7 +144,7 @@ export function SetlistDetailPage({
               <ActionModal title="Add item" triggerLabel="Add item">
                 <AddSetlistItemForm setlist={setlist} itemOptions={itemOptions} />
               </ActionModal>
-              <Link href="/sessions" className="btn btn-ghost border border-base-300">
+              <Link href="/sessions" className="btn btn-outline">
                 Use in sessions
               </Link>
             </div>
@@ -151,28 +152,16 @@ export function SetlistDetailPage({
 
           <div className="mt-5 space-y-3">
             {sortedItems.length ? (
-              sortedItems.map((item) => (
-                <div key={item.id} className="accent-card flex items-center justify-between gap-3 p-4">
-                  <div>
-                    <p className="font-medium text-base-content">{labelSetlistItem(item, itemMaps)}</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="chip chip-neutral text-[0.72rem]">Position {item.position}</span>
-                      <span className="chip text-[0.72rem]">
-                        {item.item_type === "exercise" ? "Exercise" : "Song"}
-                      </span>
-                    </div>
-                  </div>
-                  <form action={deleteSetlistItemAction}>
-                    <input type="hidden" name="setlistItemId" value={item.id} />
-                    <input type="hidden" name="returnPath" value={`/setlists/${setlist.id}`} />
-                    <FormSubmitButton
-                      label="Remove"
-                      pendingLabel="Removing..."
-                      className="btn btn-ghost btn-xs border border-base-300"
-                    />
-                  </form>
-                </div>
-              ))
+              <DraggableSetlistItems
+                items={sortedItems.map((item) => ({
+                  id: item.id,
+                  itemType: item.item_type,
+                  label: labelSetlistItem(item, itemMaps),
+                }))}
+                onReorder={reorderSetlistItemsAction}
+                returnPath={`/setlists/${setlist.id}`}
+                setlistId={setlist.id}
+              />
             ) : (
               <EmptyBox label="No items yet." />
             )}
@@ -189,12 +178,12 @@ function CreateSetlistForm() {
       <CardForm title="Add setlist">
         <label className="form-control w-full">
           <span className="label-text mb-2 text-sm font-medium text-base-content">Name</span>
-          <input className="input input-bordered w-full" name="name" placeholder="Warm-up block" />
+          <input className="input app-field w-full" name="name" placeholder="Warm-up block" />
         </label>
         <label className="form-control w-full">
           <span className="label-text mb-2 text-sm font-medium text-base-content">Description</span>
           <textarea
-            className="textarea textarea-bordered min-h-28 w-full"
+            className="textarea app-textarea min-h-28 w-full"
             name="description"
             placeholder="Hands, rudiments, then tunes."
           />
@@ -220,12 +209,12 @@ function EditSetlistForm({
         defaultValue={setlist.name}
       />
       <textarea
-        className="textarea w-full"
+        className="textarea app-textarea w-full"
         name="description"
         defaultValue={setlist.description ?? ""}
         placeholder="Description"
       />
-      <FormSubmitButton label="Save" pendingLabel="Saving..." className="btn btn-secondary btn-sm" />
+      <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
     </form>
   );
 }
@@ -241,6 +230,7 @@ function AddSetlistItemForm({
     <form action={addSetlistItemAction}>
       <input type="hidden" name="setlistId" value={setlist.id} />
       <input type="hidden" name="returnPath" value={`/setlists/${setlist.id}`} />
+      <input type="hidden" name="position" value={String((setlist.items?.length ?? 0) + 1)} />
       <CardForm title="Add item">
         <FormSelect
           label="Library item"
@@ -248,17 +238,7 @@ function AddSetlistItemForm({
           emptyLabel="Select exercise or song"
           options={itemOptions}
         />
-        <label className="form-control w-full">
-          <span className="label-text mb-2 text-sm font-medium text-base-content">Position</span>
-          <input
-            className="input input-bordered w-full"
-            name="position"
-            type="number"
-            min={1}
-            defaultValue={(setlist.items?.length ?? 0) + 1}
-          />
-        </label>
-        <FormSubmitButton label="Add item" pendingLabel="Adding..." className="btn btn-accent btn-sm" />
+        <FormSubmitButton label="Add item" pendingLabel="Adding..." variant="accent" />
       </CardForm>
     </form>
   );
