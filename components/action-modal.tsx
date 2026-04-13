@@ -26,7 +26,7 @@ export function ActionModal({
         {triggerLabel}
       </button>
       {isOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="page-panel w-full max-w-xl p-6">
             <div className="flex items-start justify-between gap-4">
               <div>

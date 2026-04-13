@@ -28,7 +28,7 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
             isOpen ? "translate-x-0" : "-translate-x-[120%] md:translate-x-0"
           }`}
         >
-          <div className="app-shell-surface flex h-full flex-col rounded-[2rem] p-5 md:sticky md:top-6 md:min-h-[calc(100vh-3rem)]">
+          <div className="app-shell-surface flex h-full flex-col p-5 md:sticky md:top-6 md:min-h-[calc(100vh-3rem)]">
             <Link href="/sessions" className="space-y-1">
               <p className="eyebrow">PracticePal</p>
               <h1 className="font-display text-3xl font-semibold text-base-content">Practice tracking</h1>
@@ -45,7 +45,7 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
               ))}
             </nav>
             <div className="mt-auto space-y-4">
-              <div className="rounded-[1.25rem] border border-base-300/70 bg-base-200/70 p-4 text-sm leading-6 text-base-content/80">
+              <div className="border-2 border-base-300 bg-base-200 p-4 text-sm leading-6 font-medium text-base-content/80">
                 {authConfigured
                   ? userEmail ?? "Signed in"
                   : "Supabase is not configured yet."}
@@ -61,7 +61,7 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
           </div>
         </aside>
         <main className="flex-1 md:pl-0">
-          <div className="app-shell-surface mb-4 flex items-center justify-between rounded-[1.5rem] px-4 py-3 md:hidden">
+          <div className="app-shell-surface mb-4 flex items-center justify-between px-4 py-3 md:hidden">
             <div>
               <p className="eyebrow">PracticePal</p>
               <p className="text-sm text-base-content/70">Responsive side rail</p>

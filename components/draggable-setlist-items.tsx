@@ -64,7 +64,7 @@ function SortableSetlistRow({
       <button
         ref={setActivatorNodeRef}
         type="button"
-        className="btn btn-outline btn-sm cursor-grab active:cursor-grabbing"
+        className="btn btn-ghost btn-sm cursor-grab active:cursor-grabbing"
         aria-label={`Drag ${item.label}`}
         {...attributes}
         {...listeners}
@@ -74,7 +74,7 @@ function SortableSetlistRow({
       <div className="flex-1">
         <p className="font-medium text-base-content">{item.label}</p>
         <div className="mt-2 flex flex-wrap gap-2">
-          <span className="chip text-[0.72rem]">{item.itemType === "exercise" ? "Exercise" : "Song"}</span>
+          <span className="chip">{item.itemType === "exercise" ? "Exercise" : "Song"}</span>
         </div>
       </div>
       <form action={deleteSetlistItemAction}>

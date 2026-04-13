@@ -114,7 +114,7 @@ export function SessionsDashboard({
               <div className="space-y-6">
                 <section className="page-panel space-y-4 p-6">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-semibold text-base-content">Logged items</h3>
+                    <h3 className="text-lg font-bold text-base-content">Logged items</h3>
                   </div>
                   {currentSession.session_items?.length ? (
                     <DraggableSessionItems
@@ -139,7 +139,7 @@ export function SessionsDashboard({
                 <form action={addSessionItemAction} className="page-panel p-6">
                   <input type="hidden" name="sessionId" value={currentSession.id} />
                   <input type="hidden" name="displayOrder" value={String(currentSession.session_items?.length ?? 0)} />
-                  <h3 className="text-lg font-semibold text-primary">Add item</h3>
+                  <h3 className="text-lg font-bold text-primary">Add item</h3>
                   <div className="mt-4 space-y-3">
                     <FormSelect
                       label="Library item"
@@ -161,7 +161,7 @@ export function SessionsDashboard({
                   <input type="hidden" name="sessionId" value={currentSession.id} />
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-primary">Session notes</h3>
+                      <h3 className="text-lg font-bold text-primary">Session notes</h3>
                       <textarea
                         className="textarea app-textarea mt-4 min-h-32 w-full"
                         name="notes"

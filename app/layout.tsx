@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="practicapal">
-      <body>{children}</body>
+    <html lang="en" data-theme="practicapal" className="bg-base-200">
+      <body className="font-sans">{children}</body>
     </html>
   );
 }

@@ -57,33 +57,27 @@ function SortableSectionRow({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`list-row flex items-stretch gap-3 p-3 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      className={`list-row flex items-center gap-3 p-4 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
     >
-      <div className="flex items-start pt-2">
-        <button
-          ref={setActivatorNodeRef}
-          type="button"
-          className="btn btn-outline btn-sm cursor-grab active:cursor-grabbing"
-          aria-label={`Drag ${section.title}`}
-          {...attributes}
-          {...listeners}
-        >
-          ⋮⋮
-        </button>
-      </div>
+      <button
+        ref={setActivatorNodeRef}
+        type="button"
+        className="btn btn-ghost btn-sm cursor-grab active:cursor-grabbing"
+        aria-label={`Drag ${section.title}`}
+        {...attributes}
+        {...listeners}
+      >
+        ⋮⋮
+      </button>
       <Link
         href={`/library/books/${bookId}/sections/${section.id}`}
-        className="section-panel block flex-1 p-5 transition hover:border-primary/25 hover:bg-red-50/30"
+        className="flex-1"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-base-content">{section.title}</h2>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <span className="chip chip-neutral text-[0.72rem]">
-                {section.exerciseCount} exercise{section.exerciseCount === 1 ? "" : "s"}
-              </span>
-            </div>
-          </div>
+        <p className="font-semibold text-base-content">{section.title}</p>
+        <div className="mt-1.5 flex flex-wrap gap-2">
+          <span className="chip chip-neutral">
+            {section.exerciseCount} exercise{section.exerciseCount === 1 ? "" : "s"}
+          </span>
         </div>
       </Link>
     </div>

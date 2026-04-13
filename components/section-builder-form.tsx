@@ -74,11 +74,11 @@ export function SectionBuilderForm({
       <div className="page-panel p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-base-content/50">
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/50">
               Exercise Pattern
             </p>
           </div>
-          <div className="chip chip-neutral text-[0.72rem]">
+          <div className="chip chip-neutral ">
             Existing exercises: {existingCount}
           </div>
         </div>
@@ -118,20 +118,20 @@ export function SectionBuilderForm({
           </label>
         </div>
 
-        <div className="mt-5 rounded-[1rem] border border-base-300/70 bg-base-200/60 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-base-content/50">
+        <div className="mt-5 border-2 border-base-300 bg-base-200 p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-base-content/50">
             Preview
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {previewNames.length ? (
               previewNames.slice(0, 6).map((name) => (
-                <span key={name} className="chip chip-neutral text-[0.72rem]">
+                <span key={name} className="chip chip-neutral ">
                   {name}
                 </span>
               ))
             ) : null}
             {previewNames.length > 6 ? (
-              <span className="chip chip-neutral text-[0.72rem]">+{previewNames.length - 6} more</span>
+              <span className="chip chip-neutral ">+{previewNames.length - 6} more</span>
             ) : null}
           </div>
         </div>

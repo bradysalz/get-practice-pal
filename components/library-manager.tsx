@@ -95,24 +95,24 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                     <Link
                       key={book.id}
                       href={`/library/books/${book.id}`}
-                      className="accent-card block p-5 transition hover:border-primary/25 hover:bg-red-50/35"
+                      className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
                     >
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-base-content">{book.title}</h2>
+                          <h2 className="text-lg font-bold text-base-content">{book.title}</h2>
                           <p className="mt-2 text-sm text-base-content/65">
                             {book.composer || "No composer set"}
                           </p>
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <span className="chip chip-neutral text-[0.72rem]">
+                            <span className="chip chip-neutral ">
                               {sectionCount} section{sectionCount === 1 ? "" : "s"}
                             </span>
-                            <span className="chip chip-neutral text-[0.72rem]">
+                            <span className="chip chip-neutral ">
                               {bookExerciseCount} exercise{bookExerciseCount === 1 ? "" : "s"}
                             </span>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-primary">Open</span>
+                        <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                       </div>
                     </Link>
                   );
@@ -136,18 +136,18 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                     <Link
                       key={artist.id}
                       href={`/library/artists/${artist.id}`}
-                      className="accent-card block p-5 transition hover:border-primary/25 hover:bg-red-50/35"
+                      className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
                     >
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-base-content">{artist.name}</h2>
+                          <h2 className="text-lg font-bold text-base-content">{artist.name}</h2>
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <span className="chip chip-neutral text-[0.72rem]">
+                            <span className="chip chip-neutral ">
                               {artistSongCount} song{artistSongCount === 1 ? "" : "s"}
                             </span>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-primary">Open</span>
+                        <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                       </div>
                     </Link>
                   );
@@ -173,7 +173,7 @@ export function SectionHeader({
   return (
     <div>
       <div className="section-bar w-fit">
-        <span className="text-lg font-semibold">{title}</span>
+        <span className="text-lg font-bold">{title}</span>
       </div>
       {description ? (
         <p className="mt-2 max-w-3xl text-sm leading-6 text-base-content/75">{description}</p>
@@ -185,10 +185,10 @@ export function SectionHeader({
 export function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="soft-stat px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-base-content/55">
+      <p className="text-xs font-bold uppercase tracking-[0.15em] text-current opacity-70">
         {label}
       </p>
-      <p className="mt-2 text-[2rem] font-semibold text-base-content">{value}</p>
+      <p className="mt-2 text-[2rem] font-bold text-base-content">{value}</p>
     </div>
   );
 }
@@ -208,7 +208,7 @@ export function CardForm({
 }) {
   return (
     <div className="accent-card p-4">
-      <h3 className="text-lg font-semibold text-primary">
+      <h3 className="text-lg font-bold text-primary">
         {title}
       </h3>
       {description ? (
@@ -368,7 +368,7 @@ export function EditExerciseForm({
       <input type="hidden" name="exerciseId" value={exercise.id} />
       <input type="hidden" name="position" value={String(exercise.position)} />
       <div className="mb-3 flex flex-wrap gap-2">
-        <span className="chip text-[0.72rem]">
+        <span className="chip ">
           Inherited {inheritedTempo ? `${inheritedTempo} BPM` : "none"}
         </span>
       </div>
@@ -443,7 +443,7 @@ export function EditSongForm({
     <form action={updateSongAction} className="section-panel p-4">
       <input type="hidden" name="songId" value={song.id} />
       <div className="mb-3 flex flex-wrap gap-2">
-        <span className="chip text-[0.72rem]">
+        <span className="chip ">
           Goal {song.goal_tempo ? `${song.goal_tempo} BPM` : "unset"}
         </span>
       </div>
