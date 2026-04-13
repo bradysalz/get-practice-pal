@@ -17,6 +17,7 @@ import {
   CardLink,
   EmptyState,
   Field,
+  FormActions,
   PageHero,
   PagePanel,
   StatCard,
@@ -35,7 +36,7 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
     <div className="space-y-6">
       <PageHero
         eyebrow="Setlists"
-        title="Plan what you want to practice."
+        title=""
         stats={
           <div className="grid grid-cols-2 gap-3 md:min-w-[18rem]">
             <StatCard label="Setlists" value={String(snapshot.setlists.length)} />
@@ -51,7 +52,7 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
         <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader title="Create" />
-            <ActionModal title="Add setlist" triggerLabel="Add setlist">
+            <ActionModal triggerLabel="Add setlist" submitFormId="create-setlist-form" submitLabel="Save">
               <CreateSetlistForm />
             </ActionModal>
           </div>
@@ -80,7 +81,7 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
                 </CardLink>
               ))
             ) : (
-              <EmptyState label="No setlists yet. Add your first setlist." />
+              <EmptyState label="No setlists yet." />
             )}
           </div>
         </PagePanel>
@@ -135,7 +136,12 @@ export function SetlistDetailPage({
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader title="Items" />
             <div className="flex flex-wrap gap-3">
-              <ActionModal title="Add item" triggerLabel="Add item">
+              <ActionModal
+                triggerLabel="Add item"
+                submitFormId="add-setlist-item-form"
+                submitLabel="Add item"
+                submitClassName="btn btn-accent"
+              >
                 <AddSetlistItemForm setlist={setlist} itemOptions={itemOptions} />
               </ActionModal>
               <Link href="/sessions" className="btn btn-outline">
@@ -157,7 +163,7 @@ export function SetlistDetailPage({
                 setlistId={setlist.id}
               />
             ) : (
-              <EmptyState label="No items yet." />
+              <EmptyState label="No items." />
             )}
           </div>
         </PagePanel>
@@ -168,8 +174,8 @@ export function SetlistDetailPage({
 
 function CreateSetlistForm() {
   return (
-    <form action={createSetlistAction}>
-      <CardForm title="Add setlist">
+    <form id="create-setlist-form" action={createSetlistAction}>
+      <CardForm surface="plain">
         <Field label="Name">
           <TextInput name="name" placeholder="Warm-up block" />
         </Field>
@@ -180,7 +186,6 @@ function CreateSetlistForm() {
             placeholder="Hands, rudiments, then tunes."
           />
         </Field>
-        <FormSubmitButton label="Create setlist" pendingLabel="Creating..." />
       </CardForm>
     </form>
   );
@@ -218,18 +223,17 @@ function AddSetlistItemForm({
   setlist: NonNullable<LibrarySnapshot["setlists"]>[number];
 }) {
   return (
-    <form action={addSetlistItemAction}>
+    <form id="add-setlist-item-form" action={addSetlistItemAction}>
       <input type="hidden" name="setlistId" value={setlist.id} />
       <input type="hidden" name="returnPath" value={`/setlists/${setlist.id}`} />
       <input type="hidden" name="position" value={String((setlist.items?.length ?? 0) + 1)} />
-      <CardForm title="Add item">
+      <CardForm surface="plain">
         <FormSelect
           label="Library item"
           name="itemKey"
           emptyLabel="Select exercise or song"
           options={itemOptions}
         />
-        <FormSubmitButton label="Add item" pendingLabel="Adding..." variant="accent" />
       </CardForm>
     </form>
   );

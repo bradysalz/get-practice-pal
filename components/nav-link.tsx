@@ -28,7 +28,7 @@ export function NavLink({ href, icon, label, onNavigate }: NavLinkProps) {
         className={`flex h-9 w-9 items-center justify-center text-lg transition ${
           isActive
             ? "bg-primary text-primary-content"
-            : "bg-base-200 text-base-content/70 group-hover:bg-base-300 group-hover:text-base-content"
+            : "bg-base-300 text-base-content/85 group-hover:bg-base-300 group-hover:text-base-content"
         }`}
       >
         {icon}

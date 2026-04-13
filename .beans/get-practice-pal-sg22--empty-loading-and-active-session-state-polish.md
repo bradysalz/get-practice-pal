@@ -5,8 +5,8 @@ status: todo
 type: epic
 priority: normal
 created_at: 2026-04-12T00:23:08Z
-updated_at: 2026-04-12T23:46:52Z
-parent: gpp-mmn0
+updated_at: 2026-04-13T07:04:35Z
+parent: gpp-1qyh
 ---
 
 Polish the states users will frequently encounter while practicing.
