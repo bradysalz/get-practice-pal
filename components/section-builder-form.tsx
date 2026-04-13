@@ -74,7 +74,7 @@ export function SectionBuilderForm({
       <div className="page-panel p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-base-content/50">
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/50">
               Exercise Pattern
             </p>
           </div>
@@ -118,8 +118,8 @@ export function SectionBuilderForm({
           </label>
         </div>
 
-        <div className="mt-5 rounded-[1rem] border border-base-300/70 bg-base-200/60 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-base-content/50">
+        <div className="mt-5 border-2 border-base-300 bg-base-200 p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-base-content/50">
             Preview
           </p>
           <div className="mt-3 flex flex-wrap gap-2">

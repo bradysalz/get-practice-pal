@@ -26,11 +26,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl items-center px-4 py-10 md:px-6">
       <div className="grid w-full gap-6 md:grid-cols-[1.1fr_0.9fr]">
-        <section className="rounded-[2rem] border border-base-300/70 bg-base-100/85 p-8 shadow-sm backdrop-blur">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-secondary">
+        <section className="border-2 border-neutral bg-base-100 p-8 shadow-[4px_4px_0_#0a0a0a]">
+          <p className="eyebrow">
             PracticePal
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-base-content">
+          <h1 className="mt-4 text-4xl font-bold tracking-tight text-base-content">
             Sign in to PracticePal.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-base-content/75">
@@ -38,7 +38,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             scoped to a real user from the start.
           </p>
           <div className="mt-8 grid gap-5 lg:grid-cols-2">
-            <form action={sendMagicLinkAction} className="space-y-4 rounded-[1.5rem] border border-base-300/70 bg-base-200/45 p-5">
+            <form action={sendMagicLinkAction} className="space-y-4 border-2 border-neutral bg-base-200 p-5">
               <div>
                 <h2 className="text-lg font-semibold text-base-content">Magic link</h2>
                 <p className="mt-2 text-sm leading-6 text-base-content/70">
@@ -61,7 +61,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </form>
 
             {isDevPasswordLoginEnabled ? (
-              <div className="space-y-4 rounded-[1.5rem] border border-secondary/35 bg-secondary/8 p-5">
+              <div className="space-y-4 border-2 border-neutral bg-base-200 p-5">
                 <div>
                   <h2 className="text-lg font-semibold text-base-content">Dev password fallback</h2>
                   <p className="mt-2 text-sm leading-6 text-base-content/70">
@@ -103,29 +103,29 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             ) : null}
           </div>
           {params.success ? (
-            <p className="mt-4 rounded-xl bg-success/15 px-4 py-3 text-sm text-base-content">
+            <p className="mt-4 border-2 border-success bg-success/10 px-4 py-3 text-sm font-medium text-base-content">
               {params.success}
             </p>
           ) : null}
           {params.error ? (
-            <p className="mt-4 rounded-xl bg-error/12 px-4 py-3 text-sm text-base-content">
+            <p className="mt-4 border-2 border-error bg-error/10 px-4 py-3 text-sm font-medium text-base-content">
               {params.error}
             </p>
           ) : null}
           {!auth.isConfigured ? (
-            <p className="mt-4 rounded-xl bg-warning/15 px-4 py-3 text-sm text-base-content">
+            <p className="mt-4 border-2 border-warning bg-warning/10 px-4 py-3 text-sm font-medium text-base-content">
               Supabase env vars are not configured yet. Add them to `.env.local` to test auth.
             </p>
           ) : null}
           {auth.isConfigured && !isDevPasswordLoginEnabled ? (
-            <p className="mt-4 rounded-xl bg-base-200/70 px-4 py-3 text-sm text-base-content/75">
+            <p className="mt-4 border-2 border-base-300 bg-base-200 px-4 py-3 text-sm font-medium text-base-content/75">
               If Supabase email rate limits block testing, set `ENABLE_DEV_PASSWORD_LOGIN=true` locally to
               expose a temporary password fallback on this page.
             </p>
           ) : null}
         </section>
-        <aside className="rounded-[2rem] border border-base-300/60 bg-base-100/70 p-8 shadow-sm backdrop-blur">
-          <h2 className="text-lg font-semibold text-base-content">What this unlocks</h2>
+        <aside className="border-2 border-neutral bg-base-100 p-8 shadow-[3px_3px_0_#0a0a0a]">
+          <h2 className="text-lg font-bold text-base-content">What this unlocks</h2>
           <div className="mt-5 space-y-3 text-sm leading-6 text-base-content/75">
             <p>Each user gets isolated library, setlist, session, and stats data via row-level security.</p>
             <p>The same sign-in flow works locally, in preview deployments, and in production.</p>

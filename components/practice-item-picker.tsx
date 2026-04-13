@@ -81,7 +81,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-base-content/60">
+          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/60">
             Books
           </h3>
           {filtered.books.length ? (
@@ -100,7 +100,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
                           return (
                             <label
                               key={exercise.id}
-                                className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 text-sm"
+                                className="flex items-center justify-between gap-3 border border-base-300 bg-white px-3 py-2 text-sm font-medium"
                             >
                               <span>{exercise.title}</span>
                               <input
@@ -130,7 +130,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
           )}
         </div>
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-base-content/60">
+          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/60">
             Artists
           </h3>
           {filtered.artists.length ? (
@@ -144,7 +144,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
                     return (
                       <label
                         key={song.id}
-                        className="flex items-center justify-between gap-3 rounded-xl bg-base-200/85 px-3 py-2 text-sm"
+                        className="flex items-center justify-between gap-3 border border-base-300 bg-base-200 px-3 py-2 text-sm font-medium"
                       >
                         <span>{song.title}</span>
                         <input

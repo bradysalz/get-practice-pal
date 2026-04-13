@@ -61,7 +61,7 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
                 <Link
                   key={setlist.id}
                   href={`/setlists/${setlist.id}`}
-                  className="accent-card block p-5 transition hover:border-primary/25 hover:bg-red-50/35"
+                  className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
@@ -75,7 +75,7 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
                         </span>
                       </div>
                     </div>
-                    <span className="text-sm font-medium text-primary">Open</span>
+                    <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                   </div>
                 </Link>
               ))
@@ -115,7 +115,7 @@ export function SetlistDetailPage({
       <section className="page-hero p-6 md:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <Link href="/setlists" className="text-sm font-medium text-primary">
+            <Link href="/setlists" className="text-sm font-bold uppercase tracking-wide text-primary">
               Back to setlists
             </Link>
             <p className="eyebrow mt-4">Setlist</p>

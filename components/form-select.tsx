@@ -52,7 +52,7 @@ export function FormSelect({
             ▾
           </span>
         </summary>
-        <ul className="dropdown-content form-select-menu menu w-full rounded-[1.15rem] bg-base-100 p-2 shadow-xl">
+        <ul className="dropdown-content form-select-menu menu w-full bg-base-100 p-2">
           <li>
             <button
               className={!value ? "form-select-active" : ""}

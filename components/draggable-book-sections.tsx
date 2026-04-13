@@ -73,7 +73,7 @@ function SortableSectionRow({
       </div>
       <Link
         href={`/library/books/${bookId}/sections/${section.id}`}
-        className="section-panel block flex-1 p-5 transition hover:border-primary/25 hover:bg-red-50/30"
+        className="section-panel block flex-1 p-5 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
       >
         <div className="flex items-start justify-between gap-4">
           <div>

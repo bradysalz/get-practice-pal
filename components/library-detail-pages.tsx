@@ -33,7 +33,7 @@ export function BookDetailPage({
       <section className="page-hero p-6 md:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <Link href="/library" className="text-sm font-medium text-primary">
+            <Link href="/library" className="text-sm font-bold uppercase tracking-wide text-primary">
               Back to library
             </Link>
             <p className="eyebrow mt-4">Book</p>
@@ -116,7 +116,7 @@ export function ArtistDetailPage({
       <section className="page-hero p-6 md:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
-            <Link href="/library" className="text-sm font-medium text-primary">
+            <Link href="/library" className="text-sm font-bold uppercase tracking-wide text-primary">
               Back to library
             </Link>
             <p className="eyebrow mt-4">Artist</p>
@@ -176,7 +176,7 @@ export function SectionDetailPage({
     <div className="space-y-6">
       <section className="page-hero p-6 md:p-8">
         <div className="max-w-3xl">
-          <Link href={`/library/books/${book.id}`} className="text-sm font-medium text-primary">
+          <Link href={`/library/books/${book.id}`} className="text-sm font-bold uppercase tracking-wide text-primary">
             Back to {book.title}
           </Link>
           <p className="eyebrow mt-4">Section</p>

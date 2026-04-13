@@ -183,8 +183,8 @@ function EmptyBox({ label }: { label: string }) {
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="soft-stat px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-base-content/55">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-base-content">{value}</p>
+      <p className="text-xs font-bold uppercase tracking-[0.15em] text-current opacity-70">{label}</p>
+      <p className="mt-2 text-2xl font-bold text-base-content">{value}</p>
     </div>
   );
 }

@@ -95,7 +95,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                     <Link
                       key={book.id}
                       href={`/library/books/${book.id}`}
-                      className="accent-card block p-5 transition hover:border-primary/25 hover:bg-red-50/35"
+                      className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
                     >
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
@@ -112,7 +112,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                             </span>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-primary">Open</span>
+                        <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                       </div>
                     </Link>
                   );
@@ -136,7 +136,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                     <Link
                       key={artist.id}
                       href={`/library/artists/${artist.id}`}
-                      className="accent-card block p-5 transition hover:border-primary/25 hover:bg-red-50/35"
+                      className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
                     >
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
@@ -147,7 +147,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                             </span>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-primary">Open</span>
+                        <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                       </div>
                     </Link>
                   );
@@ -185,10 +185,10 @@ export function SectionHeader({
 export function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="soft-stat px-4 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-base-content/55">
+      <p className="text-xs font-bold uppercase tracking-[0.15em] text-current opacity-70">
         {label}
       </p>
-      <p className="mt-2 text-[2rem] font-semibold text-base-content">{value}</p>
+      <p className="mt-2 text-[2rem] font-bold text-base-content">{value}</p>
     </div>
   );
 }
