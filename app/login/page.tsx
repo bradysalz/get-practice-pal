@@ -5,6 +5,7 @@ import {
   signInWithPasswordAction,
   signUpWithPasswordAction,
 } from "@/lib/auth/actions";
+import { Field, TextInput } from "@/components/ui/primitives";
 import { getAuthState } from "@/lib/auth/session";
 
 type LoginPageProps = {
@@ -45,16 +46,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   Primary sign-in flow for real usage and deployment.
                 </p>
               </div>
-              <label className="form-control w-full">
-                <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
-                <input
+              <Field label="Email">
+                <TextInput
                   required
                   type="email"
                   name="email"
                   placeholder="you@example.com"
-                  className="input app-field w-full"
                 />
-              </label>
+              </Field>
               <button className="btn btn-primary w-full sm:w-auto" type="submit">
                 Send magic link
               </button>
@@ -71,14 +70,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 </div>
 
                 <form action={signInWithPasswordAction} className="space-y-3">
-                  <label className="form-control w-full">
-                    <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
-                    <input required type="email" name="email" className="input app-field w-full" />
-                  </label>
-                  <label className="form-control w-full">
-                    <span className="label-text mb-2 text-sm font-medium text-base-content">Password</span>
-                    <input required type="password" name="password" className="input app-field w-full" />
-                  </label>
+                  <Field label="Email">
+                    <TextInput required type="email" name="email" />
+                  </Field>
+                  <Field label="Password">
+                    <TextInput required type="password" name="password" />
+                  </Field>
                   <button className="btn btn-secondary w-full sm:w-auto" type="submit">
                     Sign in with password
                   </button>
@@ -87,14 +84,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <div className="divider my-1">or</div>
 
                 <form action={signUpWithPasswordAction} className="space-y-3">
-                  <label className="form-control w-full">
-                    <span className="label-text mb-2 text-sm font-medium text-base-content">Email</span>
-                    <input required type="email" name="email" className="input app-field w-full" />
-                  </label>
-                  <label className="form-control w-full">
-                    <span className="label-text mb-2 text-sm font-medium text-base-content">Password</span>
-                    <input required type="password" name="password" className="input app-field w-full" />
-                  </label>
+                  <Field label="Email">
+                    <TextInput required type="email" name="email" />
+                  </Field>
+                  <Field label="Password">
+                    <TextInput required type="password" name="password" />
+                  </Field>
                   <button className="btn btn-outline w-full sm:w-auto" type="submit">
                     Create dev password account
                   </button>

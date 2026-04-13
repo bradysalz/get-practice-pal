@@ -8,13 +8,18 @@ import {
 import { DraggableBookSections } from "@/components/draggable-book-sections";
 import { SectionBuilderForm } from "@/components/section-builder-form";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import {
+  EmptyState,
+  PageHero,
+  PagePanel,
+  StatCard,
+  TextInput,
+} from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import {
   CreateSongForm,
   EditSongForm,
-  EmptyBox,
   SectionHeader,
-  StatCard,
 } from "@/components/library-manager";
 
 export function BookDetailPage({
@@ -30,37 +35,33 @@ export function BookDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <Link href="/library" className="text-sm font-bold uppercase tracking-wide text-primary">
-              Back to library
-            </Link>
-            <p className="eyebrow mt-4">Book</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              {book.title}
-            </h1>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="chip chip-neutral">{book.composer || "No composer set"}</span>
-            </div>
-          </div>
+      <PageHero
+        backHref="/library"
+        backLabel="Back to library"
+        eyebrow="Book"
+        title={book.title}
+        stats={
           <div className="grid grid-cols-2 gap-3 md:min-w-[18rem]">
             <StatCard label="Sections" value={String(sectionCount)} />
             <StatCard label="Exercises" value={String(exerciseCount)} />
           </div>
+        }
+      >
+        <div className="flex flex-wrap gap-2">
+          <span className="chip chip-neutral">{book.composer || "No composer set"}</span>
         </div>
-      </section>
+      </PageHero>
 
       <section className="space-y-6">
-        <section className="page-panel p-6">
+        <PagePanel>
           <form action={updateBookAction} className="max-w-3xl space-y-4">
             <input type="hidden" name="bookId" value={book.id} />
-            <input
+            <TextInput
               className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-4xl"
               name="title"
               defaultValue={book.title}
             />
-            <input
+            <TextInput
               className="w-full border-0 bg-transparent p-0 text-lg text-base-content/70 outline-none"
               name="composer"
               defaultValue={book.composer ?? ""}
@@ -68,9 +69,9 @@ export function BookDetailPage({
             />
             <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
           </form>
-        </section>
+        </PagePanel>
 
-        <section className="page-panel p-6">
+        <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader
               title="Sections"
@@ -95,10 +96,10 @@ export function BookDetailPage({
                   }))}
               />
             ) : (
-              <EmptyBox label="No sections yet. Add your first section." />
+              <EmptyState label="No sections yet. Add your first section." />
             )}
           </div>
-        </section>
+        </PagePanel>
       </section>
     </div>
   );
@@ -113,37 +114,32 @@ export function ArtistDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <Link href="/library" className="text-sm font-bold uppercase tracking-wide text-primary">
-              Back to library
-            </Link>
-            <p className="eyebrow mt-4">Artist</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              {artist.name}
-            </h1>
-          </div>
+      <PageHero
+        backHref="/library"
+        backLabel="Back to library"
+        eyebrow="Artist"
+        title={artist.name}
+        stats={
           <div className="grid grid-cols-1 gap-3 md:min-w-[12rem]">
             <StatCard label="Songs" value={String(songCount)} />
           </div>
-        </div>
-      </section>
+        }
+      />
 
       <section className="space-y-6">
-        <section className="page-panel p-6">
+        <PagePanel>
           <form action={updateArtistAction} className="max-w-3xl space-y-4">
             <input type="hidden" name="artistId" value={artist.id} />
-            <input
+            <TextInput
               className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-4xl"
               name="name"
               defaultValue={artist.name}
             />
             <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
           </form>
-        </section>
+        </PagePanel>
 
-        <section className="page-panel p-6">
+        <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader
               title="Songs"
@@ -156,10 +152,10 @@ export function ArtistDetailPage({
             {songCount ? (
               (artist.songs ?? []).map((song) => <EditSongForm key={song.id} song={song} />)
             ) : (
-              <EmptyBox label="No songs yet. Add your first song." />
+              <EmptyState label="No songs yet. Add your first song." />
             )}
           </div>
-        </section>
+        </PagePanel>
       </section>
     </div>
   );
@@ -174,17 +170,12 @@ export function SectionDetailPage({
 }) {
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="max-w-3xl">
-          <Link href={`/library/books/${book.id}`} className="text-sm font-bold uppercase tracking-wide text-primary">
-            Back to {book.title}
-          </Link>
-          <p className="eyebrow mt-4">Section</p>
-          <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-            {section ? section.title : "New section"}
-          </h1>
-        </div>
-      </section>
+      <PageHero
+        backHref={`/library/books/${book.id}`}
+        backLabel={`Back to ${book.title}`}
+        eyebrow="Section"
+        title={section ? section.title : "New section"}
+      />
 
       <section className="space-y-6">
         <SectionBuilderForm
@@ -195,7 +186,7 @@ export function SectionDetailPage({
         />
 
         {section ? (
-          <section className="page-panel p-6">
+          <PagePanel>
             <SectionHeader
               title="Current Exercises"
             />
@@ -212,10 +203,10 @@ export function SectionDetailPage({
                   </div>
                 ))
               ) : (
-                <EmptyBox label="No exercises yet for this section." />
+                <EmptyState label="No exercises yet for this section." />
               )}
             </div>
-          </section>
+          </PagePanel>
         ) : null}
       </section>
     </div>

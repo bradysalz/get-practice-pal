@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FormSelect } from "@/components/form-select";
+import { Field, PagePanel, TextInput } from "@/components/ui/primitives";
 import type { ExerciseNamingType } from "@/lib/section-builder";
 import { buildExerciseNames } from "@/lib/section-builder";
 
@@ -46,32 +47,28 @@ export function SectionBuilderForm({
       <input type="hidden" name="existingExerciseCount" value={existingCount} />
       <input type="hidden" name="position" value={String(section?.position ?? 1)} />
 
-      <div className="page-panel p-5">
+      <PagePanel className="p-5">
         <div className="grid gap-4">
-          <label className="form-control w-full">
-            <span className="label-text mb-2 text-sm font-medium text-base-content">Section title</span>
-            <input
-              className="input app-field w-full"
+          <Field label="Section title">
+            <TextInput
               name="title"
               defaultValue={section?.title ?? ""}
               placeholder="Triplet Grid"
             />
-          </label>
-          <label className="form-control w-full">
-            <span className="label-text mb-2 text-sm font-medium text-base-content">Default goal tempo</span>
-            <input
-              className="input app-field w-full"
+          </Field>
+          <Field label="Default goal tempo">
+            <TextInput
               name="defaultGoalTempo"
               type="number"
               min={1}
               defaultValue={section?.default_goal_tempo ?? ""}
               placeholder="132"
             />
-          </label>
+          </Field>
         </div>
-      </div>
+      </PagePanel>
 
-      <div className="page-panel p-5">
+      <PagePanel className="p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/50">
@@ -84,17 +81,15 @@ export function SectionBuilderForm({
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-3">
-          <label className="form-control w-full">
-            <span className="label-text mb-2 text-sm font-medium text-base-content">New exercises</span>
-            <input
-              className="input app-field w-full"
+          <Field label="New exercises">
+            <TextInput
               name="exerciseCount"
               type="number"
               min={0}
               value={exerciseCount}
               onChange={(event) => setExerciseCount(Number(event.target.value) || 0)}
             />
-          </label>
+          </Field>
           <FormSelect
             label="Enumeration"
             name="namingType"
@@ -106,16 +101,14 @@ export function SectionBuilderForm({
               { value: "roman", label: "I, II, III..." },
             ]}
           />
-          <label className="form-control w-full">
-            <span className="label-text mb-2 text-sm font-medium text-base-content">Prefix</span>
-            <input
-              className="input app-field w-full"
+          <Field label="Prefix">
+            <TextInput
               name="exercisePrefix"
               value={prefix}
               onChange={(event) => setPrefix(event.target.value)}
               placeholder="Exercise"
             />
-          </label>
+          </Field>
         </div>
 
         <div className="mt-5 border-2 border-base-300 bg-base-200 p-4">
@@ -135,7 +128,7 @@ export function SectionBuilderForm({
             ) : null}
           </div>
         </div>
-      </div>
+      </PagePanel>
 
       <button className="btn btn-primary" type="submit">
         {mode === "create" ? "Create section" : "Save section"}

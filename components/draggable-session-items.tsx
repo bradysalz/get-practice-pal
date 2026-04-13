@@ -25,6 +25,7 @@ import {
   updateSessionItemAction,
 } from "@/app/(app)/sessions/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { DragHandle, Field, TextInput } from "@/components/ui/primitives";
 
 type SessionItemRow = {
   exerciseId: string | null;
@@ -68,16 +69,12 @@ function SortableSessionRow({
       }}
       className={`list-row flex items-start gap-3 p-4 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
     >
-      <button
+      <DragHandle
         ref={setActivatorNodeRef}
-        type="button"
-        className="btn btn-ghost btn-sm cursor-grab active:cursor-grabbing"
-        aria-label={`Drag ${item.label}`}
+        label={`Drag ${item.label}`}
         {...attributes}
         {...listeners}
-      >
-        ⋮⋮
-      </button>
+      />
       <div className="flex-1">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
@@ -91,16 +88,14 @@ function SortableSessionRow({
                 <input type="hidden" name="exerciseId" value={item.exerciseId ?? ""} />
                 <input type="hidden" name="songId" value={item.songId ?? ""} />
                 <input type="hidden" name="displayOrder" value={String(order)} />
-                <label className="form-control w-full">
-                  <span className="label-text mb-2 text-sm font-medium text-base-content">Tempo</span>
-                  <input
-                    className="input app-field w-full"
+                <Field label="Tempo">
+                  <TextInput
                     name="tempo"
                     type="number"
                     min={1}
                     defaultValue={item.tempo}
                   />
-                </label>
+                </Field>
                 <FormSubmitButton
                   label="Save"
                   pendingLabel="Saving..."

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   createArtistAction,
@@ -14,6 +13,16 @@ import {
 } from "@/app/(app)/library/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { ActionModal } from "@/components/action-modal";
+import {
+  CardLink,
+  EmptyState,
+  Field,
+  PageHero,
+  PagePanel,
+  SectionTitle,
+  StatCard as PrimitiveStatCard,
+  TextInput,
+} from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 
 type LibraryManagerProps = {
@@ -37,51 +46,39 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
 
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <p className="eyebrow">Library</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              Keep your material organized.
-            </h1>
-          </div>
+      <PageHero
+        eyebrow="Library"
+        title="Keep your material organized."
+        stats={
           <div className="grid grid-cols-2 gap-3 md:min-w-[20rem]">
             <StatCard label="Books" value={String(snapshot.books.length)} />
             <StatCard label="Exercises" value={String(exerciseCount)} />
             <StatCard label="Artists" value={String(snapshot.artists.length)} />
             <StatCard label="Songs" value={String(songCount)} />
           </div>
-        </div>
-      </section>
+        }
+      />
 
       <section className="space-y-6">
-        <div className="page-panel p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <SectionHeader
-              title="Create"
-            />
-            <div className="flex flex-wrap gap-3">
-              <ActionModal
-                title="Add book"
-                triggerLabel="Add book"
-              >
-                <CreateBookForm />
-              </ActionModal>
-              <ActionModal
-                title="Add artist"
-                triggerLabel="Add artist"
-              >
-                <CreateArtistForm />
-              </ActionModal>
-            </div>
-          </div>
-        </div>
+        <PagePanel>
+          <SectionTitle
+            title="Create"
+            actions={
+              <>
+                <ActionModal title="Add book" triggerLabel="Add book">
+                  <CreateBookForm />
+                </ActionModal>
+                <ActionModal title="Add artist" triggerLabel="Add artist">
+                  <CreateArtistForm />
+                </ActionModal>
+              </>
+            }
+          />
+        </PagePanel>
 
         <div className="space-y-6">
-          <section className="page-panel p-6">
-            <SectionHeader
-              title="Books"
-            />
+          <PagePanel>
+            <SectionTitle title="Books" />
             <div className="mt-5 space-y-3">
               {snapshot.books.length ? (
                 snapshot.books.map((book) => {
@@ -92,11 +89,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                   );
 
                   return (
-                    <Link
-                      key={book.id}
-                      href={`/library/books/${book.id}`}
-                      className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                    >
+                    <CardLink key={book.id} href={`/library/books/${book.id}`}>
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
                           <h2 className="text-lg font-bold text-base-content">{book.title}</h2>
@@ -114,30 +107,24 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                         </div>
                         <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                       </div>
-                    </Link>
+                    </CardLink>
                   );
                 })
               ) : (
-                <EmptyBox label="No books yet. Add your first book." />
+                <EmptyState label="No books yet. Add your first book." />
               )}
             </div>
-          </section>
+          </PagePanel>
 
-          <section className="page-panel p-6">
-            <SectionHeader
-              title="Artists"
-            />
+          <PagePanel>
+            <SectionTitle title="Artists" />
             <div className="mt-5 space-y-3">
               {snapshot.artists.length ? (
                 snapshot.artists.map((artist) => {
                   const artistSongCount = artist.songs?.length ?? 0;
 
                   return (
-                    <Link
-                      key={artist.id}
-                      href={`/library/artists/${artist.id}`}
-                      className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                    >
+                    <CardLink key={artist.id} href={`/library/artists/${artist.id}`}>
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
                           <h2 className="text-lg font-bold text-base-content">{artist.name}</h2>
@@ -149,14 +136,14 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                         </div>
                         <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                       </div>
-                    </Link>
+                    </CardLink>
                   );
                 })
               ) : (
-                <EmptyBox label="No artists yet. Add your first artist." />
+                <EmptyState label="No artists yet. Add your first artist." />
               )}
             </div>
-          </section>
+          </PagePanel>
         </div>
       </section>
     </div>
@@ -172,9 +159,7 @@ export function SectionHeader({
 }) {
   return (
     <div>
-      <div className="section-bar w-fit">
-        <span className="text-lg font-bold">{title}</span>
-      </div>
+      <h2 className="text-lg font-bold text-primary">{title}</h2>
       {description ? (
         <p className="mt-2 max-w-3xl text-sm leading-6 text-base-content/75">{description}</p>
       ) : null}
@@ -183,18 +168,11 @@ export function SectionHeader({
 }
 
 export function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="soft-stat px-4 py-4">
-      <p className="text-xs font-bold uppercase tracking-[0.15em] text-current opacity-70">
-        {label}
-      </p>
-      <p className="mt-2 text-[2rem] font-bold text-base-content">{value}</p>
-    </div>
-  );
+  return <PrimitiveStatCard label={label} value={value} />;
 }
 
 export function EmptyBox({ label }: { label: string }) {
-  return <div className="empty-box px-4 py-4 text-sm">{label}</div>;
+  return <EmptyState label={label} />;
 }
 
 export function CardForm({
@@ -235,17 +213,15 @@ export function Input({
   type?: string;
 }) {
   return (
-    <label className="form-control w-full">
-      <span className="label-text mb-2 text-sm font-medium text-base-content">{label}</span>
-      <input
-        className="input app-field w-full"
+    <Field label={label}>
+      <TextInput
         defaultValue={defaultValue ?? ""}
         min={min}
         name={name}
         placeholder={placeholder}
         type={type}
       />
-    </label>
+    </Field>
   );
 }
 

@@ -1,5 +1,6 @@
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { FormSelect } from "@/components/form-select";
+import { EmptyState, PageHero, PagePanel, StatCard } from "@/components/ui/primitives";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
 type StatsDashboardProps = {
@@ -57,22 +58,18 @@ export function StatsDashboard({
 
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <p className="eyebrow">Stats</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              See what is improving.
-            </h1>
-          </div>
+      <PageHero
+        eyebrow="Stats"
+        title="See what is improving."
+        stats={
           <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
             {snapshot.books.length} books · {snapshot.artists.length} artists
           </div>
-        </div>
-      </section>
+        }
+      />
 
       <section className="space-y-6">
-        <section className="page-panel p-6">
+        <PagePanel>
           <h2 className="font-display text-xl font-semibold text-base-content">Progress to goal tempo</h2>
           <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
             <FormSelect
@@ -115,18 +112,18 @@ export function StatsDashboard({
                     </div>
                   ))
                 ) : (
-                  <EmptyBox label="No progress points found in the selected range." />
+                  <EmptyState label="No progress points found in the selected range." />
                 )}
               </div>
             </div>
           ) : (
             <div className="mt-6">
-              <EmptyBox label="Choose an exercise or song to see progress." />
+              <EmptyState label="Choose an exercise or song to see progress." />
             </div>
           )}
-        </section>
+        </PagePanel>
 
-        <section className="page-panel p-6">
+        <PagePanel>
           <h2 className="font-display text-xl font-semibold text-base-content">Book completion</h2>
           <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
             <FormSelect
@@ -163,28 +160,11 @@ export function StatsDashboard({
             </div>
           ) : (
             <div className="mt-6">
-              <EmptyBox label="Choose a book to see completion." />
+              <EmptyState label="Choose a book to see completion." />
             </div>
           )}
-        </section>
+        </PagePanel>
       </section>
-    </div>
-  );
-}
-
-function EmptyBox({ label }: { label: string }) {
-  return (
-    <div className="empty-box px-4 py-4 text-sm">
-      {label}
-    </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="soft-stat px-4 py-4">
-      <p className="text-xs font-bold uppercase tracking-[0.15em] text-current opacity-70">{label}</p>
-      <p className="mt-2 text-2xl font-bold text-base-content">{value}</p>
     </div>
   );
 }
