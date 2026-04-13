@@ -60,7 +60,7 @@ export function StatsDashboard({
     <div className="space-y-6">
       <PageHero
         eyebrow="Stats"
-        title="See what is improving."
+        title=""
         stats={
           <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
             {snapshot.books.length} books · {snapshot.artists.length} artists
@@ -70,7 +70,7 @@ export function StatsDashboard({
 
       <section className="space-y-6">
         <PagePanel>
-          <h2 className="font-display text-xl font-semibold text-base-content">Progress to goal tempo</h2>
+          <h2 className="font-display text-xl font-semibold text-base-content">Tempo</h2>
           <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
             <FormSelect
               label="Exercise or song"
@@ -112,19 +112,19 @@ export function StatsDashboard({
                     </div>
                   ))
                 ) : (
-                  <EmptyState label="No progress points found in the selected range." />
+                  <EmptyState label="No progress in this range." />
                 )}
               </div>
             </div>
           ) : (
             <div className="mt-6">
-              <EmptyState label="Choose an exercise or song to see progress." />
+              <EmptyState label="Choose an item." />
             </div>
           )}
         </PagePanel>
 
         <PagePanel>
-          <h2 className="font-display text-xl font-semibold text-base-content">Book completion</h2>
+          <h2 className="font-display text-xl font-semibold text-base-content">Books</h2>
           <form className="mt-5 grid gap-3 md:grid-cols-[1.2fr_0.6fr_auto] md:items-end">
             <FormSelect
               label="Book"
@@ -160,7 +160,7 @@ export function StatsDashboard({
             </div>
           ) : (
             <div className="mt-6">
-              <EmptyState label="Choose a book to see completion." />
+              <EmptyState label="Choose a book." />
             </div>
           )}
         </PagePanel>

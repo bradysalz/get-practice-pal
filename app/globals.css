@@ -85,6 +85,11 @@ h4,
   box-shadow: var(--app-shadow);
 }
 
+.app-shell-frame {
+  border: 2px solid #0a0a0a;
+  box-shadow: 4px 4px 0 #0a0a0a;
+}
+
 .page-hero {
   border-radius: 0;
   border: 2px solid #0a0a0a;
@@ -127,9 +132,10 @@ h4,
 }
 
 .eyebrow {
-  font-size: 0.75rem;
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: 0.15em;
+  line-height: 1.2;
   text-transform: uppercase;
   color: var(--accent-red);
 }

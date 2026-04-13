@@ -28,10 +28,9 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
             isOpen ? "translate-x-0" : "-translate-x-[120%] md:translate-x-0"
           }`}
         >
-          <div className="app-shell-surface flex h-full flex-col p-5 md:sticky md:top-6 md:min-h-[calc(100vh-3rem)]">
+          <div className="page-panel flex h-full flex-col p-5 md:sticky md:top-6 md:min-h-[calc(100vh-3rem)]">
             <Link href="/sessions" className="space-y-1">
               <p className="eyebrow">PracticePal</p>
-              <h1 className="font-display text-3xl font-semibold text-base-content">Practice tracking</h1>
             </Link>
             <nav className="mt-8 flex flex-col gap-2">
               {navigationItems.map((item) => (
@@ -61,10 +60,9 @@ export function AppShell({ authConfigured, children, userEmail }: AppShellProps)
           </div>
         </aside>
         <main className="flex-1 md:pl-0">
-          <div className="app-shell-surface mb-4 flex items-center justify-between px-4 py-3 md:hidden">
+          <div className="page-panel mb-4 flex items-center justify-between px-4 py-3 md:hidden">
             <div>
               <p className="eyebrow">PracticePal</p>
-              <p className="text-sm text-base-content/70">Responsive side rail</p>
             </div>
             <button
               type="button"

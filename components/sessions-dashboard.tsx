@@ -5,10 +5,11 @@ import {
   resumeSessionAction,
   startSessionAction,
 } from "@/app/(app)/sessions/actions";
+import Link from "next/link";
 import { DraggableSessionItems } from "@/components/draggable-session-items";
 import { FormSelect } from "@/components/form-select";
 import { FormSubmitButton } from "@/components/form-submit-button";
-import { EmptyState, Field, PageHero, PagePanel, TextInput, Textarea } from "@/components/ui/primitives";
+import { EmptyState, Field, FormActions, PageHero, PagePanel, TextInput, Textarea } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
@@ -70,10 +71,10 @@ export function SessionsDashboard({
     <div className="space-y-6">
       <PageHero
         eyebrow="Sessions"
-        title="Log practice as you go."
+        title=""
         stats={
           <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
-            {currentSession ? "An active session is in progress." : "No active session right now."}
+            {currentSession ? "Active session" : "No active session"}
           </div>
         }
       />
@@ -129,7 +130,7 @@ export function SessionsDashboard({
                       sessionId={currentSession.id}
                     />
                   ) : (
-                    <EmptyState label="No exercises or songs logged yet." />
+                    <EmptyState label="No logged items." />
                   )}
                 </PagePanel>
 
@@ -147,7 +148,9 @@ export function SessionsDashboard({
                     <Field label="Tempo">
                       <TextInput name="tempo" type="number" min={1} />
                     </Field>
-                    <FormSubmitButton label="Log item" pendingLabel="Logging..." />
+                    <FormActions>
+                      <FormSubmitButton label="Log item" pendingLabel="Logging..." />
+                    </FormActions>
                   </div>
                 </form>
 
@@ -160,7 +163,7 @@ export function SessionsDashboard({
                         className="mt-4 min-h-32"
                         name="notes"
                         defaultValue={currentSession.notes ?? ""}
-                        placeholder="How did the session feel?"
+                        placeholder="Notes"
                       />
                     </div>
                     <div className="md:pt-[2.7rem]">
@@ -177,15 +180,15 @@ export function SessionsDashboard({
                 <FormSelect
                   label="Setlist"
                   name="sourceSetlistId"
-                  emptyLabel="Scratch"
+                  emptyLabel="Blank setlist"
                   options={librarySnapshot.setlists.map((setlist) => ({
                     value: setlist.id,
                     label: setlist.name,
                   }))}
                 />
-                <div className="mt-4">
+                <FormActions>
                   <FormSubmitButton label="Start session" pendingLabel="Starting..." />
-                </div>
+                </FormActions>
               </form>
             </PagePanel>
           )}
@@ -196,7 +199,7 @@ export function SessionsDashboard({
             <div className="mt-5 space-y-3">
               {recentSessions.length ? (
                 recentSessions.map((session) => (
-                  <div key={session.id} className="list-row p-4">
+                  <Link key={session.id} href={`/sessions/${session.id}`} className="list-row block p-4 transition-colors hover:bg-base-100">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-medium text-base-content">{formatDateTime(session.started_at)}</p>
@@ -207,12 +210,14 @@ export function SessionsDashboard({
                       </span>
                     </div>
                     {session.notes ? (
-                      <p className="mt-3 text-sm leading-6 text-base-content/75">{session.notes}</p>
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-base-content/75">
+                        {session.notes}
+                      </p>
                     ) : null}
-                  </div>
+                  </Link>
                 ))
               ) : (
-                <EmptyState label="No session history yet." />
+                <EmptyState label="No session history." />
               )}
             </div>
           </PagePanel>

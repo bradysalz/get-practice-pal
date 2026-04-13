@@ -33,9 +33,11 @@ export function PageHero({
             </Link>
           ) : null}
           <p className={joinClasses("eyebrow", backHref ? "mt-4" : undefined)}>{eyebrow}</p>
-          <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-            {title}
-          </h1>
+          {title ? (
+            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
+              {title}
+            </h1>
+          ) : null}
           {children ? <div className="mt-3">{children}</div> : null}
         </div>
         {stats ? <div>{stats}</div> : null}
@@ -125,6 +127,16 @@ export function Field({
       {children}
     </label>
   );
+}
+
+export function FormActions({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={joinClasses("pt-2", className)}>{children}</div>;
 }
 
 export const TextInput = forwardRef<HTMLInputElement, ComponentPropsWithoutRef<"input">>(

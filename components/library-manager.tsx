@@ -17,6 +17,7 @@ import {
   CardLink,
   EmptyState,
   Field,
+  FormActions,
   PageHero,
   PagePanel,
   SectionTitle,
@@ -48,7 +49,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
     <div className="space-y-6">
       <PageHero
         eyebrow="Library"
-        title="Keep your material organized."
+        title=""
         stats={
           <div className="grid grid-cols-2 gap-3 md:min-w-[20rem]">
             <StatCard label="Books" value={String(snapshot.books.length)} />
@@ -65,10 +66,10 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
             title="Create"
             actions={
               <>
-                <ActionModal title="Add book" triggerLabel="Add book">
+                <ActionModal triggerLabel="Add book" submitFormId="create-book-form" submitLabel="Save">
                   <CreateBookForm />
                 </ActionModal>
-                <ActionModal title="Add artist" triggerLabel="Add artist">
+                <ActionModal triggerLabel="Add artist" submitFormId="create-artist-form" submitLabel="Save">
                   <CreateArtistForm />
                 </ActionModal>
               </>
@@ -111,7 +112,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                   );
                 })
               ) : (
-                <EmptyState label="No books yet. Add your first book." />
+                <EmptyState label="No books yet." />
               )}
             </div>
           </PagePanel>
@@ -140,7 +141,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                   );
                 })
               ) : (
-                <EmptyState label="No artists yet. Add your first artist." />
+                <EmptyState label="No artists yet." />
               )}
             </div>
           </PagePanel>
@@ -179,20 +180,20 @@ export function CardForm({
   title,
   description,
   children,
+  surface = "card",
 }: {
-  title: string;
+  title?: string;
   description?: string;
   children: ReactNode;
+  surface?: "card" | "plain";
 }) {
   return (
-    <div className="accent-card p-4">
-      <h3 className="text-lg font-bold text-primary">
-        {title}
-      </h3>
+    <div className={surface === "card" ? "accent-card p-4" : ""}>
+      {title ? <h3 className="text-lg font-bold text-primary">{title}</h3> : null}
       {description ? (
         <p className="mt-2 text-sm leading-6 text-base-content/70">{description}</p>
       ) : null}
-      <div className="mt-4 space-y-3">{children}</div>
+      <div className={title || description ? "mt-4 space-y-4" : "space-y-4"}>{children}</div>
     </div>
   );
 }
@@ -227,11 +228,10 @@ export function Input({
 
 export function CreateBookForm() {
   return (
-    <form action={createBookAction}>
-      <CardForm title="Add book" description="">
+    <form id="create-book-form" action={createBookAction}>
+      <CardForm surface="plain">
         <Input label="Title" name="title" placeholder="Stick Control" />
-        <Input label="Composer or author" name="composer" placeholder="George Lawrence Stone" />
-        <FormSubmitButton label="Create book" />
+        <Input label="Composer" name="composer" placeholder="George Lawrence Stone" />
       </CardForm>
     </form>
   );
@@ -260,18 +260,19 @@ export function CreateSectionForm({ bookId }: { bookId: string }) {
       <input type="hidden" name="bookId" value={bookId} />
       <input type="hidden" name="position" value="1" />
       <CardForm
-        title="Add section"
-        description=""
+        title="New section"
       >
-        <Input label="Section title" name="title" placeholder="Triplet Grid" />
+        <Input label="Title" name="title" placeholder="Triplet Grid" />
         <Input
-          label="Default goal tempo"
+          label="Default tempo"
           name="defaultGoalTempo"
           type="number"
           min={1}
           placeholder="132"
         />
-        <FormSubmitButton label="Create section" pendingLabel="Creating..." variant="accent" />
+        <FormActions>
+          <FormSubmitButton label="Save" pendingLabel="Saving..." variant="accent" />
+        </FormActions>
       </CardForm>
     </form>
   );
@@ -313,10 +314,9 @@ export function CreateExerciseForm({
       <input type="hidden" name="sectionId" value={sectionId} />
       <input type="hidden" name="position" value="1" />
       <CardForm
-        title="Add exercise"
-        description=""
+        title="New exercise"
       >
-        <Input label="Exercise title" name="title" placeholder="Exercise 1" />
+        <Input label="Title" name="title" placeholder="Exercise 1" />
         <Input
           label="Goal tempo"
           name="goalTempo"
@@ -324,7 +324,9 @@ export function CreateExerciseForm({
           min={1}
           placeholder="Override if needed"
         />
-        <FormSubmitButton label="Create exercise" pendingLabel="Creating..." variant="accent" />
+        <FormActions>
+          <FormSubmitButton label="Save" pendingLabel="Saving..." variant="accent" />
+        </FormActions>
       </CardForm>
     </form>
   );
@@ -369,13 +371,9 @@ export function EditExerciseForm({
 
 export function CreateArtistForm() {
   return (
-    <form action={createArtistAction}>
-      <CardForm
-        title="Add artist"
-        description=""
-      >
-        <Input label="Artist name" name="name" placeholder="John Coltrane" />
-        <FormSubmitButton label="Create artist" pendingLabel="Creating..." />
+    <form id="create-artist-form" action={createArtistAction}>
+      <CardForm surface="plain">
+        <Input label="Name" name="name" placeholder="John Coltrane" />
       </CardForm>
     </form>
   );
@@ -401,10 +399,12 @@ export function CreateSongForm({ artistId }: { artistId: string }) {
   return (
     <form action={createSongAction}>
       <input type="hidden" name="artistId" value={artistId} />
-      <CardForm title="Add song" description="">
-        <Input label="Song title" name="title" placeholder="Giant Steps" />
+      <CardForm title="New song">
+        <Input label="Title" name="title" placeholder="Giant Steps" />
         <Input label="Goal tempo" name="goalTempo" type="number" min={1} placeholder="220" />
-        <FormSubmitButton label="Create song" pendingLabel="Creating..." variant="accent" />
+        <FormActions>
+          <FormSubmitButton label="Save" pendingLabel="Saving..." variant="accent" />
+        </FormActions>
       </CardForm>
     </form>
   );
