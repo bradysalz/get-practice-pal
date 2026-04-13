@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { PagePanel } from "@/components/ui/primitives";
 
 type ActionModalProps = {
   title: string;
@@ -27,7 +28,7 @@ export function ActionModal({
       </button>
       {isOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="page-panel w-full max-w-xl p-6">
+          <PagePanel className="w-full max-w-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="font-display text-xl font-semibold text-base-content">{title}</h2>
@@ -40,7 +41,7 @@ export function ActionModal({
               </button>
             </div>
             <div className="mt-5">{children}</div>
-          </div>
+          </PagePanel>
         </div>
       ) : null}
     </>

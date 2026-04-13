@@ -11,10 +11,18 @@ import { FormSelect } from "@/components/form-select";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import {
   CardForm,
-  EmptyBox,
   SectionHeader,
-  StatCard,
 } from "@/components/library-manager";
+import {
+  CardLink,
+  EmptyState,
+  Field,
+  PageHero,
+  PagePanel,
+  StatCard,
+  TextInput,
+  Textarea,
+} from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
@@ -25,14 +33,10 @@ type SetlistsDashboardProps = {
 export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <p className="eyebrow">Setlists</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              Plan what you want to practice.
-            </h1>
-          </div>
+      <PageHero
+        eyebrow="Setlists"
+        title="Plan what you want to practice."
+        stats={
           <div className="grid grid-cols-2 gap-3 md:min-w-[18rem]">
             <StatCard label="Setlists" value={String(snapshot.setlists.length)} />
             <StatCard
@@ -40,29 +44,25 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
               value={String(snapshot.setlists.reduce((sum, setlist) => sum + (setlist.items?.length ?? 0), 0))}
             />
           </div>
-        </div>
-      </section>
+        }
+      />
 
       <section className="space-y-6">
-        <section className="page-panel p-6">
+        <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader title="Create" />
             <ActionModal title="Add setlist" triggerLabel="Add setlist">
               <CreateSetlistForm />
             </ActionModal>
           </div>
-        </section>
+        </PagePanel>
 
-        <section className="page-panel p-6">
+        <PagePanel>
           <SectionHeader title="Saved Setlists" />
           <div className="mt-5 space-y-3">
             {snapshot.setlists.length ? (
               snapshot.setlists.map((setlist) => (
-                <Link
-                  key={setlist.id}
-                  href={`/setlists/${setlist.id}`}
-                  className="accent-card block p-5 transition-all hover:shadow-[4px_4px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                >
+                <CardLink key={setlist.id} href={`/setlists/${setlist.id}`}>
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                       <h2 className="text-lg font-bold text-base-content">{setlist.name}</h2>
@@ -77,13 +77,13 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
                     </div>
                     <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
                   </div>
-                </Link>
+                </CardLink>
               ))
             ) : (
-              <EmptyBox label="No setlists yet. Add your first setlist." />
+              <EmptyState label="No setlists yet. Add your first setlist." />
             )}
           </div>
-        </section>
+        </PagePanel>
       </section>
     </div>
   );
@@ -112,32 +112,26 @@ export function SetlistDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <Link href="/setlists" className="text-sm font-bold uppercase tracking-wide text-primary">
-              Back to setlists
-            </Link>
-            <p className="eyebrow mt-4">Setlist</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              {setlist.name}
-            </h1>
-            {setlist.description ? (
-              <p className="mt-3 text-sm text-base-content/65">{setlist.description}</p>
-            ) : null}
-          </div>
+      <PageHero
+        backHref="/setlists"
+        backLabel="Back to setlists"
+        eyebrow="Setlist"
+        title={setlist.name}
+        stats={
           <div className="grid grid-cols-1 gap-3 md:min-w-[12rem]">
             <StatCard label="Items" value={String(sortedItems.length)} />
           </div>
-        </div>
-      </section>
+        }
+      >
+        {setlist.description ? <p className="text-sm text-base-content/65">{setlist.description}</p> : null}
+      </PageHero>
 
       <section className="space-y-6">
-        <section className="page-panel p-6">
+        <PagePanel>
           <EditSetlistForm setlist={setlist} />
-        </section>
+        </PagePanel>
 
-        <section className="page-panel p-6">
+        <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader title="Items" />
             <div className="flex flex-wrap gap-3">
@@ -163,10 +157,10 @@ export function SetlistDetailPage({
                 setlistId={setlist.id}
               />
             ) : (
-              <EmptyBox label="No items yet." />
+              <EmptyState label="No items yet." />
             )}
           </div>
-        </section>
+        </PagePanel>
       </section>
     </div>
   );
@@ -176,18 +170,16 @@ function CreateSetlistForm() {
   return (
     <form action={createSetlistAction}>
       <CardForm title="Add setlist">
-        <label className="form-control w-full">
-          <span className="label-text mb-2 text-sm font-medium text-base-content">Name</span>
-          <input className="input app-field w-full" name="name" placeholder="Warm-up block" />
-        </label>
-        <label className="form-control w-full">
-          <span className="label-text mb-2 text-sm font-medium text-base-content">Description</span>
-          <textarea
-            className="textarea app-textarea min-h-28 w-full"
+        <Field label="Name">
+          <TextInput name="name" placeholder="Warm-up block" />
+        </Field>
+        <Field label="Description">
+          <Textarea
+            className="min-h-28"
             name="description"
             placeholder="Hands, rudiments, then tunes."
           />
-        </label>
+        </Field>
         <FormSubmitButton label="Create setlist" pendingLabel="Creating..." />
       </CardForm>
     </form>
@@ -203,13 +195,12 @@ function EditSetlistForm({
     <form action={updateSetlistAction} className="max-w-3xl space-y-4">
       <input type="hidden" name="setlistId" value={setlist.id} />
       <input type="hidden" name="returnPath" value={`/setlists/${setlist.id}`} />
-      <input
+      <TextInput
         className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-4xl"
         name="name"
         defaultValue={setlist.name}
       />
-      <textarea
-        className="textarea app-textarea w-full"
+      <Textarea
         name="description"
         defaultValue={setlist.description ?? ""}
         placeholder="Description"

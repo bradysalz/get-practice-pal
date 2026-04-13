@@ -8,6 +8,7 @@ import {
 import { DraggableSessionItems } from "@/components/draggable-session-items";
 import { FormSelect } from "@/components/form-select";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { EmptyState, Field, PageHero, PagePanel, TextInput, Textarea } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
@@ -67,19 +68,15 @@ export function SessionsDashboard({
 
   return (
     <div className="space-y-6">
-      <section className="page-hero p-6 md:p-8">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl">
-            <p className="eyebrow">Sessions</p>
-            <h1 className="font-display mt-3 text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              Log practice as you go.
-            </h1>
-          </div>
+      <PageHero
+        eyebrow="Sessions"
+        title="Log practice as you go."
+        stats={
           <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
             {currentSession ? "An active session is in progress." : "No active session right now."}
           </div>
-        </div>
-      </section>
+        }
+      />
 
       <section className="grid gap-6">
         <div className="space-y-6">
@@ -112,7 +109,7 @@ export function SessionsDashboard({
               </div>
 
               <div className="space-y-6">
-                <section className="page-panel space-y-4 p-6">
+                <PagePanel className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-lg font-bold text-base-content">Logged items</h3>
                   </div>
@@ -132,9 +129,9 @@ export function SessionsDashboard({
                       sessionId={currentSession.id}
                     />
                   ) : (
-                    <EmptyBox label="No exercises or songs logged yet." />
+                    <EmptyState label="No exercises or songs logged yet." />
                   )}
-                </section>
+                </PagePanel>
 
                 <form action={addSessionItemAction} className="page-panel p-6">
                   <input type="hidden" name="sessionId" value={currentSession.id} />
@@ -147,12 +144,9 @@ export function SessionsDashboard({
                       emptyLabel="Select exercise or song"
                       options={itemOptions}
                     />
-                    <div className="grid gap-3 md:grid-cols-1">
-                      <label className="form-control w-full">
-                        <span className="label-text mb-2 text-sm font-medium text-base-content">Tempo</span>
-                        <input className="input app-field w-full" name="tempo" type="number" min={1} />
-                      </label>
-                    </div>
+                    <Field label="Tempo">
+                      <TextInput name="tempo" type="number" min={1} />
+                    </Field>
                     <FormSubmitButton label="Log item" pendingLabel="Logging..." />
                   </div>
                 </form>
@@ -162,8 +156,8 @@ export function SessionsDashboard({
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex-1">
                       <h3 className="text-lg font-bold text-primary">Session notes</h3>
-                      <textarea
-                        className="textarea app-textarea mt-4 min-h-32 w-full"
+                      <Textarea
+                        className="mt-4 min-h-32"
                         name="notes"
                         defaultValue={currentSession.notes ?? ""}
                         placeholder="How did the session feel?"
@@ -177,7 +171,7 @@ export function SessionsDashboard({
               </div>
             </section>
           ) : (
-            <section className="page-panel p-6">
+            <PagePanel>
               <h2 className="font-display text-xl font-semibold text-base-content">Start a session</h2>
               <form action={startSessionAction} className="mt-5 max-w-xl space-y-4">
                 <FormSelect
@@ -193,11 +187,11 @@ export function SessionsDashboard({
                   <FormSubmitButton label="Start session" pendingLabel="Starting..." />
                 </div>
               </form>
-            </section>
+            </PagePanel>
           )}
 
           {!currentSession ? (
-          <section className="page-panel p-6">
+          <PagePanel>
             <h2 className="font-display text-xl font-semibold text-base-content">Recent sessions</h2>
             <div className="mt-5 space-y-3">
               {recentSessions.length ? (
@@ -218,21 +212,13 @@ export function SessionsDashboard({
                   </div>
                 ))
               ) : (
-                <EmptyBox label="No session history yet." />
+                <EmptyState label="No session history yet." />
               )}
             </div>
-          </section>
+          </PagePanel>
           ) : null}
         </div>
       </section>
-    </div>
-  );
-}
-
-function EmptyBox({ label }: { label: string }) {
-  return (
-    <div className="empty-box px-4 py-4 text-sm">
-      {label}
     </div>
   );
 }

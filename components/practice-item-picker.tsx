@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { EmptyState, Field, PagePanel, TextInput } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 
 type PracticeItemPickerProps = {
@@ -52,7 +53,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
   const selectedItems = Object.keys(selected).filter((key) => selected[key]);
 
   return (
-    <section className="page-panel p-6">
+    <PagePanel>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="eyebrow">Nested Picker</p>
@@ -64,15 +65,14 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
             browsing and lightweight search across exercises and songs.
           </p>
         </div>
-        <label className="form-control w-full md:max-w-sm">
-          <span className="label-text mb-2 text-sm font-medium text-base-content">Search items</span>
-          <input
-            className="input app-field w-full"
+        <Field label="Search items">
+          <TextInput
+            className="md:max-w-sm"
             placeholder="Search books, sections, exercises, artists, or songs"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-        </label>
+        </Field>
       </div>
       <div className="soft-stat mt-4 px-4 py-3 text-sm text-base-content/75">
         {selectedItems.length
@@ -124,9 +124,7 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
               </div>
             ))
           ) : (
-            <div className="empty-box p-5 text-sm">
-              No matching exercises yet.
-            </div>
+            <EmptyState label="No matching exercises yet." className="p-5" />
           )}
         </div>
         <div className="space-y-4">
@@ -165,12 +163,10 @@ export function PracticeItemPicker({ snapshot }: PracticeItemPickerProps) {
               </div>
             ))
           ) : (
-            <div className="empty-box p-5 text-sm">
-              No matching songs yet.
-            </div>
+            <EmptyState label="No matching songs yet." className="p-5" />
           )}
         </div>
       </div>
-    </section>
+    </PagePanel>
   );
 }

@@ -20,6 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
+import { DragHandle } from "@/components/ui/primitives";
 
 type SectionItem = {
   exerciseCount: number;
@@ -59,16 +60,12 @@ function SortableSectionRow({
       }}
       className={`list-row flex items-center gap-3 p-4 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
     >
-      <button
+      <DragHandle
         ref={setActivatorNodeRef}
-        type="button"
-        className="btn btn-ghost btn-sm cursor-grab active:cursor-grabbing"
-        aria-label={`Drag ${section.title}`}
+        label={`Drag ${section.title}`}
         {...attributes}
         {...listeners}
-      >
-        ⋮⋮
-      </button>
+      />
       <Link
         href={`/library/books/${bookId}/sections/${section.id}`}
         className="flex-1"

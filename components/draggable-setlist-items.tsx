@@ -21,6 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState, useTransition } from "react";
 import { deleteSetlistItemAction } from "@/app/(app)/setlists/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { DragHandle } from "@/components/ui/primitives";
 
 type SetlistItemRow = {
   id: string;
@@ -61,16 +62,12 @@ function SortableSetlistRow({
       }}
       className={`list-row flex items-center gap-3 p-4 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
     >
-      <button
+      <DragHandle
         ref={setActivatorNodeRef}
-        type="button"
-        className="btn btn-ghost btn-sm cursor-grab active:cursor-grabbing"
-        aria-label={`Drag ${item.label}`}
+        label={`Drag ${item.label}`}
         {...attributes}
         {...listeners}
-      >
-        ⋮⋮
-      </button>
+      />
       <div className="flex-1">
         <p className="font-medium text-base-content">{item.label}</p>
         <div className="mt-2 flex flex-wrap gap-2">

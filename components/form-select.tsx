@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { Field } from "@/components/ui/primitives";
 
 type FormSelectOption = {
   label: string;
@@ -40,8 +41,7 @@ export function FormSelect({
   }
 
   return (
-    <label className="form-control w-full">
-      <span className="label-text mb-3 text-[0.95rem] font-medium text-base-content">{label}</span>
+    <Field label={label}>
       <input type="hidden" name={name} value={value} />
       <details ref={detailsRef} className="dropdown dropdown-bottom w-full">
         <summary className="form-select-trigger">
@@ -83,6 +83,6 @@ export function FormSelect({
           ))}
         </ul>
       </details>
-    </label>
+    </Field>
   );
 }
