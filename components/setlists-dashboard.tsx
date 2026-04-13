@@ -65,12 +65,12 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold text-base-content">{setlist.name}</h2>
+                      <h2 className="text-lg font-bold text-base-content">{setlist.name}</h2>
                       {setlist.description ? (
                         <p className="mt-2 text-sm text-base-content/65">{setlist.description}</p>
                       ) : null}
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="chip chip-neutral text-[0.72rem]">
+                        <span className="chip chip-neutral">
                           {(setlist.items?.length ?? 0)} item{(setlist.items?.length ?? 0) === 1 ? "" : "s"}
                         </span>
                       </div>

@@ -71,7 +71,7 @@ function SortableSessionRow({
       <button
         ref={setActivatorNodeRef}
         type="button"
-        className="btn btn-outline btn-sm mt-1 cursor-grab active:cursor-grabbing"
+        className="btn btn-ghost btn-sm cursor-grab active:cursor-grabbing"
         aria-label={`Drag ${item.label}`}
         {...attributes}
         {...listeners}

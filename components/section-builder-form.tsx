@@ -78,7 +78,7 @@ export function SectionBuilderForm({
               Exercise Pattern
             </p>
           </div>
-          <div className="chip chip-neutral text-[0.72rem]">
+          <div className="chip chip-neutral ">
             Existing exercises: {existingCount}
           </div>
         </div>
@@ -125,13 +125,13 @@ export function SectionBuilderForm({
           <div className="mt-3 flex flex-wrap gap-2">
             {previewNames.length ? (
               previewNames.slice(0, 6).map((name) => (
-                <span key={name} className="chip chip-neutral text-[0.72rem]">
+                <span key={name} className="chip chip-neutral ">
                   {name}
                 </span>
               ))
             ) : null}
             {previewNames.length > 6 ? (
-              <span className="chip chip-neutral text-[0.72rem]">+{previewNames.length - 6} more</span>
+              <span className="chip chip-neutral ">+{previewNames.length - 6} more</span>
             ) : null}
           </div>
         </div>

@@ -205,7 +205,7 @@ export function SectionDetailPage({
                   <div key={exercise.id} className="list-row p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium text-base-content">{exercise.title}</p>
-                      <span className="chip text-[0.72rem]">
+                      <span className="chip">
                         Goal {exercise.goal_tempo ? `${exercise.goal_tempo} BPM` : "unset"}
                       </span>
                     </div>
