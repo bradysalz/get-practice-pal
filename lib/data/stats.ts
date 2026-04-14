@@ -10,6 +10,22 @@ type RawTempoEntry = {
   }[] | null;
 };
 
+type RawItemRow = {
+  tempo: number;
+  created_at: string;
+  exercise_id: string | null;
+  song_id: string | null;
+};
+
+export type ItemProgressSummary = {
+  goalTempo: number | null;
+  currentMaxTempo: number;
+  completionRatio: number;
+  completed: boolean;
+  entryCount: number;
+  lastRecordedAt: string | null;
+};
+
 export async function getItemTempoHistory(input: {
   itemType: PracticeItemType;
   exerciseId?: string | null;
@@ -78,6 +94,82 @@ export async function getProgressToGoal(input: {
     goalTempo: input.goalTempo,
     progress,
   };
+}
+
+export async function getItemProgressSummaryMap(input: {
+  itemType: PracticeItemType;
+  items: Array<{ id: string; goalTempo: number | null }>;
+  range?: TimeRange;
+}) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const rangeStart = getRangeStart(input.range ?? "all");
+  const ids = input.items.map((item) => item.id);
+
+  const emptyMap = new Map<string, ItemProgressSummary>();
+
+  for (const item of input.items) {
+    emptyMap.set(item.id, {
+      goalTempo: item.goalTempo,
+      currentMaxTempo: 0,
+      completionRatio: 0,
+      completed: false,
+      entryCount: 0,
+      lastRecordedAt: null,
+    });
+  }
+
+  if (!ids.length) {
+    return emptyMap;
+  }
+
+  let query = client
+    .from("practice_session_items")
+    .select("tempo, created_at, exercise_id, song_id")
+    .eq("user_id", user.id)
+    .eq("item_type", input.itemType)
+    .order("created_at", { ascending: true });
+
+  query =
+    input.itemType === "exercise"
+      ? query.in("exercise_id", ids)
+      : query.in("song_id", ids);
+
+  if (rangeStart) {
+    query = query.gte("created_at", rangeStart.toISOString());
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw error;
+
+  for (const row of (data ?? []) as RawItemRow[]) {
+    const id = input.itemType === "exercise" ? row.exercise_id : row.song_id;
+
+    if (!id) {
+      continue;
+    }
+
+    const current = emptyMap.get(id);
+
+    if (!current) {
+      continue;
+    }
+
+    const currentMaxTempo = Math.max(current.currentMaxTempo, row.tempo);
+    const goalTempo = current.goalTempo;
+
+    emptyMap.set(id, {
+      goalTempo,
+      currentMaxTempo,
+      completionRatio: goalTempo && goalTempo > 0 ? currentMaxTempo / goalTempo : 0,
+      completed: goalTempo ? currentMaxTempo >= goalTempo : false,
+      entryCount: current.entryCount + 1,
+      lastRecordedAt: row.created_at,
+    });
+  }
+
+  return emptyMap;
 }
 
 export async function getBookCompletion(bookId: string, range: TimeRange = "all") {

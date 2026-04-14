@@ -18,7 +18,7 @@ export async function getLibrarySnapshot() {
   const [books, artists, setlists] = await Promise.all([
     client
       .from("books")
-      .select("id, title, composer, default_goal_tempo, created_at, sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
+      .select("id, title, composer, created_at, sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
       .eq("user_id", user.id)
       .order("title"),
     client
@@ -53,7 +53,6 @@ export async function createBook(input: BookInsert) {
       user_id: user.id,
       title: input.title,
       composer: input.composer ?? null,
-      default_goal_tempo: input.defaultGoalTempo ?? null,
     })
     .select()
     .single();
@@ -67,7 +66,6 @@ export async function updateBook(
   input: {
     title: string;
     composer?: string | null;
-    defaultGoalTempo?: number | null;
   },
 ) {
   const client = await requireSupabaseClient();
@@ -77,7 +75,6 @@ export async function updateBook(
     .update({
       title: input.title,
       composer: input.composer ?? null,
-      default_goal_tempo: input.defaultGoalTempo ?? null,
     })
     .eq("id", bookId)
     .eq("user_id", user.id)
@@ -200,6 +197,18 @@ export async function updateExercise(
 
   if (error) throw error;
   return data;
+}
+
+export async function deleteExercise(exerciseId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("exercises")
+    .delete()
+    .eq("id", exerciseId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
 }
 
 export async function createArtist(input: ArtistInsert) {

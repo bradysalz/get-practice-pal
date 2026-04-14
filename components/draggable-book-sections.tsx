@@ -23,6 +23,7 @@ import { useEffect, useState, useTransition } from "react";
 import { DragHandle } from "@/components/ui/primitives";
 
 type SectionItem = {
+  completionLabel?: string;
   exerciseCount: number;
   id: string;
   title: string;
@@ -58,7 +59,7 @@ function SortableSectionRow({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`list-row flex items-center gap-3 p-4 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      className={`list-row flex items-center gap-3 p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px] ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
     >
       <DragHandle
         ref={setActivatorNodeRef}
@@ -75,6 +76,9 @@ function SortableSectionRow({
           <span className="chip chip-neutral">
             {section.exerciseCount} exercise{section.exerciseCount === 1 ? "" : "s"}
           </span>
+          {section.completionLabel ? (
+            <span className="chip">{section.completionLabel}</span>
+          ) : null}
         </div>
       </Link>
     </div>

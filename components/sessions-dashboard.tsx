@@ -13,24 +13,25 @@ import { EmptyState, Field, FormActions, PageHero, PagePanel, TextInput, Textare
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
-type SessionsDashboardProps = {
-  currentSession: {
+type SessionDetail = {
+  id: string;
+  started_at: string;
+  ended_at: string | null;
+  paused_at: string | null;
+  is_paused: boolean;
+  notes: string | null;
+  source_setlist_id: string | null;
+  session_items?: Array<{
     id: string;
-    started_at: string;
-    ended_at: string | null;
-    paused_at: string | null;
-    is_paused: boolean;
-    notes: string | null;
-    source_setlist_id: string | null;
-    session_items?: Array<{
-      id: string;
-      item_type: "exercise" | "song";
-      exercise_id: string | null;
-      song_id: string | null;
-      tempo: number;
-      display_order: number;
-    }>;
-  } | null;
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+    tempo: number;
+    display_order: number;
+  }>;
+};
+
+type SessionsDashboardProps = {
   librarySnapshot: LibrarySnapshot;
   recentSessions: Array<{
     id: string;
@@ -51,149 +52,36 @@ type SessionsDashboardProps = {
 };
 
 export function SessionsDashboard({
-  currentSession,
   librarySnapshot,
   recentSessions,
 }: SessionsDashboardProps) {
-  const itemMaps = buildLibraryItemMaps(librarySnapshot);
-  const itemOptions = [
-    ...Array.from(itemMaps.exerciseMap.entries()).map(([id, item]) => ({
-      value: `exercise:${id}`,
-      label: item.label,
-    })),
-    ...Array.from(itemMaps.songMap.entries()).map(([id, item]) => ({
-      value: `song:${id}`,
-      label: item.label,
-    })),
-  ].sort((left, right) => left.label.localeCompare(right.label));
-
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Sessions"
         title=""
-        stats={
-          <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
-            {currentSession ? "Active session" : "No active session"}
-          </div>
-        }
       />
 
       <section className="grid gap-6">
         <div className="space-y-6">
-          {currentSession ? (
-            <section className="space-y-6">
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <p className="eyebrow">Active Session</p>
-                  <h2 className="font-display mt-2 text-2xl font-semibold text-base-content">
-                    Started {formatDateTime(currentSession.started_at)}
-                  </h2>
-                  <p className="mt-2 text-sm text-base-content/70">
-                    {currentSession.is_paused ? "Paused" : "Running"} · {currentSession.session_items?.length ?? 0} logged item
-                    {(currentSession.session_items?.length ?? 0) === 1 ? "" : "s"}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {currentSession.is_paused ? (
-                    <form action={resumeSessionAction}>
-                      <input type="hidden" name="sessionId" value={currentSession.id} />
-                      <FormSubmitButton label="Resume" pendingLabel="Resuming..." className="btn btn-primary" />
-                    </form>
-                  ) : (
-                    <form action={pauseSessionAction}>
-                      <input type="hidden" name="sessionId" value={currentSession.id} />
-                      <FormSubmitButton label="Pause" pendingLabel="Pausing..." className="btn btn-outline" />
-                    </form>
-                  )}
-                </div>
-              </div>
+          <PagePanel>
+            <h2 className="font-display text-xl font-semibold text-base-content">Start a session</h2>
+            <form action={startSessionAction} className="mt-5 max-w-xl space-y-4">
+              <FormSelect
+                label="Setlist"
+                name="sourceSetlistId"
+                emptyLabel="Blank setlist"
+                options={librarySnapshot.setlists.map((setlist) => ({
+                  value: setlist.id,
+                  label: setlist.name,
+                }))}
+              />
+              <FormActions>
+                <FormSubmitButton label="Start session" pendingLabel="Starting..." />
+              </FormActions>
+            </form>
+          </PagePanel>
 
-              <div className="space-y-6">
-                <PagePanel className="space-y-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-bold text-base-content">Logged items</h3>
-                  </div>
-                  {currentSession.session_items?.length ? (
-                    <DraggableSessionItems
-                      items={currentSession.session_items
-                        .slice()
-                        .sort((left, right) => left.display_order - right.display_order)
-                        .map((item) => ({
-                          exerciseId: item.exercise_id,
-                          id: item.id,
-                          itemType: item.item_type,
-                          label: labelSessionItem(item, itemMaps),
-                          songId: item.song_id,
-                          tempo: item.tempo,
-                        }))}
-                      sessionId={currentSession.id}
-                    />
-                  ) : (
-                    <EmptyState label="No logged items." />
-                  )}
-                </PagePanel>
-
-                <form action={addSessionItemAction} className="page-panel p-6">
-                  <input type="hidden" name="sessionId" value={currentSession.id} />
-                  <input type="hidden" name="displayOrder" value={String(currentSession.session_items?.length ?? 0)} />
-                  <h3 className="text-lg font-bold text-primary">Add item</h3>
-                  <div className="mt-4 space-y-3">
-                    <FormSelect
-                      label="Library item"
-                      name="itemKey"
-                      emptyLabel="Select exercise or song"
-                      options={itemOptions}
-                    />
-                    <Field label="Tempo">
-                      <TextInput name="tempo" type="number" min={1} />
-                    </Field>
-                    <FormActions>
-                      <FormSubmitButton label="Log item" pendingLabel="Logging..." />
-                    </FormActions>
-                  </div>
-                </form>
-
-                <form action={endSessionAction} className="page-panel p-6">
-                  <input type="hidden" name="sessionId" value={currentSession.id} />
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-primary">Session notes</h3>
-                      <Textarea
-                        className="mt-4 min-h-32"
-                        name="notes"
-                        defaultValue={currentSession.notes ?? ""}
-                        placeholder="Notes"
-                      />
-                    </div>
-                    <div className="md:pt-[2.7rem]">
-                      <FormSubmitButton label="End session" pendingLabel="Ending..." className="btn btn-error" />
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </section>
-          ) : (
-            <PagePanel>
-              <h2 className="font-display text-xl font-semibold text-base-content">Start a session</h2>
-              <form action={startSessionAction} className="mt-5 max-w-xl space-y-4">
-                <FormSelect
-                  label="Setlist"
-                  name="sourceSetlistId"
-                  emptyLabel="Blank setlist"
-                  options={librarySnapshot.setlists.map((setlist) => ({
-                    value: setlist.id,
-                    label: setlist.name,
-                  }))}
-                />
-                <FormActions>
-                  <FormSubmitButton label="Start session" pendingLabel="Starting..." />
-                </FormActions>
-              </form>
-            </PagePanel>
-          )}
-
-          {!currentSession ? (
           <PagePanel>
             <h2 className="font-display text-xl font-semibold text-base-content">Recent sessions</h2>
             <div className="mt-5 space-y-3">
@@ -221,8 +109,126 @@ export function SessionsDashboard({
               )}
             </div>
           </PagePanel>
-          ) : null}
         </div>
+      </section>
+    </div>
+  );
+}
+
+export function ActiveSessionPage({
+  currentSession,
+  librarySnapshot,
+}: {
+  currentSession: SessionDetail;
+  librarySnapshot: LibrarySnapshot;
+}) {
+  const itemMaps = buildLibraryItemMaps(librarySnapshot);
+  const itemOptions = [
+    ...Array.from(itemMaps.exerciseMap.entries()).map(([id, item]) => ({
+      value: `exercise:${id}`,
+      label: item.label,
+    })),
+    ...Array.from(itemMaps.songMap.entries()).map(([id, item]) => ({
+      value: `song:${id}`,
+      label: item.label,
+    })),
+  ].sort((left, right) => left.label.localeCompare(right.label));
+
+  return (
+    <div className="space-y-6">
+      <PageHero
+        eyebrow="Active Session"
+        title=""
+        stats={
+          <div className="soft-stat px-5 py-4 text-sm text-base-content/75">
+            {currentSession.is_paused ? "Paused" : "Running"} · {currentSession.session_items?.length ?? 0} items
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h2 className="font-display text-2xl font-semibold text-base-content">
+              Started {formatDateTime(currentSession.started_at)}
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {currentSession.is_paused ? (
+              <form action={resumeSessionAction}>
+                <input type="hidden" name="sessionId" value={currentSession.id} />
+                <FormSubmitButton label="Resume" pendingLabel="Resuming..." className="btn btn-primary" />
+              </form>
+            ) : (
+              <form action={pauseSessionAction}>
+                <input type="hidden" name="sessionId" value={currentSession.id} />
+                <FormSubmitButton label="Pause" pendingLabel="Pausing..." className="btn btn-outline" />
+              </form>
+            )}
+          </div>
+        </div>
+      </PageHero>
+
+      <section className="space-y-6">
+        <PagePanel className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-lg font-bold text-base-content">Logged items</h3>
+          </div>
+          {currentSession.session_items?.length ? (
+            <DraggableSessionItems
+              items={currentSession.session_items
+                .slice()
+                .sort((left, right) => left.display_order - right.display_order)
+                .map((item) => ({
+                  exerciseId: item.exercise_id,
+                  id: item.id,
+                  itemType: item.item_type,
+                  label: labelSessionItem(item, itemMaps),
+                  songId: item.song_id,
+                  tempo: item.tempo,
+                }))}
+              sessionId={currentSession.id}
+            />
+          ) : (
+            <EmptyState label="No logged items." />
+          )}
+        </PagePanel>
+
+        <form action={addSessionItemAction} className="page-panel p-6">
+          <input type="hidden" name="sessionId" value={currentSession.id} />
+          <input type="hidden" name="displayOrder" value={String(currentSession.session_items?.length ?? 0)} />
+          <h3 className="text-lg font-bold text-primary">Add item</h3>
+          <div className="mt-4 space-y-3">
+            <FormSelect
+              label="Library item"
+              name="itemKey"
+              emptyLabel="Select exercise or song"
+              options={itemOptions}
+            />
+            <Field label="Tempo">
+              <TextInput name="tempo" type="number" min={1} />
+            </Field>
+            <FormActions>
+              <FormSubmitButton label="Log item" pendingLabel="Logging..." />
+            </FormActions>
+          </div>
+        </form>
+
+        <form action={endSessionAction} className="page-panel p-6">
+          <input type="hidden" name="sessionId" value={currentSession.id} />
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-primary">Session notes</h3>
+              <Textarea
+                className="mt-4 min-h-32"
+                name="notes"
+                defaultValue={currentSession.notes ?? ""}
+                placeholder="Notes"
+              />
+            </div>
+            <div className="md:pt-[2.7rem]">
+              <FormSubmitButton label="End session" pendingLabel="Ending..." className="btn btn-error" />
+            </div>
+          </div>
+        </form>
       </section>
     </div>
   );

@@ -17,15 +17,17 @@ export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps)
   if (!isEditing) {
     return (
       <div className="space-y-4">
-        <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-            {title}
-          </h1>
-          <p className="mt-3 text-lg text-base-content/70">{composer || "No composer set"}</p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
+              {title}
+            </h1>
+            <p className="mt-3 text-lg text-base-content/70">{composer || "No composer set"}</p>
+          </div>
+          <button type="button" className="btn btn-outline" onClick={() => setIsEditing(true)}>
+            Edit
+          </button>
         </div>
-        <button type="button" className="btn btn-outline w-full md:w-auto" onClick={() => setIsEditing(true)}>
-          Edit
-        </button>
       </div>
     );
   }
@@ -33,11 +35,16 @@ export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps)
   return (
     <form action={updateBookAction} className="max-w-3xl space-y-4">
       <input type="hidden" name="bookId" value={bookId} />
-      <TextInput
-        className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-5xl"
-        name="title"
-        defaultValue={title}
-      />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <TextInput
+          className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-5xl md:max-w-[calc(100%-8rem)]"
+          name="title"
+          defaultValue={title}
+        />
+        <button type="button" className="btn btn-outline" onClick={() => setIsEditing(false)}>
+          Cancel
+        </button>
+      </div>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <TextInput
           className="w-full border-0 bg-transparent p-0 text-lg text-base-content/70 outline-none"
@@ -46,9 +53,6 @@ export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps)
           placeholder="Composer or author"
         />
         <div className="flex flex-col gap-3 md:flex-row">
-          <button type="button" className="btn btn-outline w-full md:w-auto" onClick={() => setIsEditing(false)}>
-            Cancel
-          </button>
           <FormSubmitButton
             label="Save"
             pendingLabel="Saving..."

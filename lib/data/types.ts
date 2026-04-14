@@ -5,7 +5,6 @@ export type TimeRange = "1w" | "1m" | "6m" | "1y" | "all";
 export type BookInsert = {
   title: string;
   composer?: string | null;
-  defaultGoalTempo?: number | null;
 };
 
 export type SectionInsert = {
