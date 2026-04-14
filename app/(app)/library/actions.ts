@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
   createArtist,
   createBook,
@@ -8,6 +9,7 @@ import {
   createExercisesBatch,
   createSection,
   createSong,
+  deleteExercise,
   reorderBookSections,
   updateArtist,
   updateBook,
@@ -108,6 +110,17 @@ export async function updateExerciseAction(formData: FormData) {
   });
 
   finishLibraryAction();
+}
+
+export async function deleteExerciseAction(formData: FormData) {
+  const exerciseId = String(formData.get("exerciseId") ?? "").trim();
+  const bookId = String(formData.get("bookId") ?? "").trim();
+  const sectionId = String(formData.get("sectionId") ?? "").trim();
+
+  await deleteExercise(exerciseId);
+  finishLibraryAction();
+  revalidatePath(`/library/books/${bookId}/sections/${sectionId}`);
+  redirect(`/library/books/${bookId}/sections/${sectionId}`);
 }
 
 export async function createArtistAction(formData: FormData) {

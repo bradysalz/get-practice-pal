@@ -3,12 +3,11 @@ import {
   addSetlistItemAction,
   createSetlistAction,
   reorderSetlistItemsAction,
-  updateSetlistAction,
 } from "@/app/(app)/setlists/actions";
 import { ActionModal } from "@/components/action-modal";
 import { DraggableSetlistItems } from "@/components/draggable-setlist-items";
 import { FormSelect } from "@/components/form-select";
-import { FormSubmitButton } from "@/components/form-submit-button";
+import { SetlistHeroEditor } from "@/components/setlist-hero-editor";
 import {
   CardForm,
   SectionHeader,
@@ -17,7 +16,6 @@ import {
   CardLink,
   EmptyState,
   Field,
-  FormActions,
   PageHero,
   PagePanel,
   StatCard,
@@ -117,21 +115,17 @@ export function SetlistDetailPage({
         backHref="/setlists"
         backLabel="Back to setlists"
         eyebrow="Setlist"
-        title={setlist.name}
+        title=""
         stats={
           <div className="grid grid-cols-1 gap-3 md:min-w-[12rem]">
             <StatCard label="Items" value={String(sortedItems.length)} />
           </div>
         }
       >
-        {setlist.description ? <p className="text-sm text-base-content/65">{setlist.description}</p> : null}
+        <SetlistHeroEditor setlist={setlist} />
       </PageHero>
 
       <section className="space-y-6">
-        <PagePanel>
-          <EditSetlistForm setlist={setlist} />
-        </PagePanel>
-
         <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader title="Items" />
@@ -187,30 +181,6 @@ function CreateSetlistForm() {
           />
         </Field>
       </CardForm>
-    </form>
-  );
-}
-
-function EditSetlistForm({
-  setlist,
-}: {
-  setlist: NonNullable<LibrarySnapshot["setlists"]>[number];
-}) {
-  return (
-    <form action={updateSetlistAction} className="max-w-3xl space-y-4">
-      <input type="hidden" name="setlistId" value={setlist.id} />
-      <input type="hidden" name="returnPath" value={`/setlists/${setlist.id}`} />
-      <TextInput
-        className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-4xl"
-        name="name"
-        defaultValue={setlist.name}
-      />
-      <Textarea
-        name="description"
-        defaultValue={setlist.description ?? ""}
-        placeholder="Description"
-      />
-      <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
     </form>
   );
 }

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { SectionDetailPage } from "@/components/library-detail-pages";
 import { getLibrarySnapshot } from "@/lib/data/library";
+import { getItemProgressSummaryMap } from "@/lib/data/stats";
 
 export default async function LibrarySectionPage({
   params,
@@ -21,5 +22,13 @@ export default async function LibrarySectionPage({
     notFound();
   }
 
-  return <SectionDetailPage book={book} section={section} />;
+  const exerciseProgressMap = await getItemProgressSummaryMap({
+    itemType: "exercise",
+    items: (section.exercises ?? []).map((exercise) => ({
+      id: exercise.id,
+      goalTempo: exercise.goal_tempo,
+    })),
+  });
+
+  return <SectionDetailPage book={book} section={section} exerciseProgressMap={exerciseProgressMap} />;
 }

@@ -1,6 +1,7 @@
+import { redirect } from "next/navigation";
 import { SessionsDashboard } from "@/components/sessions-dashboard";
 import { getLibrarySnapshot } from "@/lib/data/library";
-import { getCurrentSession, getSessionById, listRecentSessions } from "@/lib/data/sessions";
+import { getCurrentSession, listRecentSessions } from "@/lib/data/sessions";
 
 export default async function SessionsPage() {
   const [librarySnapshot, recentSessions, currentSessionSummary] = await Promise.all([
@@ -9,13 +10,12 @@ export default async function SessionsPage() {
     getCurrentSession(),
   ]);
 
-  const currentSession = currentSessionSummary
-    ? await getSessionById(currentSessionSummary.id)
-    : null;
+  if (currentSessionSummary) {
+    redirect("/sessions/active");
+  }
 
   return (
     <SessionsDashboard
-      currentSession={currentSession}
       librarySnapshot={librarySnapshot}
       recentSessions={recentSessions}
     />
