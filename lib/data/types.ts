@@ -2,9 +2,58 @@ export type PracticeItemType = "exercise" | "song";
 
 export type TimeRange = "1w" | "1m" | "6m" | "1y" | "all";
 
+export type ExternalBookProvider = "google_books" | (string & {});
+
+export type ExternalBook = {
+  id: string;
+  createdByUserId: string | null;
+  provider: ExternalBookProvider;
+  providerBookId: string;
+  isbn10: string | null;
+  isbn13: string | null;
+  title: string;
+  subtitle: string | null;
+  authors: string[];
+  publishedYear: number | null;
+  publishedDate: string | null;
+  description: string | null;
+  language: string | null;
+  pageCount: number | null;
+  coverThumbnailUrl: string | null;
+  coverSmallUrl: string | null;
+  coverMediumUrl: string | null;
+  coverLargeUrl: string | null;
+  canonicalUrl: string | null;
+  rawMetadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ExternalBookUpsert = {
+  provider: ExternalBookProvider;
+  providerBookId: string;
+  isbn10?: string | null;
+  isbn13?: string | null;
+  title: string;
+  subtitle?: string | null;
+  authors?: string[];
+  publishedYear?: number | null;
+  publishedDate?: string | null;
+  description?: string | null;
+  language?: string | null;
+  pageCount?: number | null;
+  coverThumbnailUrl?: string | null;
+  coverSmallUrl?: string | null;
+  coverMediumUrl?: string | null;
+  coverLargeUrl?: string | null;
+  canonicalUrl?: string | null;
+  rawMetadata?: Record<string, unknown>;
+};
+
 export type BookInsert = {
   title: string;
   composer?: string | null;
+  externalBookId?: string | null;
 };
 
 export type SectionInsert = {

@@ -17,6 +17,11 @@ import {
   updateSection,
   updateSong,
 } from "@/lib/data/library";
+import {
+  externalBookUpsertFromGoogleBooksCandidate,
+  upsertExternalBook,
+} from "@/lib/data/external-books";
+import { type GoogleBooksCandidate, searchGoogleBooks } from "@/lib/data/google-books";
 import { buildExerciseNames } from "@/lib/section-builder";
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
@@ -56,6 +61,7 @@ export async function createBookAction(formData: FormData) {
   await createBook({
     title: String(formData.get("title") ?? "").trim(),
     composer: String(formData.get("composer") ?? "").trim() || null,
+    externalBookId: String(formData.get("externalBookId") ?? "").trim() || null,
   });
 
   finishLibraryAction();
@@ -65,9 +71,27 @@ export async function updateBookAction(formData: FormData) {
   await updateBook(String(formData.get("bookId") ?? ""), {
     title: String(formData.get("title") ?? "").trim(),
     composer: String(formData.get("composer") ?? "").trim() || null,
+    externalBookId: String(formData.get("externalBookId") ?? "").trim() || null,
   });
 
   finishLibraryAction();
+}
+
+export async function searchBookMetadataAction(formData: FormData) {
+  return searchGoogleBooks({
+    author: String(formData.get("author") ?? "").trim(),
+    isbn: String(formData.get("isbn") ?? "").trim(),
+    title: String(formData.get("title") ?? "").trim(),
+  });
+}
+
+export async function saveBookMetadataSelectionAction(candidate: GoogleBooksCandidate) {
+  const externalBook = await upsertExternalBook(
+    externalBookUpsertFromGoogleBooksCandidate(candidate),
+  );
+
+  finishLibraryAction();
+  return externalBook;
 }
 
 export async function createSectionAction(formData: FormData) {

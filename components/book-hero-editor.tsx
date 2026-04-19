@@ -2,27 +2,59 @@
 
 import { useState } from "react";
 import { updateBookAction } from "@/app/(app)/library/actions";
+import { BookMetadataSearch, type LinkedExternalBook } from "@/components/book-metadata-search";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import {
+  linkedBookAuthors,
+  linkedBookCoverUrl,
+  linkedBookPublishedYear,
+  resolveLinkedBook,
+} from "@/components/linked-book-metadata";
 import { TextInput } from "@/components/ui/primitives";
 
 type BookHeroEditorProps = {
   bookId: string;
   composer: string | null;
+  externalBook: LinkedExternalBook | LinkedExternalBook[] | null;
+  externalBookId: string | null;
   title: string;
 };
 
-export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps) {
+export function BookHeroEditor({
+  bookId,
+  composer,
+  externalBook,
+  externalBookId,
+  title,
+}: BookHeroEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const resolvedExternalBook = resolveLinkedBook(externalBook);
+  const coverUrl = linkedBookCoverUrl(resolvedExternalBook);
+  const displayAuthor = composer || linkedBookAuthors(resolvedExternalBook);
+  const publishedYear = linkedBookPublishedYear(resolvedExternalBook);
 
   if (!isEditing) {
     return (
       <div className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
-              {title}
-            </h1>
-            <p className="mt-3 text-lg text-base-content/70">{composer || "No composer set"}</p>
+          <div className="flex gap-5">
+            {coverUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt=""
+                className="h-36 w-24 shrink-0 rounded object-cover shadow-[3px_3px_0_#0a0a0a]"
+                src={coverUrl}
+              />
+            ) : null}
+            <div>
+              <h1 className="font-display text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
+                {title}
+              </h1>
+              <p className="mt-3 text-lg text-base-content/70">
+                {displayAuthor || "No composer set"}
+                {publishedYear ? ` · ${publishedYear}` : ""}
+              </p>
+            </div>
           </div>
           <button type="button" className="btn btn-outline" onClick={() => setIsEditing(true)}>
             Edit
@@ -61,6 +93,12 @@ export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps)
           />
         </div>
       </div>
+      <BookMetadataSearch
+        author={composer}
+        initialExternalBook={externalBook}
+        initialExternalBookId={externalBookId}
+        title={title}
+      />
     </form>
   );
 }

@@ -13,6 +13,13 @@ import {
 } from "@/app/(app)/library/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { ActionModal } from "@/components/action-modal";
+import { BookMetadataSearch } from "@/components/book-metadata-search";
+import {
+  linkedBookAuthors,
+  linkedBookCoverUrl,
+  linkedBookPublishedYear,
+  resolveLinkedBook,
+} from "@/components/linked-book-metadata";
 import {
   CardLink,
   EmptyState,
@@ -88,22 +95,38 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                     (sum, section) => sum + (section.exercises?.length ?? 0),
                     0,
                   );
+                  const externalBook = resolveLinkedBook(book.external_book);
+                  const coverUrl = linkedBookCoverUrl(externalBook);
+                  const displayTitle = externalBook?.title ?? book.title;
+                  const displayAuthor = linkedBookAuthors(externalBook) ?? book.composer;
+                  const publishedYear = linkedBookPublishedYear(externalBook);
 
                   return (
                     <CardLink key={book.id} href={`/library/books/${book.id}`}>
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                          <h2 className="text-lg font-bold text-base-content">{book.title}</h2>
-                          <p className="mt-2 text-sm text-base-content/65">
-                            {book.composer || "No composer set"}
-                          </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <span className="chip chip-neutral ">
-                              {sectionCount} section{sectionCount === 1 ? "" : "s"}
-                            </span>
-                            <span className="chip chip-neutral ">
-                              {bookExerciseCount} exercise{bookExerciseCount === 1 ? "" : "s"}
-                            </span>
+                        <div className="flex gap-4">
+                          {coverUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              alt=""
+                              className="h-24 w-16 shrink-0 rounded object-cover"
+                              src={coverUrl}
+                            />
+                          ) : null}
+                          <div>
+                            <h2 className="text-lg font-bold text-base-content">{displayTitle}</h2>
+                            <p className="mt-2 text-sm text-base-content/65">
+                              {displayAuthor || "No composer set"}
+                              {publishedYear ? ` · ${publishedYear}` : ""}
+                            </p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              <span className="chip chip-neutral ">
+                                {sectionCount} section{sectionCount === 1 ? "" : "s"}
+                              </span>
+                              <span className="chip chip-neutral ">
+                                {bookExerciseCount} exercise{bookExerciseCount === 1 ? "" : "s"}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
@@ -232,6 +255,7 @@ export function CreateBookForm() {
       <CardForm surface="plain">
         <Input label="Title" name="title" placeholder="Stick Control" />
         <Input label="Composer" name="composer" placeholder="George Lawrence Stone" />
+        <BookMetadataSearch />
       </CardForm>
     </form>
   );
@@ -248,6 +272,12 @@ export function EditBookForm({
       <CardForm title="Edit book" description="">
         <Input label="Title" name="title" defaultValue={book.title} />
         <Input label="Composer or author" name="composer" defaultValue={book.composer} />
+        <BookMetadataSearch
+          author={book.composer}
+          initialExternalBook={book.external_book}
+          initialExternalBookId={book.external_book_id}
+          title={book.title}
+        />
         <FormSubmitButton label="Save book" pendingLabel="Saving book..." variant="secondary" />
       </CardForm>
     </form>
