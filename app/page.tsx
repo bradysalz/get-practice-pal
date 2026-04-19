@@ -33,7 +33,31 @@ export default function HomePage() {
   return (
     <main className="public-home min-h-screen bg-base-100 text-base-content">
       <section className="public-hero">
-        <div className="public-hero-scene" aria-hidden="true">
+        <div className="public-hero-content">
+          <p className="eyebrow">PracticePal</p>
+          <h1>PracticePal</h1>
+          <p className="public-hero-copy">
+            A focused workspace for musicians who want their books, songs, setlists, sessions, and progress in one place.
+          </p>
+          <div className="public-actions">
+            <Link className="btn btn-primary" href="/login">
+              Sign in
+            </Link>
+            <Link className="btn btn-outline" href="/sessions">
+              Open app
+            </Link>
+          </div>
+          <div className="public-stat-strip" aria-label="Example practice library totals">
+            {heroStats.map((stat) => (
+              <div key={stat.label}>
+                <strong>{stat.value}</strong>
+                <span>{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="public-hero-visual" aria-label="PracticePal product screenshots">
           <div className="hero-shot hero-shot-library">
             <div className="shot-bar">
               <span />
@@ -73,30 +97,6 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        <div className="public-hero-content">
-          <p className="eyebrow">PracticePal</p>
-          <h1>PracticePal</h1>
-          <p className="public-hero-copy">
-            A focused workspace for musicians who want their books, songs, setlists, sessions, and progress in one place.
-          </p>
-          <div className="public-actions">
-            <Link className="btn btn-primary" href="/login">
-              Sign in
-            </Link>
-            <Link className="btn btn-outline" href="/sessions">
-              Open app
-            </Link>
-          </div>
-          <div className="public-stat-strip" aria-label="Example practice library totals">
-            {heroStats.map((stat) => (
-              <div key={stat.label}>
-                <strong>{stat.value}</strong>
-                <span>{stat.label}</span>
-              </div>
-            ))}
           </div>
         </div>
       </section>

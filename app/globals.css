@@ -360,8 +360,8 @@ h4,
 .public-hero {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.82fr) minmax(34rem, 1.18fr);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+    gap: 3rem;
     align-items: center;
     min-height: 92vh;
     overflow: hidden;
@@ -370,27 +370,31 @@ h4,
     padding: 4rem max(1rem, calc((100vw - var(--page-max-width)) / 2 + 1.5rem));
 }
 
-.public-hero-scene {
-    display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
-    gap: 1rem;
-    align-items: stretch;
+.public-hero-visual {
+    position: relative;
+    min-height: 35rem;
+    isolation: isolate;
 }
 
 .hero-shot {
+    position: absolute;
     border: 2px solid #0a0a0a;
     background: #ffffff;
     box-shadow: 8px 8px 0 #0a0a0a;
 }
 
 .hero-shot-library {
-    min-height: 26rem;
-    padding: 1.25rem;
+    inset: 0 8rem 6rem 0;
+    padding: 1.6rem;
 }
 
 .hero-shot-session {
-    padding: 1.25rem;
+    right: 0;
+    bottom: 0;
+    width: min(24rem, 48%);
+    padding: 1.6rem;
     background: #fef2f2;
+    z-index: 1;
 }
 
 .shot-bar {
@@ -691,13 +695,20 @@ h4,
         font-size: 2.7rem;
     }
 
-    .public-hero-scene {
-        gap: 1rem;
+    .public-hero-visual {
+        display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.8fr);
+        gap: 1rem;
+        min-height: 0;
+    }
+
+    .hero-shot {
+        position: relative;
+        inset: auto;
     }
 
     .hero-shot-session {
-        min-height: 0;
+        width: auto;
     }
 
     .public-feature-grid,
@@ -724,17 +735,17 @@ h4,
         padding-block: 3rem;
     }
 
-    .public-hero-scene {
+    .public-hero-visual {
         grid-template-columns: 1fr;
     }
 
     .hero-shot-library {
-        padding: 0.8rem;
+        padding: 1rem;
     }
 
     .hero-shot-session {
         display: block;
-        padding: 0.8rem;
+        padding: 1rem;
     }
 
     .shot-card {
