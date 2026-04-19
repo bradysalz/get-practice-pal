@@ -1,35 +1,6 @@
+# Project Instructions for AI Agents
 
-## Workflow
-
-- Open a branch before editing any code. If already on a branch, continue to use that.
-- Commit and open a PR for all code changes.
-- Open normal PRs, not draft PRs.
-- Do not commit directly to `master`; always use a branch and land changes through the PR flow.
-- It is fine to group several related changes into one PR when they belong to the same milestone or workflow.
-- Keep local-only files such as editor swap files and private env files out of commits and PRs.
-
-## Lightweight Tree
-
-```text
-.
-├── AGENTS.md
-├── SPEC.md
-├── README.md
-├── app/                     # Next.js app routes and pages
-│   ├── (app)/               # authenticated app shell routes
-│   ├── auth/                # auth callback and sign-out routes
-│   └── login/               # magic-link sign-in page
-├── components/              # shared UI components
-├── lib/
-│   ├── auth/                # auth helpers and server actions
-│   ├── data/                # backend-facing data services
-│   ├── supabase/            # Supabase client/env helpers
-│   └── utils/               # smaller shared utilities
-├── supabase/
-│   └── migrations/          # SQL migrations for the live backend
-├── .beads/                  # Beads project work tracking
-└── .github/workflows/       # CI automation
-```
+This file provides instructions and context for AI coding agents working on this project.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
@@ -77,3 +48,22 @@ bd close <id>         # Complete work
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
+
+
+## Build & Test
+
+_Add your build and test commands here_
+
+```bash
+# Example:
+# npm install
+# npm test
+```
+
+## Architecture Overview
+
+_Add a brief overview of your project architecture_
+
+## Conventions & Patterns
+
+_Add your project-specific conventions here_
