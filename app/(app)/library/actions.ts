@@ -17,6 +17,7 @@ import {
   updateSection,
   updateSong,
 } from "@/lib/data/library";
+import { searchGoogleBooks } from "@/lib/data/google-books";
 import { buildExerciseNames } from "@/lib/section-builder";
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
@@ -70,6 +71,14 @@ export async function updateBookAction(formData: FormData) {
   });
 
   finishLibraryAction();
+}
+
+export async function searchBookMetadataAction(formData: FormData) {
+  return searchGoogleBooks({
+    author: String(formData.get("author") ?? "").trim(),
+    isbn: String(formData.get("isbn") ?? "").trim(),
+    title: String(formData.get("title") ?? "").trim(),
+  });
 }
 
 export async function createSectionAction(formData: FormData) {
