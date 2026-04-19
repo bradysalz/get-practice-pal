@@ -1,10 +1,11 @@
 import Link from "next/link";
 import {
-  deleteExerciseAction,
+  deleteArtistAction,
   reorderBookSectionsAction,
   updateArtistAction,
 } from "@/app/(app)/library/actions";
 import { BookHeroEditor } from "@/components/book-hero-editor";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { DraggableBookSections } from "@/components/draggable-book-sections";
 import { SectionHeroEditor } from "@/components/section-hero-editor";
 import { FormSubmitButton } from "@/components/form-submit-button";
@@ -175,6 +176,14 @@ export function ArtistDetailPage({
             />
             <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
           </form>
+          <form action={deleteArtistAction} className="mt-4">
+            <input type="hidden" name="artistId" value={artist.id} />
+            <ConfirmSubmitButton
+              className="btn btn-outline btn-sm"
+              confirmMessage={`Delete "${artist.name}" and all of their songs? This cannot be undone.`}
+              label="Delete artist"
+            />
+          </form>
         </PagePanel>
 
         <PagePanel>
@@ -191,7 +200,7 @@ export function ArtistDetailPage({
               (artist.songs ?? []).map((song) => (
                 <div key={song.id} className="space-y-3">
                   <SongProgressRow progress={songProgressMap.get(song.id)} song={song} />
-                  <EditSongForm song={song} />
+                  <EditSongForm artistId={artist.id} song={song} />
                 </div>
               ))
             ) : (
@@ -326,7 +335,12 @@ export function ExerciseDetailPage({
 
       <section className="space-y-6">
         <PagePanel>
-          <EditExerciseForm exercise={exercise} inheritedTempo={section.default_goal_tempo} />
+          <EditExerciseForm
+            bookId={book.id}
+            exercise={exercise}
+            inheritedTempo={section.default_goal_tempo}
+            sectionId={section.id}
+          />
         </PagePanel>
 
         <PagePanel>
@@ -354,23 +368,6 @@ export function ExerciseDetailPage({
               <EmptyState label="Set a goal tempo to track progress." />
             </div>
           )}
-        </PagePanel>
-
-        <PagePanel>
-          <SectionHeader title="Danger zone" />
-          <form action={deleteExerciseAction} className="mt-5 flex flex-wrap items-center justify-between gap-3">
-            <input type="hidden" name="exerciseId" value={exercise.id} />
-            <input type="hidden" name="bookId" value={book.id} />
-            <input type="hidden" name="sectionId" value={section.id} />
-            <p className="text-sm text-base-content/70">Delete this exercise and return to the section.</p>
-            <button
-              type="submit"
-              className="btn border-[#0a0a0a] bg-[#991b1b] text-white hover:border-[#0a0a0a] hover:bg-[#991b1b] hover:text-white"
-            >
-              <span aria-hidden="true">🗑</span>
-              <span>Delete exercise</span>
-            </button>
-          </form>
         </PagePanel>
       </section>
     </div>

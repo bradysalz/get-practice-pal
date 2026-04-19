@@ -9,7 +9,11 @@ import {
   createExercisesBatch,
   createSection,
   createSong,
+  deleteArtist,
+  deleteBook,
   deleteExercise,
+  deleteSection,
+  deleteSong,
   reorderBookSections,
   updateArtist,
   updateBook,
@@ -77,6 +81,12 @@ export async function updateBookAction(formData: FormData) {
   finishLibraryAction();
 }
 
+export async function deleteBookAction(formData: FormData) {
+  await deleteBook(String(formData.get("bookId") ?? "").trim());
+  finishLibraryAction();
+  redirect("/library");
+}
+
 export async function searchBookMetadataAction(formData: FormData) {
   return searchGoogleBooks({
     author: String(formData.get("author") ?? "").trim(),
@@ -113,6 +123,15 @@ export async function updateSectionAction(formData: FormData) {
   });
 
   finishLibraryAction();
+}
+
+export async function deleteSectionAction(formData: FormData) {
+  const sectionId = String(formData.get("sectionId") ?? "").trim();
+  const bookId = String(formData.get("bookId") ?? "").trim();
+
+  await deleteSection(sectionId);
+  finishLibraryAction();
+  redirect(`/library/books/${bookId}`);
 }
 
 export async function createExerciseAction(formData: FormData) {
@@ -163,6 +182,12 @@ export async function updateArtistAction(formData: FormData) {
   finishLibraryAction();
 }
 
+export async function deleteArtistAction(formData: FormData) {
+  await deleteArtist(String(formData.get("artistId") ?? "").trim());
+  finishLibraryAction();
+  redirect("/library");
+}
+
 export async function createSongAction(formData: FormData) {
   await createSong({
     artistId: String(formData.get("artistId") ?? ""),
@@ -180,6 +205,15 @@ export async function updateSongAction(formData: FormData) {
   });
 
   finishLibraryAction();
+}
+
+export async function deleteSongAction(formData: FormData) {
+  const songId = String(formData.get("songId") ?? "").trim();
+  const artistId = String(formData.get("artistId") ?? "").trim();
+
+  await deleteSong(songId);
+  finishLibraryAction();
+  redirect(`/library/artists/${artistId}`);
 }
 
 export async function saveSectionBuilderAction(formData: FormData) {

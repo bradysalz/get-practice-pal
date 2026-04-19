@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { updateBookAction } from "@/app/(app)/library/actions";
+import { deleteBookAction, updateBookAction } from "@/app/(app)/library/actions";
 import { BookMetadataSearch, type LinkedExternalBook } from "@/components/book-metadata-search";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import {
   linkedBookAuthors,
@@ -65,40 +66,50 @@ export function BookHeroEditor({
   }
 
   return (
-    <form action={updateBookAction} className="max-w-3xl space-y-4">
-      <input type="hidden" name="bookId" value={bookId} />
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <TextInput
-          className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-5xl md:max-w-[calc(100%-8rem)]"
-          name="title"
-          defaultValue={title}
-        />
-        <button type="button" className="btn btn-outline" onClick={() => setIsEditing(false)}>
-          Cancel
-        </button>
-      </div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <TextInput
-          className="w-full border-0 bg-transparent p-0 text-lg text-base-content/70 outline-none"
-          name="composer"
-          defaultValue={composer ?? ""}
-          placeholder="Composer or author"
-        />
-        <div className="flex flex-col gap-3 md:flex-row">
-          <FormSubmitButton
-            label="Save"
-            pendingLabel="Saving..."
-            variant="secondary"
-            className="btn btn-secondary w-full md:w-auto"
+    <div className="max-w-3xl space-y-4">
+      <form action={updateBookAction} className="space-y-4">
+        <input type="hidden" name="bookId" value={bookId} />
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <TextInput
+            className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-5xl md:max-w-[calc(100%-8rem)]"
+            name="title"
+            defaultValue={title}
           />
+          <button type="button" className="btn btn-outline" onClick={() => setIsEditing(false)}>
+            Cancel
+          </button>
         </div>
-      </div>
-      <BookMetadataSearch
-        author={composer}
-        initialExternalBook={externalBook}
-        initialExternalBookId={externalBookId}
-        title={title}
-      />
-    </form>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <TextInput
+            className="w-full border-0 bg-transparent p-0 text-lg text-base-content/70 outline-none"
+            name="composer"
+            defaultValue={composer ?? ""}
+            placeholder="Composer or author"
+          />
+          <div className="flex flex-col gap-3 md:flex-row">
+            <FormSubmitButton
+              label="Save"
+              pendingLabel="Saving..."
+              variant="secondary"
+              className="btn btn-secondary w-full md:w-auto"
+            />
+          </div>
+        </div>
+        <BookMetadataSearch
+          author={composer}
+          initialExternalBook={externalBook}
+          initialExternalBookId={externalBookId}
+          title={title}
+        />
+      </form>
+      <form action={deleteBookAction}>
+        <input type="hidden" name="bookId" value={bookId} />
+        <ConfirmSubmitButton
+          className="btn btn-outline btn-sm"
+          confirmMessage={`Delete "${title}" and all of its sections and exercises? This cannot be undone.`}
+          label="Delete book"
+        />
+      </form>
+    </div>
   );
 }
