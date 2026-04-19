@@ -47,14 +47,6 @@ export default function HomePage() {
               Open app
             </Link>
           </div>
-          <div className="public-stat-strip" aria-label="Example practice library totals">
-            {heroStats.map((stat) => (
-              <div key={stat.label}>
-                <strong>{stat.value}</strong>
-                <span>{stat.label}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="public-hero-visual" aria-label="PracticePal product screenshots">
@@ -98,6 +90,15 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+        </div>
+
+        <div className="public-stat-strip" aria-label="Example practice library totals">
+          {heroStats.map((stat) => (
+            <div key={stat.label}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
