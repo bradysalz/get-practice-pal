@@ -418,16 +418,26 @@ export function EditArtistForm({
   );
 }
 
-export function CreateSongForm({ artistId }: { artistId: string }) {
+export function CreateSongForm({
+  artistId,
+  formId,
+  surface = "card",
+}: {
+  artistId: string;
+  formId?: string;
+  surface?: "card" | "plain";
+}) {
   return (
-    <form action={createSongAction}>
+    <form id={formId} action={createSongAction}>
       <input type="hidden" name="artistId" value={artistId} />
-      <CardForm title="New song">
+      <CardForm title={surface === "card" ? "New song" : undefined} surface={surface}>
         <Input label="Title" name="title" placeholder="Giant Steps" />
         <Input label="Goal tempo" name="goalTempo" type="number" min={1} placeholder="220" />
-        <FormActions>
-          <FormSubmitButton label="Save" pendingLabel="Saving..." variant="accent" />
-        </FormActions>
+        {surface === "card" ? (
+          <FormActions>
+            <FormSubmitButton label="Save" pendingLabel="Saving..." variant="accent" />
+          </FormActions>
+        ) : null}
       </CardForm>
     </form>
   );
