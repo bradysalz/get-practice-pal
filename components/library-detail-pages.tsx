@@ -67,6 +67,7 @@ export function BookDetailPage({
         <BookHeroEditor
           bookId={book.id}
           composer={book.composer}
+          externalBook={book.external_book}
           externalBookId={book.external_book_id}
           title={book.title}
         />

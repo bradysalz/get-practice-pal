@@ -17,7 +17,11 @@ import {
   updateSection,
   updateSong,
 } from "@/lib/data/library";
-import { searchGoogleBooks } from "@/lib/data/google-books";
+import {
+  externalBookUpsertFromGoogleBooksCandidate,
+  upsertExternalBook,
+} from "@/lib/data/external-books";
+import { type GoogleBooksCandidate, searchGoogleBooks } from "@/lib/data/google-books";
 import { buildExerciseNames } from "@/lib/section-builder";
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
@@ -79,6 +83,15 @@ export async function searchBookMetadataAction(formData: FormData) {
     isbn: String(formData.get("isbn") ?? "").trim(),
     title: String(formData.get("title") ?? "").trim(),
   });
+}
+
+export async function saveBookMetadataSelectionAction(candidate: GoogleBooksCandidate) {
+  const externalBook = await upsertExternalBook(
+    externalBookUpsertFromGoogleBooksCandidate(candidate),
+  );
+
+  finishLibraryAction();
+  return externalBook;
 }
 
 export async function createSectionAction(formData: FormData) {

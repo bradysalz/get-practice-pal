@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { normalizeGoogleBooksVolume } from "./google-books.ts";
+import { normalizeGoogleBooksVolume, searchGoogleBooks } from "./google-books.ts";
 
 describe("normalizeGoogleBooksVolume", () => {
   it("extracts identifiers, publication data, cover URLs, and provider IDs", () => {
@@ -101,5 +101,114 @@ describe("normalizeGoogleBooksVolume", () => {
       }),
       null,
     );
+  });
+});
+
+describe("searchGoogleBooks", () => {
+  const originalFetch = globalThis.fetch;
+
+  it("falls back to title and author when ISBN lookup returns a transient Google error", async () => {
+    const requestedQueries: string[] = [];
+    const requestedCaches: RequestCache[] = [];
+
+    globalThis.fetch = (async (input, init) => {
+      const url = new URL(String(input));
+      requestedQueries.push(url.searchParams.get("q") ?? "");
+      requestedCaches.push(init?.cache ?? "default");
+
+      if (requestedQueries.length === 1) {
+        return new Response(JSON.stringify({}), {
+          status: 503,
+        });
+      }
+
+      return Response.json({
+        items: [
+          {
+            id: "fallback",
+            volumeInfo: {
+              title: "Stick Control",
+              authors: ["George Lawrence Stone"],
+            },
+          },
+        ],
+      });
+    }) as typeof fetch;
+
+    try {
+      const results = await searchGoogleBooks({
+        author: "George Lawrence Stone",
+        isbn: "9781892764041",
+        title: "Stick Control",
+      });
+
+      assert.deepEqual(requestedQueries, [
+        "isbn:9781892764041",
+        "intitle:Stick Control inauthor:George Lawrence Stone",
+      ]);
+      assert.deepEqual(requestedCaches, ["no-store", "no-store"]);
+      assert.equal(results[0]?.providerBookId, "fallback");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("returns no results instead of throwing on transient Google errors without fallback", async () => {
+    globalThis.fetch = (async () =>
+      new Response(JSON.stringify({}), {
+        status: 503,
+      })) as typeof fetch;
+
+    try {
+      assert.deepEqual(
+        await searchGoogleBooks({
+          isbn: "9781892764041",
+        }),
+        [],
+      );
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("tries broader text search when scoped search has no candidates", async () => {
+    const requestedQueries: string[] = [];
+
+    globalThis.fetch = (async (input) => {
+      const url = new URL(String(input));
+      requestedQueries.push(url.searchParams.get("q") ?? "");
+
+      if (requestedQueries.length < 2) {
+        return Response.json({
+          items: [],
+        });
+      }
+
+      return Response.json({
+        items: [
+          {
+            id: "title-only",
+            volumeInfo: {
+              title: "Stick Control",
+            },
+          },
+        ],
+      });
+    }) as typeof fetch;
+
+    try {
+      const results = await searchGoogleBooks({
+        author: "George Lawrence Stone",
+        title: "Stick Control",
+      });
+
+      assert.deepEqual(requestedQueries, [
+        "intitle:Stick Control inauthor:George Lawrence Stone",
+        "Stick Control George Lawrence Stone",
+      ]);
+      assert.equal(results[0]?.providerBookId, "title-only");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });
