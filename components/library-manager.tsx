@@ -5,12 +5,15 @@ import {
   createExerciseAction,
   createSectionAction,
   createSongAction,
+  deleteExerciseAction,
+  deleteSongAction,
   updateArtistAction,
   updateBookAction,
   updateExerciseAction,
   updateSectionAction,
   updateSongAction,
 } from "@/app/(app)/library/actions";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { ActionModal } from "@/components/action-modal";
 import { BookMetadataSearch } from "@/components/book-metadata-search";
@@ -337,39 +340,55 @@ export function CreateExerciseForm({
 }
 
 export function EditExerciseForm({
+  bookId,
   exercise,
   inheritedTempo,
+  sectionId,
 }: {
+  bookId: string;
   exercise: NonNullable<
     NonNullable<LibrarySnapshot["books"][number]["sections"]>[number]["exercises"]
   >[number];
   inheritedTempo: number | null;
+  sectionId: string;
 }) {
   return (
-    <form action={updateExerciseAction} className="section-panel p-4">
-      <input type="hidden" name="exerciseId" value={exercise.id} />
-      <input type="hidden" name="position" value={String(exercise.position)} />
-      <div className="mb-3 flex flex-wrap gap-2">
-        <span className="chip ">
-          Inherited {inheritedTempo ? `${inheritedTempo} BPM` : "none"}
-        </span>
-      </div>
-      <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr_auto] md:items-end">
-        <Input label="Exercise" name="title" defaultValue={exercise.title} />
-        <Input
-          label={`Goal tempo${inheritedTempo ? ` (${inheritedTempo} BPM inherited)` : ""}`}
-          name="goalTempo"
-          defaultValue={exercise.goal_tempo}
-          type="number"
-          min={1}
+    <div className="section-panel p-4">
+      <form action={updateExerciseAction}>
+        <input type="hidden" name="exerciseId" value={exercise.id} />
+        <input type="hidden" name="position" value={String(exercise.position)} />
+        <div className="mb-3 flex flex-wrap gap-2">
+          <span className="chip ">
+            Inherited {inheritedTempo ? `${inheritedTempo} BPM` : "none"}
+          </span>
+        </div>
+        <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr_auto] md:items-end">
+          <Input label="Exercise" name="title" defaultValue={exercise.title} />
+          <Input
+            label={`Goal tempo${inheritedTempo ? ` (${inheritedTempo} BPM inherited)` : ""}`}
+            name="goalTempo"
+            defaultValue={exercise.goal_tempo}
+            type="number"
+            min={1}
+          />
+          <FormSubmitButton
+            label="Save"
+            pendingLabel="Saving..."
+            className="btn btn-outline btn-sm md:mb-[0.35rem]"
+          />
+        </div>
+      </form>
+      <form action={deleteExerciseAction} className="mt-4">
+        <input type="hidden" name="exerciseId" value={exercise.id} />
+        <input type="hidden" name="bookId" value={bookId} />
+        <input type="hidden" name="sectionId" value={sectionId} />
+        <ConfirmSubmitButton
+          className="btn btn-outline btn-sm"
+          confirmMessage={`Delete "${exercise.title}"? This cannot be undone.`}
+          label="Delete exercise"
         />
-        <FormSubmitButton
-          label="Save"
-          pendingLabel="Saving..."
-          className="btn btn-outline btn-sm md:mb-[0.35rem]"
-        />
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
 
@@ -415,27 +434,40 @@ export function CreateSongForm({ artistId }: { artistId: string }) {
 }
 
 export function EditSongForm({
+  artistId,
   song,
 }: {
+  artistId: string;
   song: NonNullable<LibrarySnapshot["artists"][number]["songs"]>[number];
 }) {
   return (
-    <form action={updateSongAction} className="section-panel p-4">
-      <input type="hidden" name="songId" value={song.id} />
+    <div className="section-panel p-4">
       <div className="mb-3 flex flex-wrap gap-2">
         <span className="chip ">
           Goal {song.goal_tempo ? `${song.goal_tempo} BPM` : "unset"}
         </span>
       </div>
-      <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr_auto] md:items-end">
-        <Input label="Song" name="title" defaultValue={song.title} />
-        <Input label="Goal tempo" name="goalTempo" defaultValue={song.goal_tempo} type="number" min={1} />
-        <FormSubmitButton
-          label="Save"
-          pendingLabel="Saving..."
-          className="btn btn-outline btn-sm md:mb-[0.35rem]"
+      <form action={updateSongAction}>
+        <input type="hidden" name="songId" value={song.id} />
+        <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr_auto] md:items-end">
+          <Input label="Song" name="title" defaultValue={song.title} />
+          <Input label="Goal tempo" name="goalTempo" defaultValue={song.goal_tempo} type="number" min={1} />
+          <FormSubmitButton
+            label="Save"
+            pendingLabel="Saving..."
+            className="btn btn-outline btn-sm md:mb-[0.35rem]"
+          />
+        </div>
+      </form>
+      <form action={deleteSongAction} className="mt-4">
+        <input type="hidden" name="songId" value={song.id} />
+        <input type="hidden" name="artistId" value={artistId} />
+        <ConfirmSubmitButton
+          className="btn btn-outline btn-sm"
+          confirmMessage={`Delete "${song.title}"? This cannot be undone.`}
+          label="Delete song"
         />
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

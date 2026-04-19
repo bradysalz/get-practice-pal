@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { saveSectionBuilderAction } from "@/app/(app)/library/actions";
+import { deleteSectionAction, saveSectionBuilderAction } from "@/app/(app)/library/actions";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { SectionBuilderForm } from "@/components/section-builder-form";
 
 type SectionHeroEditorProps = {
@@ -46,6 +47,17 @@ export function SectionHeroEditor({ bookId, section, title }: SectionHeroEditorP
           mode={section ? "edit" : "create"}
           section={section}
         />
+        {section ? (
+          <form action={deleteSectionAction}>
+            <input type="hidden" name="bookId" value={bookId} />
+            <input type="hidden" name="sectionId" value={section.id} />
+            <ConfirmSubmitButton
+              className="btn btn-outline btn-sm"
+              confirmMessage={`Delete "${section.title}" and all of its exercises? This cannot be undone.`}
+              label="Delete section"
+            />
+          </form>
+        ) : null}
       </div>
     );
   }

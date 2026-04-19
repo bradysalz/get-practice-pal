@@ -88,6 +88,18 @@ export async function updateBook(
   return data;
 }
 
+export async function deleteBook(bookId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("books")
+    .delete()
+    .eq("id", bookId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
+}
+
 export async function createSection(input: SectionInsert) {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -131,6 +143,18 @@ export async function updateSection(
 
   if (error) throw error;
   return data;
+}
+
+export async function deleteSection(sectionId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("book_sections")
+    .delete()
+    .eq("id", sectionId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
 }
 
 export async function createExercise(input: ExerciseInsert) {
@@ -252,6 +276,18 @@ export async function updateArtist(
   return data;
 }
 
+export async function deleteArtist(artistId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("artists")
+    .delete()
+    .eq("id", artistId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
+}
+
 export async function createSong(input: SongInsert) {
   const client = await requireSupabaseClient();
   const user = await requireUser();
@@ -292,6 +328,18 @@ export async function updateSong(
 
   if (error) throw error;
   return data;
+}
+
+export async function deleteSong(songId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { error } = await client
+    .from("songs")
+    .delete()
+    .eq("id", songId)
+    .eq("user_id", user.id);
+
+  if (error) throw error;
 }
 
 export async function createSetlist(input: SetlistInsert) {
