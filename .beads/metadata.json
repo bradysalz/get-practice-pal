@@ -1,7 +1,7 @@
 {
   "database": "dolt",
   "backend": "dolt",
-  "dolt_mode": "embedded",
+  "dolt_mode": "server",
   "dolt_database": "get_practice_pal",
   "project_id": "83dae6fa-d8f2-4d52-b01b-8513b731c1c9"
 }
