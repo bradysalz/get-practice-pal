@@ -1,27 +1,24 @@
 import Link from "next/link";
 import {
-  deleteArtistAction,
   reorderBookSectionsAction,
-  updateArtistAction,
 } from "@/app/(app)/library/actions";
+import { ActionModal } from "@/components/action-modal";
+import { ArtistHeroEditor } from "@/components/artist-hero-editor";
 import { BookHeroEditor } from "@/components/book-hero-editor";
-import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { DraggableBookSections } from "@/components/draggable-book-sections";
+import { ExerciseHeroEditor } from "@/components/exercise-hero-editor";
 import { SectionHeroEditor } from "@/components/section-hero-editor";
-import { FormSubmitButton } from "@/components/form-submit-button";
+import { SongHeroEditor } from "@/components/song-hero-editor";
 import {
   EmptyState,
   PageHero,
   PagePanel,
   StatCard,
-  TextInput,
 } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import type { ItemProgressSummary } from "@/lib/data/stats";
 import {
   CreateSongForm,
-  EditExerciseForm,
-  EditSongForm,
   SectionHeader,
 } from "@/components/library-manager";
 
@@ -136,8 +133,6 @@ export function ArtistDetailPage({
   songProgressMap: Map<string, ItemProgressSummary>;
 }) {
   const songCount = artist.songs?.length ?? 0;
-  const songsWithGoals = (artist.songs ?? []).filter((song) => song.goal_tempo).length;
-  const completedSongs = (artist.songs ?? []).filter((song) => songProgressMap.get(song.id)?.completed).length;
 
   return (
     <div className="space-y-6">
@@ -145,68 +140,119 @@ export function ArtistDetailPage({
         backHref="/library"
         backLabel="Back to library"
         eyebrow="Artist"
-        title={artist.name}
+        title=""
         stats={
           <div className="grid grid-cols-1 gap-3 md:min-w-[12rem]">
             <StatCard label="Songs" value={String(songCount)} />
           </div>
         }
-      />
+      >
+        <ArtistHeroEditor artistId={artist.id} name={artist.name} />
+      </PageHero>
 
       <section className="space-y-6">
-        <PagePanel>
-          <SectionHeader title="Progress" />
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <StatCard label="Songs with goals" value={String(songsWithGoals)} />
-            <StatCard label="Completed" value={String(completedSongs)} />
-            <StatCard
-              label="Tracked"
-              value={String((artist.songs ?? []).filter((song) => (songProgressMap.get(song.id)?.entryCount ?? 0) > 0).length)}
-            />
-          </div>
-        </PagePanel>
-
-        <PagePanel>
-          <form action={updateArtistAction} className="max-w-3xl space-y-4">
-            <input type="hidden" name="artistId" value={artist.id} />
-            <TextInput
-              className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-4xl"
-              name="name"
-              defaultValue={artist.name}
-            />
-            <FormSubmitButton label="Save" pendingLabel="Saving..." variant="secondary" />
-          </form>
-          <form action={deleteArtistAction} className="mt-4">
-            <input type="hidden" name="artistId" value={artist.id} />
-            <ConfirmSubmitButton
-              className="btn btn-outline btn-sm"
-              confirmMessage={`Delete "${artist.name}" and all of their songs? This cannot be undone.`}
-              label="Delete artist"
-            />
-          </form>
-        </PagePanel>
-
         <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader
               title="Songs"
             />
-            <div className="max-w-sm">
-              <CreateSongForm artistId={artist.id} />
-            </div>
+            <ActionModal triggerLabel="Add song" submitFormId="create-song-form" submitLabel="Save">
+              <CreateSongForm artistId={artist.id} formId="create-song-form" surface="plain" />
+            </ActionModal>
           </div>
           <div className="mt-5 space-y-3">
             {songCount ? (
               (artist.songs ?? []).map((song) => (
-                <div key={song.id} className="space-y-3">
+                <Link
+                  key={song.id}
+                  href={`/library/artists/${artist.id}/songs/${song.id}`}
+                  className="block transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
+                >
                   <SongProgressRow progress={songProgressMap.get(song.id)} song={song} />
-                  <EditSongForm artistId={artist.id} song={song} />
-                </div>
+                </Link>
               ))
             ) : (
               <EmptyState label="No songs yet. Add your first song." />
             )}
           </div>
+        </PagePanel>
+      </section>
+    </div>
+  );
+}
+
+export function SongDetailPage({
+  artist,
+  itemProgress,
+  song,
+}: {
+  artist: LibrarySnapshot["artists"][number];
+  itemProgress: {
+    currentMaxTempo: number;
+    goalTempo: number;
+    progress: Array<{
+      recordedAt: string;
+      maxTempo: number;
+      progressRatio: number;
+    }>;
+  } | null;
+  song: NonNullable<LibrarySnapshot["artists"][number]["songs"]>[number];
+}) {
+  const progressPercent = itemProgress ? Math.min(Math.round((itemProgress.currentMaxTempo / itemProgress.goalTempo) * 100), 100) : 0;
+
+  return (
+    <div className="space-y-6">
+      <PageHero
+        backHref={`/library/artists/${artist.id}`}
+        backLabel={
+          <>
+            Back to <em className="normal-case">{artist.name}</em>
+          </>
+        }
+        eyebrow="Song"
+        title=""
+        stats={
+          <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
+            <StatCard label="Goal" value={song.goal_tempo ? `${song.goal_tempo}` : "0"} />
+            <StatCard label="Max" value={String(itemProgress?.currentMaxTempo ?? 0)} />
+            <StatCard label="Progress" value={`${progressPercent}%`} />
+          </div>
+        }
+      >
+        <SongHeroEditor
+          artistId={artist.id}
+          goalTempo={song.goal_tempo}
+          songId={song.id}
+          title={song.title}
+        />
+      </PageHero>
+
+      <section className="space-y-6">
+        <PagePanel>
+          <SectionHeader title="Progress" />
+          {itemProgress ? (
+            <div className="mt-5 space-y-4">
+              <progress className="progress progress-primary w-full" value={progressPercent} max={100} />
+              <div className="space-y-3">
+                {itemProgress.progress.length ? (
+                  itemProgress.progress.map((point) => (
+                    <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
+                      <div className="flex items-center justify-between gap-3 text-sm">
+                        <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
+                        <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <EmptyState label="No progress yet." className="mt-4" />
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="mt-5">
+              <EmptyState label="Set a goal tempo to track progress." />
+            </div>
+          )}
         </PagePanel>
       </section>
     </div>
@@ -323,7 +369,7 @@ export function ExerciseDetailPage({
           </>
         }
         eyebrow="Exercise"
-        title={exercise.title}
+        title=""
         stats={
           <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
             <StatCard label="Goal" value={exercise.goal_tempo ? `${exercise.goal_tempo}` : "0"} />
@@ -331,18 +377,18 @@ export function ExerciseDetailPage({
             <StatCard label="Progress" value={`${progressPercent}%`} />
           </div>
         }
-      />
+      >
+        <ExerciseHeroEditor
+          bookId={book.id}
+          exerciseId={exercise.id}
+          goalTempo={exercise.goal_tempo}
+          position={exercise.position}
+          sectionId={section.id}
+          title={exercise.title}
+        />
+      </PageHero>
 
       <section className="space-y-6">
-        <PagePanel>
-          <EditExerciseForm
-            bookId={book.id}
-            exercise={exercise}
-            inheritedTempo={section.default_goal_tempo}
-            sectionId={section.id}
-          />
-        </PagePanel>
-
         <PagePanel>
           <SectionHeader title="Progress" />
           {itemProgress ? (
