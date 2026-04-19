@@ -5,6 +5,7 @@
 - Commit and open a PR for all code changes.
 - Open normal PRs, not draft PRs.
 - Do not commit directly to `master`; always use a branch and land changes through the PR flow.
+- Never merge UI changes unless the user explicitly approves the merge after reviewing them.
 - It is fine to group several related changes into one PR when they belong to the same milestone or workflow.
 - Do not open PRs that only create Beads; complete at least one Bead's implementation work before opening a PR. Multiple related Beads can still ship in one PR.
 - Keep local-only files such as editor swap files and private env files out of commits and PRs.
