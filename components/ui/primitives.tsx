@@ -17,7 +17,7 @@ export function PageHero({
 }: {
   actions?: ReactNode;
   backHref?: string;
-  backLabel?: string;
+  backLabel?: ReactNode;
   children?: ReactNode;
   eyebrow: string;
   stats?: ReactNode;

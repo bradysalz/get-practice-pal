@@ -58,26 +58,25 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
 
         <PagePanel>
           <SectionHeader title="Saved Setlists" />
-          <div className="mt-5 space-y-3">
+          <div className="mt-5">
             {snapshot.setlists.length ? (
-              snapshot.setlists.map((setlist) => (
-                <CardLink key={setlist.id} href={`/setlists/${setlist.id}`}>
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div>
-                      <h2 className="text-lg font-bold text-base-content">{setlist.name}</h2>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {snapshot.setlists.map((setlist) => (
+                  <CardLink key={setlist.id} href={`/setlists/${setlist.id}`} className="h-full">
+                    <div className="flex h-full flex-col">
+                      <h2 className="text-lg font-bold leading-tight text-base-content">{setlist.name}</h2>
                       {setlist.description ? (
-                        <p className="mt-2 text-sm text-base-content/65">{setlist.description}</p>
+                        <p className="mt-2 line-clamp-3 text-sm text-base-content/65">{setlist.description}</p>
                       ) : null}
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      <div className="mt-auto flex flex-wrap gap-2 pt-4">
                         <span className="chip chip-neutral">
                           {(setlist.items?.length ?? 0)} item{(setlist.items?.length ?? 0) === 1 ? "" : "s"}
                         </span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold uppercase tracking-wide text-primary">Open</span>
-                  </div>
-                </CardLink>
-              ))
+                  </CardLink>
+                ))}
+              </div>
             ) : (
               <EmptyState label="No setlists yet." />
             )}

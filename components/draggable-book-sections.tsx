@@ -12,15 +12,14 @@ import {
 } from "@dnd-kit/core";
 import {
   arrayMove,
+  rectSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
-import { DragHandle } from "@/components/ui/primitives";
+import { type RefObject, useEffect, useRef, useState, useTransition } from "react";
 
 type SectionItem = {
   completionLabel?: string;
@@ -38,15 +37,16 @@ type DraggableBookSectionsProps = {
 function SortableSectionRow({
   bookId,
   section,
+  suppressNavigationRef,
 }: {
   bookId: string;
   section: SectionItem;
+  suppressNavigationRef: RefObject<boolean>;
 }) {
   const {
     attributes,
     isDragging,
     listeners,
-    setActivatorNodeRef,
     setNodeRef,
     transform,
     transition,
@@ -59,20 +59,22 @@ function SortableSectionRow({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`list-row flex items-center gap-3 p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px] ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      className={`list-row min-h-32 cursor-grab p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px] active:cursor-grabbing ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      {...attributes}
+      {...listeners}
     >
-      <DragHandle
-        ref={setActivatorNodeRef}
-        label={`Drag ${section.title}`}
-        {...attributes}
-        {...listeners}
-      />
       <Link
         href={`/library/books/${bookId}/sections/${section.id}`}
-        className="flex-1"
+        className="block h-full"
+        onClickCapture={(event) => {
+          if (suppressNavigationRef.current) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
       >
-        <p className="font-semibold text-base-content">{section.title}</p>
-        <div className="mt-1.5 flex flex-wrap gap-2">
+        <p className="font-semibold leading-tight text-base-content">{section.title}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
           <span className="chip chip-neutral">
             {section.exerciseCount} exercise{section.exerciseCount === 1 ? "" : "s"}
           </span>
@@ -92,9 +94,10 @@ export function DraggableBookSections({
 }: DraggableBookSectionsProps) {
   const [orderedSections, setOrderedSections] = useState(sections);
   const [isPending, startTransition] = useTransition();
+  const suppressNavigationRef = useRef(false);
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
@@ -116,6 +119,11 @@ export function DraggableBookSections({
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
+    suppressNavigationRef.current = true;
+    window.setTimeout(() => {
+      suppressNavigationRef.current = false;
+    }, 250);
+
     if (!over || active.id === over.id) {
       return;
     }
@@ -133,10 +141,15 @@ export function DraggableBookSections({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={orderedSections.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-        <div className={`space-y-4 ${isPending ? "opacity-80" : ""}`}>
+      <SortableContext items={orderedSections.map((item) => item.id)} strategy={rectSortingStrategy}>
+        <div className={`grid gap-4 sm:grid-cols-2 xl:grid-cols-3 ${isPending ? "opacity-80" : ""}`}>
           {orderedSections.map((section) => (
-            <SortableSectionRow key={section.id} bookId={bookId} section={section} />
+            <SortableSectionRow
+              key={section.id}
+              bookId={bookId}
+              section={section}
+              suppressNavigationRef={suppressNavigationRef}
+            />
           ))}
         </div>
       </SortableContext>

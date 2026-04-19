@@ -12,16 +12,15 @@ import {
 } from "@dnd-kit/core";
 import {
   arrayMove,
+  rectSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState, useTransition } from "react";
 import { deleteSetlistItemAction } from "@/app/(app)/setlists/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
-import { DragHandle } from "@/components/ui/primitives";
 
 type SetlistItemRow = {
   id: string;
@@ -47,7 +46,6 @@ function SortableSetlistRow({
     attributes,
     isDragging,
     listeners,
-    setActivatorNodeRef,
     setNodeRef,
     transform,
     transition,
@@ -60,29 +58,27 @@ function SortableSetlistRow({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`list-row flex items-center gap-3 p-4 ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      className={`list-row min-h-32 cursor-grab p-4 active:cursor-grabbing ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      {...attributes}
+      {...listeners}
     >
-      <DragHandle
-        ref={setActivatorNodeRef}
-        label={`Drag ${item.label}`}
-        {...attributes}
-        {...listeners}
-      />
-      <div className="flex-1">
-        <p className="font-medium text-base-content">{item.label}</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <span className="chip">{item.itemType === "exercise" ? "Exercise" : "Song"}</span>
+      <div className="flex h-full flex-col gap-4">
+        <div className="flex-1">
+          <p className="font-medium leading-tight text-base-content">{item.label}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="chip">{item.itemType === "exercise" ? "Exercise" : "Song"}</span>
+          </div>
         </div>
+        <form action={deleteSetlistItemAction}>
+          <input type="hidden" name="setlistItemId" value={item.id} />
+          <input type="hidden" name="returnPath" value={returnPath} />
+          <FormSubmitButton
+            label="Remove"
+            pendingLabel="Removing..."
+            className="btn btn-outline btn-xs"
+          />
+        </form>
       </div>
-      <form action={deleteSetlistItemAction}>
-        <input type="hidden" name="setlistItemId" value={item.id} />
-        <input type="hidden" name="returnPath" value={returnPath} />
-        <FormSubmitButton
-          label="Remove"
-          pendingLabel="Removing..."
-          className="btn btn-outline btn-xs"
-        />
-      </form>
     </div>
   );
 }
@@ -96,8 +92,8 @@ export function DraggableSetlistItems({
   const [orderedItems, setOrderedItems] = useState(items);
   const [isPending, startTransition] = useTransition();
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
@@ -136,8 +132,8 @@ export function DraggableSetlistItems({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={orderedItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-        <div className={`space-y-3 ${isPending ? "opacity-80" : ""}`}>
+      <SortableContext items={orderedItems.map((item) => item.id)} strategy={rectSortingStrategy}>
+        <div className={`grid gap-4 sm:grid-cols-2 xl:grid-cols-3 ${isPending ? "opacity-80" : ""}`}>
           {orderedItems.map((item) => (
             <SortableSetlistRow key={item.id} item={item} returnPath={returnPath} />
           ))}

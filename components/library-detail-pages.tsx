@@ -221,7 +221,11 @@ export function SectionDetailPage({
     <div className="space-y-6">
       <PageHero
         backHref={`/library/books/${book.id}`}
-        backLabel={`Back to ${book.title}`}
+        backLabel={
+          <>
+            Back to <em className="normal-case">{book.title}</em>
+          </>
+        }
         eyebrow="Section"
         title=""
         stats={
@@ -304,7 +308,11 @@ export function ExerciseDetailPage({
     <div className="space-y-6">
       <PageHero
         backHref={`/library/books/${book.id}/sections/${section.id}`}
-        backLabel={`Back to ${section.title}`}
+        backLabel={
+          <>
+            Back to <em className="normal-case">{section.title}</em>
+          </>
+        }
         eyebrow="Exercise"
         title={exercise.title}
         stats={
@@ -314,9 +322,7 @@ export function ExerciseDetailPage({
             <StatCard label="Progress" value={`${progressPercent}%`} />
           </div>
         }
-      >
-        <p className="text-base-content/70">{book.title} / {section.title}</p>
-      </PageHero>
+      />
 
       <section className="space-y-6">
         <PagePanel>
