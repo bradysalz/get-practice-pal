@@ -38,33 +38,11 @@ type LibraryManagerProps = {
 };
 
 export function LibraryManager({ snapshot }: LibraryManagerProps) {
-  const exerciseCount = snapshot.books.reduce(
-    (sum, book) =>
-      sum +
-      (book.sections ?? []).reduce(
-        (sectionSum, section) => sectionSum + (section.exercises?.length ?? 0),
-        0,
-      ),
-    0,
-  );
-  const songCount = snapshot.artists.reduce(
-    (sum, artist) => sum + (artist.songs?.length ?? 0),
-    0,
-  );
-
   return (
     <div className="space-y-6">
       <PageHero
         eyebrow="Library"
         title=""
-        stats={
-          <div className="grid grid-cols-2 gap-3 md:min-w-[20rem]">
-            <StatCard label="Books" value={String(snapshot.books.length)} />
-            <StatCard label="Exercises" value={String(exerciseCount)} />
-            <StatCard label="Artists" value={String(snapshot.artists.length)} />
-            <StatCard label="Songs" value={String(songCount)} />
-          </div>
-        }
       />
 
       <section className="space-y-6">
