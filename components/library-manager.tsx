@@ -230,6 +230,7 @@ export function CreateBookForm() {
   return (
     <form id="create-book-form" action={createBookAction}>
       <CardForm surface="plain">
+        <input type="hidden" name="externalBookId" value="" />
         <Input label="Title" name="title" placeholder="Stick Control" />
         <Input label="Composer" name="composer" placeholder="George Lawrence Stone" />
       </CardForm>
@@ -245,6 +246,7 @@ export function EditBookForm({
   return (
     <form action={updateBookAction}>
       <input type="hidden" name="bookId" value={book.id} />
+      <input type="hidden" name="externalBookId" value={book.external_book_id ?? ""} />
       <CardForm title="Edit book" description="">
         <Input label="Title" name="title" defaultValue={book.title} />
         <Input label="Composer or author" name="composer" defaultValue={book.composer} />

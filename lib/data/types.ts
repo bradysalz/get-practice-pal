@@ -53,6 +53,7 @@ export type ExternalBookUpsert = {
 export type BookInsert = {
   title: string;
   composer?: string | null;
+  externalBookId?: string | null;
 };
 
 export type SectionInsert = {

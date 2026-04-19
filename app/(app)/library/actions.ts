@@ -56,6 +56,7 @@ export async function createBookAction(formData: FormData) {
   await createBook({
     title: String(formData.get("title") ?? "").trim(),
     composer: String(formData.get("composer") ?? "").trim() || null,
+    externalBookId: String(formData.get("externalBookId") ?? "").trim() || null,
   });
 
   finishLibraryAction();
@@ -65,6 +66,7 @@ export async function updateBookAction(formData: FormData) {
   await updateBook(String(formData.get("bookId") ?? ""), {
     title: String(formData.get("title") ?? "").trim(),
     composer: String(formData.get("composer") ?? "").trim() || null,
+    externalBookId: String(formData.get("externalBookId") ?? "").trim() || null,
   });
 
   finishLibraryAction();

@@ -64,7 +64,12 @@ export function BookDetailPage({
           </div>
         }
       >
-        <BookHeroEditor bookId={book.id} composer={book.composer} title={book.title} />
+        <BookHeroEditor
+          bookId={book.id}
+          composer={book.composer}
+          externalBookId={book.external_book_id}
+          title={book.title}
+        />
       </PageHero>
 
       <section className="space-y-6">

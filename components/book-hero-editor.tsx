@@ -8,10 +8,11 @@ import { TextInput } from "@/components/ui/primitives";
 type BookHeroEditorProps = {
   bookId: string;
   composer: string | null;
+  externalBookId: string | null;
   title: string;
 };
 
-export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps) {
+export function BookHeroEditor({ bookId, composer, externalBookId, title }: BookHeroEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   if (!isEditing) {
@@ -35,6 +36,7 @@ export function BookHeroEditor({ bookId, composer, title }: BookHeroEditorProps)
   return (
     <form action={updateBookAction} className="max-w-3xl space-y-4">
       <input type="hidden" name="bookId" value={bookId} />
+      <input type="hidden" name="externalBookId" value={externalBookId ?? ""} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <TextInput
           className="w-full border-0 bg-transparent p-0 font-display text-3xl font-semibold tracking-tight text-base-content outline-none md:text-5xl md:max-w-[calc(100%-8rem)]"

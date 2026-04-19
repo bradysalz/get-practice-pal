@@ -18,7 +18,7 @@ export async function getLibrarySnapshot() {
   const [books, artists, setlists] = await Promise.all([
     client
       .from("books")
-      .select("id, title, composer, created_at, sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
+      .select("id, title, composer, external_book_id, created_at, external_book:external_books(id, provider, provider_book_id, isbn_10, isbn_13, title, subtitle, authors, published_year, published_date, cover_thumbnail_url, cover_small_url, cover_medium_url, cover_large_url, canonical_url), sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
       .eq("user_id", user.id)
       .order("title"),
     client
@@ -53,6 +53,7 @@ export async function createBook(input: BookInsert) {
       user_id: user.id,
       title: input.title,
       composer: input.composer ?? null,
+      external_book_id: input.externalBookId ?? null,
     })
     .select()
     .single();
@@ -66,6 +67,7 @@ export async function updateBook(
   input: {
     title: string;
     composer?: string | null;
+    externalBookId?: string | null;
   },
 ) {
   const client = await requireSupabaseClient();
@@ -75,6 +77,7 @@ export async function updateBook(
     .update({
       title: input.title,
       composer: input.composer ?? null,
+      external_book_id: input.externalBookId ?? null,
     })
     .eq("id", bookId)
     .eq("user_id", user.id)
