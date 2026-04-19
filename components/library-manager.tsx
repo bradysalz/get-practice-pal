@@ -13,6 +13,7 @@ import {
 } from "@/app/(app)/library/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { ActionModal } from "@/components/action-modal";
+import { BookMetadataSearch } from "@/components/book-metadata-search";
 import {
   CardLink,
   EmptyState,
@@ -233,6 +234,7 @@ export function CreateBookForm() {
         <input type="hidden" name="externalBookId" value="" />
         <Input label="Title" name="title" placeholder="Stick Control" />
         <Input label="Composer" name="composer" placeholder="George Lawrence Stone" />
+        <BookMetadataSearch />
       </CardForm>
     </form>
   );
@@ -250,6 +252,7 @@ export function EditBookForm({
       <CardForm title="Edit book" description="">
         <Input label="Title" name="title" defaultValue={book.title} />
         <Input label="Composer or author" name="composer" defaultValue={book.composer} />
+        <BookMetadataSearch author={book.composer} title={book.title} />
         <FormSubmitButton label="Save book" pendingLabel="Saving book..." variant="secondary" />
       </CardForm>
     </form>
