@@ -13,6 +13,7 @@ export type GoogleBooksCandidate = {
   title: string;
   subtitle: string | null;
   authors: string[];
+  publishedYear: number | null;
   publishedDate: string | null;
   description: string | null;
   isbn10: string | null;
@@ -26,12 +27,12 @@ export type GoogleBooksCandidate = {
   canonicalUrl: string | null;
 };
 
-type GoogleBooksIndustryIdentifier = {
+export type GoogleBooksIndustryIdentifier = {
   type?: string;
   identifier?: string;
 };
 
-type GoogleBooksImageLinks = {
+export type GoogleBooksImageLinks = {
   smallThumbnail?: string;
   thumbnail?: string;
   small?: string;
@@ -40,7 +41,7 @@ type GoogleBooksImageLinks = {
   extraLarge?: string;
 };
 
-type GoogleBooksVolumeInfo = {
+export type GoogleBooksVolumeInfo = {
   title?: string;
   subtitle?: string;
   authors?: string[];
@@ -54,7 +55,7 @@ type GoogleBooksVolumeInfo = {
   infoLink?: string;
 };
 
-type GoogleBooksVolume = {
+export type GoogleBooksVolume = {
   id?: string;
   volumeInfo?: GoogleBooksVolumeInfo;
 };
@@ -101,9 +102,15 @@ function normalizeImageUrl(value: string | null | undefined) {
   return text ? text.replace(/^http:/, "https:") : null;
 }
 
-function toCandidate(volume: GoogleBooksVolume): GoogleBooksCandidate | null {
+function parsePublishedYear(publishedDate: string | null) {
+  const match = publishedDate?.match(/^\d{4}/);
+  return match ? Number(match[0]) : null;
+}
+
+export function normalizeGoogleBooksVolume(volume: GoogleBooksVolume): GoogleBooksCandidate | null {
   const volumeInfo = volume.volumeInfo;
   const title = cleanText(volumeInfo?.title);
+  const publishedDate = cleanText(volumeInfo?.publishedDate);
 
   if (!volume.id || !volumeInfo || !title) {
     return null;
@@ -115,7 +122,8 @@ function toCandidate(volume: GoogleBooksVolume): GoogleBooksCandidate | null {
     title,
     subtitle: cleanText(volumeInfo.subtitle),
     authors: volumeInfo.authors ?? [],
-    publishedDate: cleanText(volumeInfo.publishedDate),
+    publishedYear: parsePublishedYear(publishedDate),
+    publishedDate,
     description: cleanText(volumeInfo.description),
     isbn10: getIdentifier(volumeInfo.industryIdentifiers, "ISBN_10"),
     isbn13: getIdentifier(volumeInfo.industryIdentifiers, "ISBN_13"),
@@ -124,7 +132,9 @@ function toCandidate(volume: GoogleBooksVolume): GoogleBooksCandidate | null {
     coverThumbnailUrl: normalizeImageUrl(volumeInfo.imageLinks?.thumbnail),
     coverSmallUrl: normalizeImageUrl(volumeInfo.imageLinks?.small),
     coverMediumUrl: normalizeImageUrl(volumeInfo.imageLinks?.medium),
-    coverLargeUrl: normalizeImageUrl(volumeInfo.imageLinks?.large ?? volumeInfo.imageLinks?.extraLarge),
+    coverLargeUrl: normalizeImageUrl(
+      volumeInfo.imageLinks?.extraLarge ?? volumeInfo.imageLinks?.large,
+    ),
     canonicalUrl: normalizeImageUrl(volumeInfo.canonicalVolumeLink ?? volumeInfo.infoLink),
   };
 }
@@ -157,7 +167,9 @@ export async function searchGoogleBooks(input: GoogleBooksSearchInput) {
   }
 
   const payload = (await response.json()) as GoogleBooksResponse;
-  return (payload.items ?? []).map(toCandidate).filter((item): item is GoogleBooksCandidate => Boolean(item));
+  return (payload.items ?? [])
+    .map(normalizeGoogleBooksVolume)
+    .filter((item): item is GoogleBooksCandidate => Boolean(item));
 }
 
 export async function lookupGoogleBookByIsbn(isbn: string) {

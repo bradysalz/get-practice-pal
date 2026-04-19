@@ -1,4 +1,5 @@
 import { requireSupabaseClient, requireUser } from "@/lib/auth/session";
+import type { GoogleBooksCandidate } from "@/lib/data/google-books";
 import type { ExternalBook, ExternalBookUpsert } from "@/lib/data/types";
 
 type ExternalBookRow = {
@@ -122,4 +123,29 @@ export async function findExternalBooksByIsbn(isbn: string) {
 
   if (error) throw error;
   return ((data ?? []) as ExternalBookRow[]).map(toExternalBook);
+}
+
+export function externalBookUpsertFromGoogleBooksCandidate(
+  candidate: GoogleBooksCandidate,
+): ExternalBookUpsert {
+  return {
+    provider: candidate.provider,
+    providerBookId: candidate.providerBookId,
+    isbn10: candidate.isbn10,
+    isbn13: candidate.isbn13,
+    title: candidate.title,
+    subtitle: candidate.subtitle,
+    authors: candidate.authors,
+    publishedYear: candidate.publishedYear,
+    publishedDate: candidate.publishedDate,
+    description: candidate.description,
+    language: candidate.language,
+    pageCount: candidate.pageCount,
+    coverThumbnailUrl: candidate.coverThumbnailUrl,
+    coverSmallUrl: candidate.coverSmallUrl,
+    coverMediumUrl: candidate.coverMediumUrl,
+    coverLargeUrl: candidate.coverLargeUrl,
+    canonicalUrl: candidate.canonicalUrl,
+    rawMetadata: candidate,
+  };
 }
