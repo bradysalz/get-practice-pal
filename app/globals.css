@@ -360,10 +360,10 @@ h4,
 .public-hero {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-    gap: 3rem;
-    align-items: center;
-    min-height: 92vh;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+    min-height: auto;
     overflow: hidden;
     border-bottom: 2px solid #0a0a0a;
     background: #f8fafc;
@@ -371,30 +371,26 @@ h4,
 }
 
 .public-hero-visual {
-    position: relative;
-    min-height: 35rem;
-    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.65fr);
+    gap: 1rem;
+    align-items: stretch;
 }
 
 .hero-shot {
-    position: absolute;
     border: 2px solid #0a0a0a;
     background: #ffffff;
     box-shadow: 8px 8px 0 #0a0a0a;
 }
 
 .hero-shot-library {
-    inset: 0 8rem 6rem 0;
+    min-height: 24rem;
     padding: 1.6rem;
 }
 
 .hero-shot-session {
-    right: 0;
-    bottom: 0;
-    width: min(24rem, 48%);
     padding: 1.6rem;
     background: #fef2f2;
-    z-index: 1;
 }
 
 .shot-bar {
@@ -514,6 +510,7 @@ h4,
     position: relative;
     z-index: 1;
     display: flex;
+    max-width: 44rem;
     flex-direction: column;
     justify-content: center;
 }
@@ -544,8 +541,7 @@ h4,
 .public-stat-strip {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    width: min(28rem, 100%);
-    margin-top: 2rem;
+    width: min(36rem, 100%);
     border: 2px solid #0a0a0a;
     background: #ffffff;
     box-shadow: 4px 4px 0 #0a0a0a;
@@ -636,8 +632,10 @@ h4,
 }
 
 .screenshot-stack {
-    position: relative;
-    min-height: 28rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.65fr);
+    gap: 1rem;
+    min-height: auto;
 }
 
 .screenshot-panel {
@@ -652,10 +650,8 @@ h4,
 }
 
 .screenshot-panel-side {
-    position: absolute;
-    right: 1rem;
-    bottom: 0;
-    width: min(23rem, 52%);
+    position: relative;
+    width: auto;
     background: #fef2f2;
 }
 
@@ -678,8 +674,6 @@ h4,
 
 @media (max-width: 1180px) {
     .public-hero {
-        grid-template-columns: 1fr;
-        min-height: auto;
         padding: 4rem 1rem;
     }
 
@@ -696,19 +690,7 @@ h4,
     }
 
     .public-hero-visual {
-        display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.8fr);
-        gap: 1rem;
-        min-height: 0;
-    }
-
-    .hero-shot {
-        position: relative;
-        inset: auto;
-    }
-
-    .hero-shot-session {
-        width: auto;
     }
 
     .public-feature-grid,
@@ -716,18 +698,6 @@ h4,
         grid-template-columns: 1fr;
     }
 
-    .screenshot-stack {
-        min-height: auto;
-    }
-
-    .screenshot-panel-side {
-        position: relative;
-        right: auto;
-        bottom: auto;
-        width: min(28rem, 100%);
-        margin-top: 1rem;
-        margin-left: auto;
-    }
 }
 
 @media (max-width: 640px) {
@@ -782,6 +752,10 @@ h4,
     }
 
     .public-stat-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .screenshot-stack {
         grid-template-columns: 1fr;
     }
 
