@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { createSetlistFromSessionAction } from "@/app/(app)/sessions/actions";
+import { FormSubmitButton } from "@/components/form-submit-button";
 import { EmptyState, PageHero, PagePanel, StatCard } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
@@ -17,7 +19,7 @@ type SessionDetailPageProps = {
       item_type: "exercise" | "song";
       exercise_id: string | null;
       song_id: string | null;
-      tempo: number;
+      tempo: number | null;
       display_order: number;
     }>;
   };
@@ -43,6 +45,14 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
             <StatCard label="Duration" value={formatDurationLabel(session.started_at, session.ended_at)} />
             <StatCard label="Items" value={String(sortedItems.length)} />
           </div>
+        }
+        actions={
+          sortedItems.length ? (
+            <form action={createSetlistFromSessionAction}>
+              <input type="hidden" name="sessionId" value={session.id} />
+              <FormSubmitButton label="Create setlist" pendingLabel="Creating..." className="btn btn-accent" />
+            </form>
+          ) : null
         }
       >
         <div className="flex flex-wrap gap-2 text-sm text-base-content/70">
@@ -78,7 +88,7 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
                       {item.item_type === "exercise" ? "Exercise" : "Song"}
                     </p>
                   </div>
-                  <span className="chip chip-neutral">{item.tempo} BPM</span>
+                  {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
                 </div>
               </div>
             ))

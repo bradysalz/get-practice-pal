@@ -6,7 +6,7 @@ import {
 } from "@/app/(app)/setlists/actions";
 import { ActionModal } from "@/components/action-modal";
 import { DraggableSetlistItems } from "@/components/draggable-setlist-items";
-import { FormSelect } from "@/components/form-select";
+import { PracticeItemPicker } from "@/components/practice-item-picker";
 import { SetlistHeroEditor } from "@/components/setlist-hero-editor";
 import {
   CardForm,
@@ -95,17 +95,6 @@ export function SetlistDetailPage({
   snapshot: LibrarySnapshot;
 }) {
   const itemMaps = buildLibraryItemMaps(snapshot);
-  const itemOptions = [
-    ...Array.from(itemMaps.exerciseMap.entries()).map(([id, item]) => ({
-      value: `exercise:${id}`,
-      label: item.label,
-    })),
-    ...Array.from(itemMaps.songMap.entries()).map(([id, item]) => ({
-      value: `song:${id}`,
-      label: item.label,
-    })),
-  ].sort((left, right) => left.label.localeCompare(right.label));
-
   const sortedItems = (setlist.items ?? []).slice().sort((left, right) => left.position - right.position);
 
   return (
@@ -132,10 +121,11 @@ export function SetlistDetailPage({
               <ActionModal
                 triggerLabel="Add item"
                 submitFormId="add-setlist-item-form"
-                submitLabel="Add item"
+                submitLabel="Add selected"
                 submitClassName="btn btn-accent"
+                panelClassName="max-w-5xl"
               >
-                <AddSetlistItemForm setlist={setlist} itemOptions={itemOptions} />
+                <AddSetlistItemForm setlist={setlist} snapshot={snapshot} />
               </ActionModal>
               <Link href="/sessions" className="btn btn-outline">
                 Use in sessions
@@ -185,11 +175,11 @@ function CreateSetlistForm() {
 }
 
 function AddSetlistItemForm({
-  itemOptions,
   setlist,
+  snapshot,
 }: {
-  itemOptions: Array<{ value: string; label: string }>;
   setlist: NonNullable<LibrarySnapshot["setlists"]>[number];
+  snapshot: Pick<LibrarySnapshot, "artists" | "books">;
 }) {
   return (
     <form id="add-setlist-item-form" action={addSetlistItemAction}>
@@ -197,12 +187,7 @@ function AddSetlistItemForm({
       <input type="hidden" name="returnPath" value={`/setlists/${setlist.id}`} />
       <input type="hidden" name="position" value={String((setlist.items?.length ?? 0) + 1)} />
       <CardForm surface="plain">
-        <FormSelect
-          label="Library item"
-          name="itemKey"
-          emptyLabel="Select exercise or song"
-          options={itemOptions}
-        />
+        <PracticeItemPicker snapshot={snapshot} />
       </CardForm>
     </form>
   );

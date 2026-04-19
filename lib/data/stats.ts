@@ -3,7 +3,7 @@ import type { PracticeItemType, TimeRange } from "@/lib/data/types";
 import { assertPracticeItemReference, getRangeStart } from "@/lib/data/validators";
 
 type RawTempoEntry = {
-  tempo: number;
+  tempo: number | null;
   created_at: string;
   practice_sessions?: {
     started_at: string;
@@ -11,7 +11,7 @@ type RawTempoEntry = {
 };
 
 type RawItemRow = {
-  tempo: number;
+  tempo: number | null;
   created_at: string;
   exercise_id: string | null;
   song_id: string | null;
@@ -43,6 +43,7 @@ export async function getItemTempoHistory(input: {
     .select("tempo, created_at, practice_sessions(started_at)")
     .eq("user_id", user.id)
     .eq("item_type", input.itemType)
+    .not("tempo", "is", null)
     .order("created_at", { ascending: true });
 
   query =
@@ -58,10 +59,12 @@ export async function getItemTempoHistory(input: {
 
   if (error) throw error;
 
-  const entries = ((data ?? []) as unknown as RawTempoEntry[]).map((entry) => ({
-    tempo: entry.tempo,
-    recordedAt: entry.practice_sessions?.[0]?.started_at ?? entry.created_at,
-  }));
+  const entries = ((data ?? []) as unknown as RawTempoEntry[])
+    .filter((entry): entry is RawTempoEntry & { tempo: number } => entry.tempo != null)
+    .map((entry) => ({
+      tempo: entry.tempo,
+      recordedAt: entry.practice_sessions?.[0]?.started_at ?? entry.created_at,
+    }));
 
   return {
     entries,
@@ -128,6 +131,7 @@ export async function getItemProgressSummaryMap(input: {
     .select("tempo, created_at, exercise_id, song_id")
     .eq("user_id", user.id)
     .eq("item_type", input.itemType)
+    .not("tempo", "is", null)
     .order("created_at", { ascending: true });
 
   query =
@@ -153,6 +157,10 @@ export async function getItemProgressSummaryMap(input: {
     const current = emptyMap.get(id);
 
     if (!current) {
+      continue;
+    }
+
+    if (row.tempo == null) {
       continue;
     }
 
@@ -201,6 +209,7 @@ export async function getBookCompletion(bookId: string, range: TimeRange = "all"
     .select("exercise_id, tempo")
     .eq("user_id", user.id)
     .eq("item_type", "exercise")
+    .not("tempo", "is", null)
     .in("exercise_id", exerciseIds);
 
   if (rangeStart) {
@@ -214,7 +223,7 @@ export async function getBookCompletion(bookId: string, range: TimeRange = "all"
   const maxByExercise = new Map<string, number>();
 
   for (const item of items.data ?? []) {
-    if (!item.exercise_id) {
+    if (!item.exercise_id || item.tempo == null) {
       continue;
     }
 

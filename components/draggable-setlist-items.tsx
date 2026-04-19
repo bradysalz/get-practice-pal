@@ -20,7 +20,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState, useTransition } from "react";
 import { deleteSetlistItemAction } from "@/app/(app)/setlists/actions";
-import { FormSubmitButton } from "@/components/form-submit-button";
 
 type SetlistItemRow = {
   id: string;
@@ -58,27 +57,44 @@ function SortableSetlistRow({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`list-row min-h-32 cursor-grab p-4 active:cursor-grabbing ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      className={`list-row min-h-32 cursor-grab p-4 transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_#0a0a0a] active:cursor-grabbing ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
       {...attributes}
       {...listeners}
     >
-      <div className="flex h-full flex-col gap-4">
-        <div className="flex-1">
-          <p className="font-medium leading-tight text-base-content">{item.label}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <span className="chip">{item.itemType === "exercise" ? "Exercise" : "Song"}</span>
-          </div>
-        </div>
-        <form action={deleteSetlistItemAction}>
+      <div className="relative flex h-full min-w-0 flex-col pr-8">
+        <SetlistItemLabel label={item.label} />
+        <form action={deleteSetlistItemAction} className="absolute right-0 top-0">
           <input type="hidden" name="setlistItemId" value={item.id} />
           <input type="hidden" name="returnPath" value={returnPath} />
-          <FormSubmitButton
-            label="Remove"
-            pendingLabel="Removing..."
-            className="btn btn-outline btn-xs"
-          />
+          <button
+            type="submit"
+            className="btn btn-ghost btn-xs h-7 min-h-0 w-7 px-0"
+            aria-label={`Remove ${item.label}`}
+            title="Remove"
+          >
+            x
+          </button>
         </form>
       </div>
+    </div>
+  );
+}
+
+function SetlistItemLabel({ label }: { label: string }) {
+  const parts = label.split(/\s+\/\s+/).filter(Boolean);
+
+  return (
+    <div className="min-w-0 space-y-1" title={label}>
+      {parts.map((part, index) => (
+        <p
+          key={`${part}-${index}`}
+          className={index === parts.length - 1
+            ? "truncate font-semibold leading-tight text-base-content"
+            : "truncate text-sm leading-tight text-base-content/65"}
+        >
+          {part}
+        </p>
+      ))}
     </div>
   );
 }

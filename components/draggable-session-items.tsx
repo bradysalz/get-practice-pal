@@ -33,7 +33,7 @@ type SessionItemRow = {
   itemType: "exercise" | "song";
   label: string;
   songId: string | null;
-  tempo: number;
+  tempo: number | null;
 };
 
 type DraggableSessionItemsProps = {
@@ -93,7 +93,7 @@ function SortableSessionRow({
                     name="tempo"
                     type="number"
                     min={1}
-                    defaultValue={item.tempo}
+                    defaultValue={item.tempo ?? ""}
                   />
                 </Field>
                 <FormSubmitButton
