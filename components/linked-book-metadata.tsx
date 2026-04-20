@@ -56,12 +56,12 @@ export function LinkedBookMetadata({
       ) : null}
       <div>
         <p className="font-medium text-base-content">{resolvedBook.title}</p>
-        <p className="mt-1 text-sm text-base-content/65">
+        <p className="mt-1 text-sm text-base-content/80">
           {authors ?? "Unknown author"}
           {resolvedBook.published_year ? ` · ${resolvedBook.published_year}` : ""}
         </p>
         {resolvedBook.isbn_13 ?? resolvedBook.isbn_10 ? (
-          <p className="mt-2 text-xs font-bold uppercase tracking-wide text-base-content/55">
+          <p className="mt-2 text-xs font-bold uppercase tracking-wide text-base-content/70">
             ISBN {resolvedBook.isbn_13 ?? resolvedBook.isbn_10}
           </p>
         ) : null}

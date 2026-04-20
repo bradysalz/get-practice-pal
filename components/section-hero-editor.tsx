@@ -52,7 +52,7 @@ export function SectionHeroEditor({ bookId, section, title }: SectionHeroEditorP
             <input type="hidden" name="bookId" value={bookId} />
             <input type="hidden" name="sectionId" value={section.id} />
             <ConfirmSubmitButton
-              className="btn btn-outline btn-sm"
+              className="btn btn-error btn-sm"
               confirmMessage={`Delete "${section.title}" and all of its exercises? This cannot be undone.`}
               label="Delete section"
             />

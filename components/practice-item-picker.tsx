@@ -427,7 +427,7 @@ function PickerNavButton({
       onClick={onClick}
     >
       <span className="block text-base font-semibold text-base-content">{title}</span>
-      {meta ? <span className="mt-1 block text-sm text-base-content/65">{meta}</span> : null}
+      {meta ? <span className="mt-1 block text-sm text-base-content/80">{meta}</span> : null}
     </button>
   );
 }
@@ -443,8 +443,8 @@ function PickerBackButton({ label, onClick }: { label: string; onClick: () => vo
 function PickerHeading({ meta, title }: { meta?: string | null; title: string }) {
   return (
     <div>
-      <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/60">{title}</h3>
-      {meta ? <p className="mt-1 text-sm text-base-content/65">{meta}</p> : null}
+      <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-base-content/75">{title}</h3>
+      {meta ? <p className="mt-1 text-sm text-base-content/80">{meta}</p> : null}
     </div>
   );
 }

@@ -55,8 +55,7 @@ export function SetlistHeroEditor({ setlist }: SetlistHeroEditorProps) {
       <FormSubmitButton
         label="Save"
         pendingLabel="Saving..."
-        variant="secondary"
-        className="btn btn-secondary w-full md:w-auto"
+        className="btn btn-primary w-full md:w-auto"
       />
     </form>
   );

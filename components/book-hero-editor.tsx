@@ -90,8 +90,7 @@ export function BookHeroEditor({
             <FormSubmitButton
               label="Save"
               pendingLabel="Saving..."
-              variant="secondary"
-              className="btn btn-secondary w-full md:w-auto"
+              className="btn btn-primary w-full md:w-auto"
             />
           </div>
         </div>
@@ -105,7 +104,7 @@ export function BookHeroEditor({
       <form action={deleteBookAction}>
         <input type="hidden" name="bookId" value={bookId} />
         <ConfirmSubmitButton
-          className="btn btn-outline btn-sm"
+          className="btn btn-error btn-sm"
           confirmMessage={`Delete "${title}" and all of its sections and exercises? This cannot be undone.`}
           label="Delete book"
         />

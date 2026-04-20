@@ -99,7 +99,7 @@ function SortableSessionRow({
                 <FormSubmitButton
                   label="Save"
                   pendingLabel="Saving..."
-                  className="btn btn-secondary btn-sm sm:mb-[0.15rem]"
+                  className="btn btn-primary btn-sm sm:mb-[0.15rem]"
                 />
               </form>
               <form action={deleteSessionItemAction} className="sm:mb-[0.15rem]">
@@ -107,7 +107,7 @@ function SortableSessionRow({
                 <FormSubmitButton
                   label="Remove"
                   pendingLabel="Removing..."
-                  className="btn btn-outline btn-xs"
+                  className="btn btn-error btn-xs"
                 />
               </form>
             </div>
