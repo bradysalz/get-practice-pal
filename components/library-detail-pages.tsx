@@ -56,9 +56,14 @@ export function BookDetailPage({
         eyebrow="Book"
         title=""
         stats={
-          <div className="grid grid-cols-2 gap-3 md:min-w-[18rem]">
-            <StatCard label="Sections" value={String(sectionCount)} />
-            <StatCard label="Exercises" value={String(exerciseCount)} />
+          <div className="grid grid-cols-3 gap-2 md:min-w-[26rem] md:gap-3">
+            <StatCard compact label="Sections" value={String(sectionCount)} />
+            <StatCard compact label="Exercises" value={String(exerciseCount)} />
+            <StatCard
+              compact
+              label="Completion"
+              value={`${Math.round(bookCompletion.completionRatio * 100)}%`}
+            />
           </div>
         }
       >
@@ -72,21 +77,6 @@ export function BookDetailPage({
       </PageHero>
 
       <section className="space-y-6">
-        <PagePanel>
-          <SectionHeader title="Progress" />
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <StatCard
-              label="Exercises with goals"
-              value={String(bookCompletion.totalExercisesWithGoals)}
-            />
-            <StatCard label="Completed" value={String(bookCompletion.completedExercises)} />
-            <StatCard
-              label="Completion"
-              value={`${Math.round(bookCompletion.completionRatio * 100)}%`}
-            />
-          </div>
-        </PagePanel>
-
         <PagePanel>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <SectionHeader
@@ -269,8 +259,8 @@ export function SectionDetailPage({
   exerciseProgressMap?: Map<string, ItemProgressSummary>;
 }) {
   const exercises = section?.exercises ?? [];
-  const exercisesWithGoals = exercises.filter((exercise) => exercise.goal_tempo).length;
   const completedExercises = exercises.filter((exercise) => exerciseProgressMap?.get(exercise.id)?.completed).length;
+  const completionPercent = exercises.length ? Math.round((completedExercises / exercises.length) * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -285,10 +275,9 @@ export function SectionDetailPage({
         title=""
         stats={
           section ? (
-            <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
-              <StatCard label="Exercises" value={String(exercises.length)} />
-              <StatCard label="Goals" value={String(exercisesWithGoals)} />
-              <StatCard label="Completed" value={String(completedExercises)} />
+            <div className="grid grid-cols-2 gap-2 md:min-w-[14rem] md:gap-3">
+              <StatCard compact label="Exercises" value={String(exercises.length)} />
+              <StatCard compact label="Completion" value={`${completionPercent}%`} />
             </div>
           ) : undefined
         }
