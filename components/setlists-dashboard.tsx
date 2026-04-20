@@ -66,7 +66,7 @@ export function SetlistsDashboard({ snapshot }: SetlistsDashboardProps) {
                     <div className="flex h-full flex-col">
                       <h2 className="text-lg font-bold leading-tight text-base-content">{setlist.name}</h2>
                       {setlist.description ? (
-                        <p className="mt-2 line-clamp-3 text-sm text-base-content/65">{setlist.description}</p>
+                        <p className="mt-2 line-clamp-3 text-sm text-base-content/80">{setlist.description}</p>
                       ) : null}
                       <div className="mt-auto flex flex-wrap gap-2 pt-4">
                         <span className="chip chip-neutral">
@@ -122,7 +122,7 @@ export function SetlistDetailPage({
                 triggerLabel="Add item"
                 submitFormId="add-setlist-item-form"
                 submitLabel="Add selected"
-                submitClassName="btn btn-accent"
+                submitClassName="btn btn-primary"
                 panelClassName="max-w-5xl"
               >
                 <AddSetlistItemForm setlist={setlist} snapshot={snapshot} />

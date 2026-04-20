@@ -87,7 +87,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
                           ) : null}
                           <div className="flex min-w-0 flex-1 flex-col">
                             <h2 className="text-lg font-bold leading-tight text-base-content">{displayTitle}</h2>
-                            <p className="mt-2 text-sm text-base-content/65">
+                            <p className="mt-2 text-sm text-base-content/80">
                               {displayAuthor || "No composer set"}
                               {publishedYear ? ` · ${publishedYear}` : ""}
                             </p>
@@ -255,7 +255,7 @@ export function EditBookForm({
           initialExternalBookId={book.external_book_id}
           title={book.title}
         />
-        <FormSubmitButton label="Save book" pendingLabel="Saving book..." variant="secondary" />
+        <FormSubmitButton label="Save book" pendingLabel="Saving book..." />
       </CardForm>
     </form>
   );
@@ -303,7 +303,7 @@ export function EditSectionForm({
           type="number"
           min={1}
         />
-        <FormSubmitButton label="Save section" pendingLabel="Saving..." variant="secondary" />
+        <FormSubmitButton label="Save section" pendingLabel="Saving..." />
       </CardForm>
     </form>
   );
@@ -374,7 +374,7 @@ export function EditExerciseForm({
           <FormSubmitButton
             label="Save"
             pendingLabel="Saving..."
-            className="btn btn-outline btn-sm md:mb-[0.35rem]"
+            className="btn btn-primary btn-sm md:mb-[0.35rem]"
           />
         </div>
       </form>
@@ -383,7 +383,7 @@ export function EditExerciseForm({
         <input type="hidden" name="bookId" value={bookId} />
         <input type="hidden" name="sectionId" value={sectionId} />
         <ConfirmSubmitButton
-          className="btn btn-outline btn-sm"
+          className="btn btn-error btn-sm"
           confirmMessage={`Delete "${exercise.title}"? This cannot be undone.`}
           label="Delete exercise"
         />
@@ -412,7 +412,7 @@ export function EditArtistForm({
       <input type="hidden" name="artistId" value={artist.id} />
       <CardForm title="Edit artist" description="">
         <Input label="Artist name" name="name" defaultValue={artist.name} />
-        <FormSubmitButton label="Save artist" pendingLabel="Saving..." variant="secondary" />
+        <FormSubmitButton label="Save artist" pendingLabel="Saving..." />
       </CardForm>
     </form>
   );
@@ -452,11 +452,11 @@ export function EditSongForm({
 }) {
   return (
     <div className="section-panel p-4">
-      <div className="mb-3 flex flex-wrap gap-2">
-        <span className="chip ">
-          Goal {song.goal_tempo ? `${song.goal_tempo} BPM` : "unset"}
-        </span>
-      </div>
+      {song.goal_tempo ? (
+        <div className="mb-3 flex flex-wrap gap-2">
+          <span className="chip">Goal {song.goal_tempo} BPM</span>
+        </div>
+      ) : null}
       <form action={updateSongAction}>
         <input type="hidden" name="songId" value={song.id} />
         <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr_auto] md:items-end">
@@ -465,7 +465,7 @@ export function EditSongForm({
           <FormSubmitButton
             label="Save"
             pendingLabel="Saving..."
-            className="btn btn-outline btn-sm md:mb-[0.35rem]"
+            className="btn btn-primary btn-sm md:mb-[0.35rem]"
           />
         </div>
       </form>
@@ -473,7 +473,7 @@ export function EditSongForm({
         <input type="hidden" name="songId" value={song.id} />
         <input type="hidden" name="artistId" value={artistId} />
         <ConfirmSubmitButton
-          className="btn btn-outline btn-sm"
+          className="btn btn-error btn-sm"
           confirmMessage={`Delete "${song.title}"? This cannot be undone.`}
           label="Delete song"
         />

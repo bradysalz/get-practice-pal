@@ -183,7 +183,7 @@ export function BookMetadataSearch({
             <div>
               <p className="text-sm font-bold text-base-content">Selected book</p>
               <p className="mt-1 font-medium text-base-content">{selectedExternalBook.title}</p>
-              <p className="mt-1 text-sm text-base-content/65">
+              <p className="mt-1 text-sm text-base-content/80">
                 {authorsLabel(selectedExternalBook.authors)}
                 {publishedYear(selectedExternalBook) ? ` · ${publishedYear(selectedExternalBook)}` : ""}
               </p>
@@ -230,12 +230,12 @@ export function BookMetadataSearch({
                     ) : null}
                     <div>
                       <p className="font-medium text-base-content">{result.title}</p>
-                      <p className="mt-1 text-sm text-base-content/65">
+                      <p className="mt-1 text-sm text-base-content/80">
                         {authorsLabel(result.authors)}
                         {publishedYear(result) ? ` · ${publishedYear(result)}` : ""}
                       </p>
                       {isbnLabel(result) ? (
-                        <p className="mt-2 text-xs font-bold uppercase tracking-wide text-base-content/55">
+                        <p className="mt-2 text-xs font-bold uppercase tracking-wide text-base-content/70">
                           ISBN {isbnLabel(result)}
                         </p>
                       ) : null}
@@ -243,7 +243,7 @@ export function BookMetadataSearch({
                   </div>
                   <button
                     type="button"
-                    className="btn btn-secondary btn-sm"
+                    className="btn btn-primary btn-sm"
                     disabled={Boolean(selectionPendingId)}
                     onClick={() => selectResult(result)}
                   >
@@ -253,7 +253,7 @@ export function BookMetadataSearch({
               </div>
             ))
           ) : (
-            <div className="rounded-box border border-base-300 bg-base-100 px-3 py-3 text-sm text-base-content/65">
+            <div className="rounded-box border border-base-300 bg-base-100 px-3 py-3 text-sm text-base-content/80">
               <p>No matching external books found.</p>
               <button type="button" className="btn btn-ghost btn-xs mt-2" onClick={skipLinking}>
                 Continue without external metadata

@@ -93,7 +93,7 @@ export function SessionsDashboard({
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-medium text-base-content">{formatDateTime(session.started_at)}</p>
-                        <p className="text-sm text-base-content/65">{formatDurationLabel(session.started_at, session.ended_at)}</p>
+                        <p className="text-sm text-base-content/80">{formatDurationLabel(session.started_at, session.ended_at)}</p>
                       </div>
                       <span className="chip chip-neutral">
                         {(session.session_items?.length ?? 0)} item{(session.session_items?.length ?? 0) === 1 ? "" : "s"}
@@ -167,7 +167,7 @@ export function ActiveSessionPage({
               triggerLabel="Add item"
               submitFormId="add-session-item-form"
               submitLabel="Log selected"
-              submitClassName="btn btn-accent"
+              submitClassName="btn btn-primary"
               panelClassName="max-w-5xl"
             >
               <AddSessionItemForm currentSession={currentSession} snapshot={librarySnapshot} />

@@ -50,7 +50,7 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
           sortedItems.length ? (
             <form action={createSetlistFromSessionAction}>
               <input type="hidden" name="sessionId" value={session.id} />
-              <FormSubmitButton label="Create setlist" pendingLabel="Creating..." className="btn btn-accent" />
+              <FormSubmitButton label="Create setlist" pendingLabel="Creating..." className="btn btn-primary" />
             </form>
           ) : null
         }
@@ -84,7 +84,7 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-base-content">{labelSessionItem(item, itemMaps)}</p>
-                    <p className="mt-2 text-sm text-base-content/65">
+                    <p className="mt-2 text-sm text-base-content/80">
                       {item.item_type === "exercise" ? "Exercise" : "Song"}
                     </p>
                   </div>

@@ -1,19 +1,21 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
+import type { ComponentPropsWithoutRef } from "react";
 
 type ConfirmSubmitButtonProps = {
   className?: string;
   confirmMessage: string;
   label: string;
   pendingLabel?: string;
-};
+} & Omit<ComponentPropsWithoutRef<"button">, "children" | "className" | "onClick" | "type">;
 
 export function ConfirmSubmitButton({
   className = "btn btn-error btn-sm",
   confirmMessage,
   label,
   pendingLabel = "Deleting...",
+  ...props
 }: ConfirmSubmitButtonProps) {
   const { pending } = useFormStatus();
 
@@ -21,7 +23,8 @@ export function ConfirmSubmitButton({
     <button
       type="submit"
       className={className}
-      disabled={pending}
+      {...props}
+      disabled={pending || props.disabled}
       onClick={(event) => {
         if (!window.confirm(confirmMessage)) {
           event.preventDefault();

@@ -99,7 +99,7 @@ export function BookDetailPage({
                     completionLabel:
                       sectionProgressMap.get(section.id)?.totalExercisesWithGoals
                         ? `${sectionProgressMap.get(section.id)?.completedExercises ?? 0}/${sectionProgressMap.get(section.id)?.totalExercisesWithGoals ?? 0} complete`
-                        : "No goals yet",
+                        : "",
                     exerciseCount: section.exercises?.length ?? 0,
                     id: section.id,
                     title: section.title,
@@ -306,9 +306,7 @@ export function SectionDetailPage({
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <p className="font-medium text-base-content">{exercise.title}</p>
                       <div className="flex flex-wrap gap-2">
-                        <span className="chip">
-                          Goal {exercise.goal_tempo ? `${exercise.goal_tempo} BPM` : "unset"}
-                        </span>
+                        {exercise.goal_tempo ? <span className="chip">Goal {exercise.goal_tempo} BPM</span> : null}
                         <span className="chip chip-neutral">
                           Max {exerciseProgressMap?.get(exercise.id)?.currentMaxTempo ?? 0} BPM
                         </span>
@@ -421,7 +419,7 @@ function SongProgressRow({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="font-medium text-base-content">{song.title}</p>
         <div className="flex flex-wrap gap-2">
-          <span className="chip">Goal {song.goal_tempo ? `${song.goal_tempo} BPM` : "unset"}</span>
+          {song.goal_tempo ? <span className="chip">Goal {song.goal_tempo} BPM</span> : null}
           <span className="chip chip-neutral">Max {progress?.currentMaxTempo ?? 0} BPM</span>
         </div>
       </div>

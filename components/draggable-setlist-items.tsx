@@ -20,6 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState, useTransition } from "react";
 import { deleteSetlistItemAction } from "@/app/(app)/setlists/actions";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 
 type SetlistItemRow = {
   id: string;
@@ -66,14 +67,14 @@ function SortableSetlistRow({
         <form action={deleteSetlistItemAction} className="absolute right-0 top-0">
           <input type="hidden" name="setlistItemId" value={item.id} />
           <input type="hidden" name="returnPath" value={returnPath} />
-          <button
-            type="submit"
-            className="btn btn-ghost btn-xs h-7 min-h-0 w-7 px-0"
+          <ConfirmSubmitButton
             aria-label={`Remove ${item.label}`}
+            className="btn btn-error btn-xs h-7 min-h-0 w-7 px-0"
+            confirmMessage={`Remove "${item.label}" from this setlist?`}
+            label="x"
+            pendingLabel="..."
             title="Remove"
-          >
-            x
-          </button>
+          />
         </form>
       </div>
     </div>
@@ -90,7 +91,7 @@ function SetlistItemLabel({ label }: { label: string }) {
           key={`${part}-${index}`}
           className={index === parts.length - 1
             ? "truncate font-semibold leading-tight text-base-content"
-            : "truncate text-sm leading-tight text-base-content/65"}
+            : "truncate text-sm leading-tight text-base-content/80"}
         >
           {part}
         </p>

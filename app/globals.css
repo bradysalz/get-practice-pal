@@ -113,14 +113,15 @@ h4,
 .accent-card {
     border-radius: 0;
     border: 2px solid #0a0a0a;
-    background: #ffffff;
+    background: #fcfcfc;
     box-shadow: 2px 2px 0 #0a0a0a;
 }
 
 .list-row {
     border-radius: 0;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 2px solid #0a0a0a;
     background: #fcfcfc;
+    box-shadow: 2px 2px 0 #0a0a0a;
 }
 
 .soft-stat {
@@ -142,9 +143,9 @@ h4,
 
 .empty-box {
     border-radius: 0;
-    border: 2px dashed rgba(0, 0, 0, 0.25);
+    border: 2px dashed rgba(0, 0, 0, 0.5);
     background: #fafafa;
-    color: rgba(10, 10, 10, 0.6);
+    color: rgba(10, 10, 10, 0.78);
 }
 
 .chip {
@@ -204,8 +205,8 @@ h4,
 
 .btn-secondary {
     border-color: #0a0a0a;
-    background: #0a0a0a;
-    color: #ffffff;
+    background: #ffffff;
+    color: #0a0a0a;
 }
 
 .btn-accent {
@@ -216,7 +217,7 @@ h4,
 
 .btn-error {
     border-color: #0a0a0a;
-    background: #dc2626;
+    background: #b91c1c;
     color: #ffffff;
 }
 

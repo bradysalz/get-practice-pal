@@ -49,14 +49,13 @@ export function ArtistHeroEditor({ artistId, name }: ArtistHeroEditorProps) {
         <FormSubmitButton
           label="Save"
           pendingLabel="Saving..."
-          variant="secondary"
-          className="btn btn-secondary w-full md:w-auto"
+          className="btn btn-primary w-full md:w-auto"
         />
       </form>
       <form action={deleteArtistAction}>
         <input type="hidden" name="artistId" value={artistId} />
         <ConfirmSubmitButton
-          className="btn btn-outline btn-sm"
+          className="btn btn-error btn-sm"
           confirmMessage={`Delete "${name}" and all of their songs? This cannot be undone.`}
           label="Delete artist"
         />
