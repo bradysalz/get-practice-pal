@@ -7,6 +7,7 @@ import { PagePanel } from "@/components/ui/primitives";
 type ActionModalProps = {
   title?: string;
   description?: string;
+  panelClassName?: string;
   submitFormId?: string;
   submitLabel?: string;
   submitClassName?: string;
@@ -18,6 +19,7 @@ type ActionModalProps = {
 export function ActionModal({
   title,
   description,
+  panelClassName,
   submitFormId,
   submitLabel,
   submitClassName = "btn btn-primary",
@@ -33,8 +35,8 @@ export function ActionModal({
         {triggerLabel}
       </button>
       {isOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <PagePanel className="w-full max-w-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 px-4 py-6">
+          <PagePanel className={`flex max-h-[75vh] w-full max-w-xl flex-col overflow-hidden ${panelClassName ?? ""}`}>
             {(title || description) ? (
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -47,7 +49,7 @@ export function ActionModal({
                 </div>
               </div>
             ) : null}
-            <div className={title || description ? "mt-5" : ""}>{children}</div>
+            <div className={`${title || description ? "mt-5" : ""} min-h-0 flex-1 overflow-y-auto pr-1`}>{children}</div>
             <div className="mt-5 flex flex-wrap justify-end gap-3">
               <button type="button" className="btn btn-outline" onClick={() => setIsOpen(false)}>
                 Close

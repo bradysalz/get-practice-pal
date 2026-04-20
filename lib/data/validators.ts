@@ -1,6 +1,10 @@
 import type { PracticeItemType } from "@/lib/data/types";
 
-export function validateTempo(value: number) {
+export function validateTempo(value: number | null | undefined) {
+  if (value == null) {
+    return;
+  }
+
   if (!Number.isFinite(value) || value <= 0) {
     throw new Error("Tempo must be a positive number.");
   }

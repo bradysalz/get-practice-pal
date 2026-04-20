@@ -1,9 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createSetlist, replaceSetlistItems } from "@/lib/data/library";
 import {
   deleteSessionItem,
   endSession,
+  getSessionById,
   pauseSession,
   reorderSessionItems,
   resumeSession,
@@ -24,6 +27,16 @@ function parseTempo(value: FormDataEntryValue | null) {
   }
 
   return parsed;
+}
+
+function parseOptionalTempo(value: FormDataEntryValue | null) {
+  const rawValue = String(value ?? "").trim();
+
+  if (!rawValue) {
+    return null;
+  }
+
+  return parseTempo(rawValue);
 }
 
 export async function startSessionAction(formData: FormData) {
@@ -58,18 +71,31 @@ export async function updateSessionNotesAction(formData: FormData) {
 }
 
 export async function addSessionItemAction(formData: FormData) {
-  const rawItem = String(formData.get("itemKey") ?? "");
-  const [itemType, itemId] = rawItem.split(":");
+  const rawItems = formData.getAll("itemKey").map((item) => String(item));
   const displayOrder = Number(String(formData.get("displayOrder") ?? "0"));
+  const startDisplayOrder = Number.isFinite(displayOrder) ? displayOrder : 0;
 
-  await upsertSessionItem({
-    sessionId: String(formData.get("sessionId") ?? ""),
-    itemType: itemType === "song" ? "song" : "exercise",
-    exerciseId: itemType === "exercise" ? itemId : null,
-    songId: itemType === "song" ? itemId : null,
-    tempo: parseTempo(formData.get("tempo")),
-    displayOrder: Number.isFinite(displayOrder) ? displayOrder : 0,
-  });
+  if (!rawItems.length) {
+    revalidateSessions();
+    return;
+  }
+
+  const tempo = parseOptionalTempo(formData.get("tempo"));
+
+  await Promise.all(
+    rawItems.map((rawItem, index) => {
+      const [itemType, itemId] = rawItem.split(":");
+
+      return upsertSessionItem({
+        sessionId: String(formData.get("sessionId") ?? ""),
+        itemType: itemType === "song" ? "song" : "exercise",
+        exerciseId: itemType === "exercise" ? itemId : null,
+        songId: itemType === "song" ? itemId : null,
+        tempo,
+        displayOrder: startDisplayOrder + index,
+      });
+    }),
+  );
 
   revalidateSessions();
 }
@@ -83,7 +109,7 @@ export async function updateSessionItemAction(formData: FormData) {
     itemType: itemType === "song" ? "song" : "exercise",
     exerciseId: itemType === "exercise" ? String(formData.get("exerciseId") ?? "") || null : null,
     songId: itemType === "song" ? String(formData.get("songId") ?? "") || null : null,
-    tempo: parseTempo(formData.get("tempo")),
+    tempo: parseOptionalTempo(formData.get("tempo")),
     displayOrder: Number.isFinite(displayOrder) ? displayOrder : 0,
   });
 
@@ -98,4 +124,31 @@ export async function deleteSessionItemAction(formData: FormData) {
 export async function reorderSessionItemsAction(sessionId: string, itemIds: string[]) {
   await reorderSessionItems(sessionId, itemIds);
   revalidateSessions();
+}
+
+export async function createSetlistFromSessionAction(formData: FormData) {
+  const sessionId = String(formData.get("sessionId") ?? "");
+  const session = await getSessionById(sessionId);
+  const items = (session.session_items ?? [])
+    .slice()
+    .sort((left, right) => left.display_order - right.display_order)
+    .filter((item) => item.exercise_id || item.song_id);
+
+  const setlist = await createSetlist({
+    name: `Session ${new Date(session.started_at).toLocaleDateString()}`,
+    description: null,
+  });
+
+  await replaceSetlistItems(
+    setlist.id,
+    items.map((item, index) => ({
+      itemType: item.item_type,
+      exerciseId: item.exercise_id,
+      songId: item.song_id,
+      position: index + 1,
+    })),
+  );
+
+  revalidatePath("/setlists");
+  redirect(`/setlists/${setlist.id}`);
 }

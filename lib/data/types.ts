@@ -107,6 +107,6 @@ export type SessionItemUpsertInput = {
   itemType: PracticeItemType;
   exerciseId?: string | null;
   songId?: string | null;
-  tempo: number;
+  tempo?: number | null;
   displayOrder: number;
 };

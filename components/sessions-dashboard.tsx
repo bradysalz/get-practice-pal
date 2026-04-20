@@ -6,9 +6,11 @@ import {
   startSessionAction,
 } from "@/app/(app)/sessions/actions";
 import Link from "next/link";
+import { ActionModal } from "@/components/action-modal";
 import { DraggableSessionItems } from "@/components/draggable-session-items";
 import { FormSelect } from "@/components/form-select";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { PracticeItemPicker } from "@/components/practice-item-picker";
 import { EmptyState, Field, FormActions, PageHero, PagePanel, TextInput, Textarea } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
@@ -26,7 +28,7 @@ type SessionDetail = {
     item_type: "exercise" | "song";
     exercise_id: string | null;
     song_id: string | null;
-    tempo: number;
+    tempo: number | null;
     display_order: number;
   }>;
 };
@@ -45,7 +47,7 @@ type SessionsDashboardProps = {
       item_type: "exercise" | "song";
       exercise_id: string | null;
       song_id: string | null;
-      tempo: number;
+      tempo: number | null;
       display_order: number;
     }>;
   }>;
@@ -123,16 +125,6 @@ export function ActiveSessionPage({
   librarySnapshot: LibrarySnapshot;
 }) {
   const itemMaps = buildLibraryItemMaps(librarySnapshot);
-  const itemOptions = [
-    ...Array.from(itemMaps.exerciseMap.entries()).map(([id, item]) => ({
-      value: `exercise:${id}`,
-      label: item.label,
-    })),
-    ...Array.from(itemMaps.songMap.entries()).map(([id, item]) => ({
-      value: `song:${id}`,
-      label: item.label,
-    })),
-  ].sort((left, right) => left.label.localeCompare(right.label));
 
   return (
     <div className="space-y-6">
@@ -171,6 +163,15 @@ export function ActiveSessionPage({
         <PagePanel className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-lg font-bold text-base-content">Logged items</h3>
+            <ActionModal
+              triggerLabel="Add item"
+              submitFormId="add-session-item-form"
+              submitLabel="Log selected"
+              submitClassName="btn btn-accent"
+              panelClassName="max-w-5xl"
+            >
+              <AddSessionItemForm currentSession={currentSession} snapshot={librarySnapshot} />
+            </ActionModal>
           </div>
           {currentSession.session_items?.length ? (
             <DraggableSessionItems
@@ -192,26 +193,6 @@ export function ActiveSessionPage({
           )}
         </PagePanel>
 
-        <form action={addSessionItemAction} className="page-panel p-6">
-          <input type="hidden" name="sessionId" value={currentSession.id} />
-          <input type="hidden" name="displayOrder" value={String(currentSession.session_items?.length ?? 0)} />
-          <h3 className="text-lg font-bold text-primary">Add item</h3>
-          <div className="mt-4 space-y-3">
-            <FormSelect
-              label="Library item"
-              name="itemKey"
-              emptyLabel="Select exercise or song"
-              options={itemOptions}
-            />
-            <Field label="Tempo">
-              <TextInput name="tempo" type="number" min={1} />
-            </Field>
-            <FormActions>
-              <FormSubmitButton label="Log item" pendingLabel="Logging..." />
-            </FormActions>
-          </div>
-        </form>
-
         <form action={endSessionAction} className="page-panel p-6">
           <input type="hidden" name="sessionId" value={currentSession.id} />
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -231,6 +212,27 @@ export function ActiveSessionPage({
         </form>
       </section>
     </div>
+  );
+}
+
+function AddSessionItemForm({
+  currentSession,
+  snapshot,
+}: {
+  currentSession: SessionDetail;
+  snapshot: Pick<LibrarySnapshot, "artists" | "books">;
+}) {
+  return (
+    <form id="add-session-item-form" action={addSessionItemAction}>
+      <input type="hidden" name="sessionId" value={currentSession.id} />
+      <input type="hidden" name="displayOrder" value={String(currentSession.session_items?.length ?? 0)} />
+      <div className="space-y-4">
+        <PracticeItemPicker snapshot={snapshot} />
+        <Field label="Tempo">
+          <TextInput name="tempo" type="number" min={1} />
+        </Field>
+      </div>
+    </form>
   );
 }
 

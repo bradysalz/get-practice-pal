@@ -80,10 +80,7 @@ export async function startSession(input: SessionStartInput = {}) {
           exercise_id: item.exercise_id,
           song_id: item.song_id,
           display_order: item.position,
-          tempo:
-            item.item_type === "exercise"
-              ? item.exercise?.[0]?.goal_tempo ?? 60
-              : item.song?.[0]?.goal_tempo ?? 60,
+          tempo: null,
         })),
       );
 
