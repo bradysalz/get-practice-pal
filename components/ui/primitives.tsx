@@ -77,13 +77,27 @@ export function SectionTitle({
   );
 }
 
-export function StatCard({ label, value }: { label: string; value: string }) {
+export function StatCard({
+  compact = false,
+  label,
+  value,
+}: {
+  compact?: boolean;
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="soft-stat px-4 py-4">
-      <p className="text-xs font-bold uppercase tracking-[0.15em] text-current opacity-70">
+    <div className={joinClasses("soft-stat", compact ? "px-3 py-3" : "px-4 py-4")}>
+      <p className={joinClasses(
+        "truncate font-bold uppercase tracking-[0.15em] text-current opacity-70 md:whitespace-normal",
+        "text-xs",
+      )}>
         {label}
       </p>
-      <p className="mt-2 text-[2rem] font-bold text-base-content">{value}</p>
+      <p className={joinClasses(
+        "font-bold text-base-content",
+        compact ? "mt-1 text-[1.75rem]" : "mt-2 text-[2rem]",
+      )}>{value}</p>
     </div>
   );
 }
