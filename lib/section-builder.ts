@@ -1,4 +1,4 @@
-export type ExerciseNamingType = "alpha" | "numeric" | "roman";
+export type ExerciseNamingType = "alpha" | "manual" | "numeric" | "roman";
 
 export function toRomanNumeral(num: number): string {
   if (num <= 0 || num > 3999) {
@@ -38,14 +38,16 @@ export function buildExerciseNames(
   count: number,
   namingType: ExerciseNamingType,
   prefix: string,
+  startNumber = 1,
 ) {
   const safePrefix = prefix.trim() || "Exercise";
+  const firstNumber = Math.max(1, Math.floor(startNumber));
 
   return Array.from({ length: Math.max(count, 0) }, (_, index) => {
-    const order = index + 1;
+    const order = firstNumber + index;
 
     if (namingType === "alpha") {
-      return `${safePrefix} ${String.fromCharCode(65 + index)}`;
+      return `${safePrefix} ${String.fromCharCode(64 + order)}`;
     }
 
     if (namingType === "roman") {

@@ -183,6 +183,7 @@ export function ActiveSessionPage({
                   id: item.id,
                   itemType: item.item_type,
                   label: labelSessionItem(item, itemMaps),
+                  pathLines: sessionItemPathLines(item, itemMaps),
                   songId: item.song_id,
                   tempo: item.tempo,
                 }))}
@@ -253,6 +254,27 @@ function labelSessionItem(
   }
 
   return "Unknown item";
+}
+
+function sessionItemPathLines(
+  item: {
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+  },
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>,
+) {
+  if (item.item_type === "exercise" && item.exercise_id) {
+    const exercise = itemMaps.exerciseMap.get(item.exercise_id);
+    return exercise ? [exercise.bookTitle, exercise.sectionTitle, exercise.title] : ["Unknown exercise"];
+  }
+
+  if (item.item_type === "song" && item.song_id) {
+    const song = itemMaps.songMap.get(item.song_id);
+    return song ? [song.artistName, song.title] : ["Unknown song"];
+  }
+
+  return ["Unknown item"];
 }
 
 function formatDateTime(value: string) {
