@@ -5,7 +5,7 @@ status: completed
 type: task
 priority: normal
 created_at: 2026-04-22T04:57:49Z
-updated_at: 2026-04-24T04:35:34Z
+updated_at: 2026-04-24T06:17:42Z
 ---
 
 Implement related UX polish and follow-up fixes:
@@ -25,3 +25,8 @@ Implement related UX polish and follow-up fixes:
 ## Summary of Changes
 
 Made the session-item remove control visibly render as `×`, changed library detail routes to fetch only the requested book instead of the full library snapshot, closed the book and exercise editors after successful saves, and kept exercise max tempo visible even before a goal tempo is set.
+
+
+## Follow-up
+
+Patched large-book progress queries to batch exercise id filters instead of issuing a single oversized `.in(...)` request. This addresses the remaining runtime failure on book detail pages with very large exercise counts.

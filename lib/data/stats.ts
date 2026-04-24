@@ -17,6 +17,8 @@ type RawItemRow = {
   song_id: string | null;
 };
 
+const ID_BATCH_SIZE = 200;
+
 export type ItemProgressSummary = {
   goalTempo: number | null;
   currentMaxTempo: number;
@@ -126,28 +128,34 @@ export async function getItemProgressSummaryMap(input: {
     return emptyMap;
   }
 
-  let query = client
-    .from("practice_session_items")
-    .select("tempo, created_at, exercise_id, song_id")
-    .eq("user_id", user.id)
-    .eq("item_type", input.itemType)
-    .not("tempo", "is", null)
-    .order("created_at", { ascending: true });
+  const rows: RawItemRow[] = [];
 
-  query =
-    input.itemType === "exercise"
-      ? query.in("exercise_id", ids)
-      : query.in("song_id", ids);
+  for (const idBatch of chunkArray(ids, ID_BATCH_SIZE)) {
+    let query = client
+      .from("practice_session_items")
+      .select("tempo, created_at, exercise_id, song_id")
+      .eq("user_id", user.id)
+      .eq("item_type", input.itemType)
+      .not("tempo", "is", null)
+      .order("created_at", { ascending: true });
 
-  if (rangeStart) {
-    query = query.gte("created_at", rangeStart.toISOString());
+    query =
+      input.itemType === "exercise"
+        ? query.in("exercise_id", idBatch)
+        : query.in("song_id", idBatch);
+
+    if (rangeStart) {
+      query = query.gte("created_at", rangeStart.toISOString());
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    rows.push(...((data ?? []) as RawItemRow[]));
   }
 
-  const { data, error } = await query;
-
-  if (error) throw error;
-
-  for (const row of (data ?? []) as RawItemRow[]) {
+  for (const row of rows) {
     const id = input.itemType === "exercise" ? row.exercise_id : row.song_id;
 
     if (!id) {
@@ -204,33 +212,35 @@ export async function getBookCompletion(bookId: string, range: TimeRange = "all"
     };
   }
 
-  let itemQuery = client
-    .from("practice_session_items")
-    .select("exercise_id, tempo")
-    .eq("user_id", user.id)
-    .eq("item_type", "exercise")
-    .not("tempo", "is", null)
-    .in("exercise_id", exerciseIds);
-
-  if (rangeStart) {
-    itemQuery = itemQuery.gte("created_at", rangeStart.toISOString());
-  }
-
-  const items = await itemQuery;
-
-  if (items.error) throw items.error;
-
   const maxByExercise = new Map<string, number>();
 
-  for (const item of items.data ?? []) {
-    if (!item.exercise_id || item.tempo == null) {
-      continue;
+  for (const idBatch of chunkArray(exerciseIds, ID_BATCH_SIZE)) {
+    let itemQuery = client
+      .from("practice_session_items")
+      .select("exercise_id, tempo")
+      .eq("user_id", user.id)
+      .eq("item_type", "exercise")
+      .not("tempo", "is", null)
+      .in("exercise_id", idBatch);
+
+    if (rangeStart) {
+      itemQuery = itemQuery.gte("created_at", rangeStart.toISOString());
     }
 
-    maxByExercise.set(
-      item.exercise_id,
-      Math.max(maxByExercise.get(item.exercise_id) ?? 0, item.tempo),
-    );
+    const items = await itemQuery;
+
+    if (items.error) throw items.error;
+
+    for (const item of items.data ?? []) {
+      if (!item.exercise_id || item.tempo == null) {
+        continue;
+      }
+
+      maxByExercise.set(
+        item.exercise_id,
+        Math.max(maxByExercise.get(item.exercise_id) ?? 0, item.tempo),
+      );
+    }
   }
 
   const completedExercises = (exercises.data ?? []).filter((exercise) => {
@@ -246,4 +256,14 @@ export async function getBookCompletion(bookId: string, range: TimeRange = "all"
     completedExercises,
     completionRatio: completedExercises / exerciseIds.length,
   };
+}
+
+function chunkArray<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+
+  return chunks;
 }
