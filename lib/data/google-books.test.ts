@@ -211,4 +211,49 @@ describe("searchGoogleBooks", () => {
       globalThis.fetch = originalFetch;
     }
   });
+
+  it("prioritizes candidates with cover images within a result set", async () => {
+    globalThis.fetch = (async () =>
+      Response.json({
+        items: [
+          {
+            id: "no-cover",
+            volumeInfo: {
+              title: "Stick Control",
+            },
+          },
+          {
+            id: "thumbnail-only",
+            volumeInfo: {
+              title: "Accents and Rebounds",
+              imageLinks: {
+                thumbnail: "http://books.google.com/thumb",
+              },
+            },
+          },
+          {
+            id: "large-cover",
+            volumeInfo: {
+              title: "Syncopation",
+              imageLinks: {
+                large: "http://books.google.com/large",
+              },
+            },
+          },
+        ],
+      })) as typeof fetch;
+
+    try {
+      const results = await searchGoogleBooks({
+        title: "drum methods",
+      });
+
+      assert.deepEqual(
+        results.map((result) => result.providerBookId),
+        ["large-cover", "thumbnail-only", "no-cover"],
+      );
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
