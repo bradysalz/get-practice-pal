@@ -65,9 +65,14 @@ export function BookHeroEditor({
     );
   }
 
+  async function submitBookUpdate(formData: FormData) {
+    await updateBookAction(formData);
+    setIsEditing(false);
+  }
+
   return (
     <div className="max-w-3xl space-y-4">
-      <form action={updateBookAction} className="space-y-4">
+      <form action={submitBookUpdate} className="space-y-4">
         <input type="hidden" name="bookId" value={bookId} />
         <div className="flex flex-wrap items-start justify-between gap-4">
           <TextInput
