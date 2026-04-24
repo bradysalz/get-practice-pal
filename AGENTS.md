@@ -3,11 +3,11 @@
 ## Workflow
 
 - Open a branch before editing any code. If already on a branch, continue to use that.
-- Commit and open a PR for all code changes.
+- Commit all code changes.
+- Do not open a PR until a feature is approved and complete.
 - Open normal PRs, not draft PRs.
 - Do not commit directly to `master`; always use a branch and land changes through the PR flow.
 - It is fine to group several related changes into one PR when they belong to the same milestone or workflow.
-- Do not open PRs that only create Beads; complete at least one Bead's implementation work before opening a PR. Multiple related Beads can still ship in one PR.
 - Keep local-only files such as editor swap files and private env files out of commits and PRs.
 
 ## Lightweight Tree
