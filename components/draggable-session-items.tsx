@@ -161,26 +161,7 @@ function RemoveSessionItemButton({ label }: { label: string }) {
       title="Remove"
       disabled={pending}
     >
-      {pending ? (
-        <span aria-hidden="true">...</span>
-      ) : (
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 20 20"
-          className="h-3.5 w-3.5"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-        >
-          <path d="M4 6h12" />
-          <path d="M8 6V4h4v2" />
-          <path d="M6 6l1 10h6l1-10" />
-          <path d="M9 9v4" />
-          <path d="M11 9v4" />
-        </svg>
-      )}
+      <span aria-hidden="true" className="text-sm leading-none">{pending ? "…" : "×"}</span>
     </button>
   );
 }

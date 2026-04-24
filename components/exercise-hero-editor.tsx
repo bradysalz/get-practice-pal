@@ -25,6 +25,11 @@ export function ExerciseHeroEditor({
 }: ExerciseHeroEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
 
+  async function submitUpdate(formData: FormData) {
+    await updateExerciseAction(formData);
+    setIsEditing(false);
+  }
+
   if (!isEditing) {
     return (
       <div className="space-y-4">
@@ -44,7 +49,7 @@ export function ExerciseHeroEditor({
 
   return (
     <div className="max-w-3xl space-y-4">
-      <form action={updateExerciseAction} className="space-y-4">
+      <form action={submitUpdate} className="space-y-4">
         <input type="hidden" name="exerciseId" value={exerciseId} />
         <input type="hidden" name="position" value={String(position)} />
         <div className="flex flex-wrap items-start justify-between gap-4">
