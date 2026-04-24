@@ -5,10 +5,10 @@ status: completed
 type: bug
 priority: normal
 created_at: 2026-04-24T07:21:22Z
-updated_at: 2026-04-24T07:22:22Z
+updated_at: 2026-04-24T07:22:44Z
 ---
 
-- [ ] Trace the book editor save flow
+- [x] Trace the book editor save flow
 - [x] Update the editor to exit edit mode after a successful save
 - [x] Verify with repo checks
 
