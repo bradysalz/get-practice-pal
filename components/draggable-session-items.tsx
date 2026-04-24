@@ -19,12 +19,12 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState, useTransition } from "react";
+import { useFormStatus } from "react-dom";
 import {
   deleteSessionItemAction,
   reorderSessionItemsAction,
   updateSessionItemAction,
 } from "@/app/(app)/sessions/actions";
-import { FormSubmitButton } from "@/components/form-submit-button";
 import { DragHandle, Field, TextInput } from "@/components/ui/primitives";
 
 type SessionItemRow = {
@@ -32,6 +32,7 @@ type SessionItemRow = {
   id: string;
   itemType: "exercise" | "song";
   label: string;
+  pathLines: string[];
   songId: string | null;
   tempo: number | null;
 };
@@ -78,11 +79,12 @@ function SortableSessionRow({
       <div className="flex-1">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <p className="font-medium text-base-content">{item.label}</p>
+            <SessionItemLabel label={item.label} pathLines={item.pathLines} />
           </div>
           <div className="flex flex-col gap-3 lg:items-end">
-            <div className="grid gap-3 sm:grid-cols-[8rem_auto_auto] sm:items-end">
+            <div className="grid gap-3 sm:grid-cols-[8rem_auto] sm:items-end">
               <form action={updateSessionItemAction} className="contents">
+                <input type="hidden" name="sessionItemId" value={item.id} />
                 <input type="hidden" name="sessionId" value={sessionId} />
                 <input type="hidden" name="itemType" value={item.itemType} />
                 <input type="hidden" name="exerciseId" value={item.exerciseId ?? ""} />
@@ -94,27 +96,73 @@ function SortableSessionRow({
                     type="number"
                     min={1}
                     defaultValue={item.tempo ?? ""}
+                    onBlur={(event) => {
+                      const nextFocus = event.relatedTarget;
+                      const isMovingToRemove = nextFocus instanceof HTMLElement
+                        ? Boolean(nextFocus.closest(`[data-session-delete-for="${item.id}"]`))
+                        : false;
+
+                      if (!isMovingToRemove && event.currentTarget.value !== String(item.tempo ?? "")) {
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
                   />
                 </Field>
-                <FormSubmitButton
-                  label="Save"
-                  pendingLabel="Saving..."
-                  className="btn btn-primary btn-sm sm:mb-[0.15rem]"
-                />
               </form>
-              <form action={deleteSessionItemAction} className="sm:mb-[0.15rem]">
+              <form
+                action={deleteSessionItemAction}
+                className="sm:mb-[0.15rem]"
+                data-session-delete-for={item.id}
+              >
                 <input type="hidden" name="sessionItemId" value={item.id} />
-                <FormSubmitButton
-                  label="Remove"
-                  pendingLabel="Removing..."
-                  className="btn btn-error btn-xs"
-                />
+                <RemoveSessionItemButton label={`Remove ${item.label}`} />
               </form>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function SessionItemLabel({
+  label,
+  pathLines,
+}: {
+  label: string;
+  pathLines: string[];
+}) {
+  const lines = pathLines.length ? pathLines : label.split(/\s+\/\s+/).filter(Boolean);
+
+  return (
+    <div className="min-w-0 space-y-1" title={label}>
+      {lines.map((line, index) => (
+        <p
+          key={`${line}-${index}`}
+          className={index === lines.length - 1
+            ? "truncate font-semibold leading-tight text-base-content"
+            : "truncate text-sm leading-tight text-base-content/80"}
+        >
+          {line}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function RemoveSessionItemButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      className="btn btn-error btn-xs h-7 min-h-0 w-7 px-0"
+      aria-label={label}
+      title="Remove"
+      disabled={pending}
+    >
+      <span aria-hidden="true" className="text-sm leading-none">{pending ? "…" : "×"}</span>
+    </button>
   );
 }
 

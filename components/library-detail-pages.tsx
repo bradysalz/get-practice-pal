@@ -336,15 +336,22 @@ export function ExerciseDetailPage({
   exercise: NonNullable<NonNullable<LibrarySnapshot["books"][number]["sections"]>[number]["exercises"]>[number];
   itemProgress: {
     currentMaxTempo: number;
-    goalTempo: number;
-    progress: Array<{
+    goalTempo?: number | null;
+    progress?: Array<{
       recordedAt: string;
       maxTempo: number;
       progressRatio: number;
     }>;
+    entries?: Array<{
+      recordedAt: string;
+      tempo: number;
+    }>;
   } | null;
 }) {
-  const progressPercent = itemProgress ? Math.min(Math.round((itemProgress.currentMaxTempo / itemProgress.goalTempo) * 100), 100) : 0;
+  const hasGoal = Boolean(exercise.goal_tempo);
+  const progressPercent = itemProgress && exercise.goal_tempo
+    ? Math.min(Math.round((itemProgress.currentMaxTempo / exercise.goal_tempo) * 100), 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -378,12 +385,12 @@ export function ExerciseDetailPage({
       <section className="space-y-6">
         <PagePanel>
           <SectionHeader title="Progress" />
-          {itemProgress ? (
+          {hasGoal && itemProgress ? (
             <div className="mt-5 space-y-4">
               <progress className="progress progress-primary w-full" value={progressPercent} max={100} />
               <div className="space-y-3">
-                {itemProgress.progress.length ? (
-                  itemProgress.progress.map((point) => (
+                {(itemProgress.progress ?? []).length ? (
+                  (itemProgress.progress ?? []).map((point) => (
                     <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
                       <div className="flex items-center justify-between gap-3 text-sm">
                         <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>

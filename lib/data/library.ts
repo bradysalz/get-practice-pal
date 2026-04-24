@@ -44,6 +44,20 @@ export async function getLibrarySnapshot() {
   };
 }
 
+export async function getBookById(bookId: string) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+  const { data, error } = await client
+    .from("books")
+    .select("id, title, composer, external_book_id, created_at, external_book:external_books(id, provider, provider_book_id, isbn_10, isbn_13, title, subtitle, authors, published_year, published_date, cover_thumbnail_url, cover_small_url, cover_medium_url, cover_large_url, canonical_url), sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
+    .eq("id", bookId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function createBook(input: BookInsert) {
   const client = await requireSupabaseClient();
   const user = await requireUser();

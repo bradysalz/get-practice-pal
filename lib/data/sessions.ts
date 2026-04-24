@@ -170,6 +170,24 @@ export async function upsertSessionItem(input: SessionItemUpsertInput) {
   return data;
 }
 
+export async function updateSessionItemTempo(sessionItemId: string, tempo: number | null) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+
+  validateTempo(tempo);
+
+  const { data, error } = await client
+    .from("practice_session_items")
+    .update({ tempo })
+    .eq("id", sessionItemId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteSessionItem(sessionItemId: string) {
   const client = await requireSupabaseClient();
   const user = await requireUser();

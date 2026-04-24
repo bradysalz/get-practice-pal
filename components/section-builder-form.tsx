@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FormSelect } from "@/components/form-select";
-import { Field, PagePanel, TextInput } from "@/components/ui/primitives";
+import { Field, PagePanel, Textarea, TextInput } from "@/components/ui/primitives";
 import type { ExerciseNamingType } from "@/lib/section-builder";
 import { buildExerciseNames } from "@/lib/section-builder";
 
@@ -34,11 +34,16 @@ export function SectionBuilderForm({
   const [exerciseCount, setExerciseCount] = useState(existingCount || 4);
   const [namingType, setNamingType] = useState<ExerciseNamingType>("numeric");
   const [prefix, setPrefix] = useState("Exercise");
+  const [firstNumber, setFirstNumber] = useState(existingCount + 1);
+  const [manualNames, setManualNames] = useState("");
 
-  const previewNames = useMemo(
-    () => buildExerciseNames(exerciseCount, namingType, prefix),
-    [exerciseCount, namingType, prefix],
-  );
+  const previewNames = useMemo(() => {
+    if (namingType === "manual") {
+      return parseManualNames(manualNames);
+    }
+
+    return buildExerciseNames(exerciseCount, namingType, prefix, firstNumber);
+  }, [exerciseCount, firstNumber, manualNames, namingType, prefix]);
 
   return (
     <form action={action} className="space-y-5">
@@ -80,7 +85,10 @@ export function SectionBuilderForm({
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <div className="mt-5 grid gap-4 md:grid-cols-4">
+          {namingType === "manual" ? (
+            <input type="hidden" name="exerciseCount" value={String(previewNames.length)} />
+          ) : null}
           <Field label="New exercises">
             <TextInput
               name="exerciseCount"
@@ -88,10 +96,21 @@ export function SectionBuilderForm({
               min={0}
               value={exerciseCount}
               onChange={(event) => setExerciseCount(Number(event.target.value) || 0)}
+              disabled={namingType === "manual"}
+            />
+          </Field>
+          <Field label="First #">
+            <TextInput
+              name="exerciseStartNumber"
+              type="number"
+              min={1}
+              value={firstNumber}
+              onChange={(event) => setFirstNumber(Number(event.target.value) || 1)}
+              disabled={namingType === "manual"}
             />
           </Field>
           <FormSelect
-            label="Enumeration"
+            label="Naming"
             name="namingType"
             defaultValue={namingType}
             onChange={(value) => setNamingType(value as ExerciseNamingType)}
@@ -99,6 +118,7 @@ export function SectionBuilderForm({
               { value: "numeric", label: "1, 2, 3..." },
               { value: "alpha", label: "A, B, C..." },
               { value: "roman", label: "I, II, III..." },
+              { value: "manual", label: "Manual names" },
             ]}
           />
           <Field label="Prefix">
@@ -107,9 +127,24 @@ export function SectionBuilderForm({
               value={prefix}
               onChange={(event) => setPrefix(event.target.value)}
               placeholder="Exercise"
+              disabled={namingType === "manual"}
             />
           </Field>
         </div>
+
+        {namingType === "manual" ? (
+          <div className="mt-4">
+            <Field label="Exercise names">
+              <Textarea
+                name="manualExerciseNames"
+                value={manualNames}
+                onChange={(event) => setManualNames(event.target.value)}
+                placeholder={"Warmup\nTriplets\nChromatic shifts"}
+                rows={5}
+              />
+            </Field>
+          </div>
+        ) : null}
 
         <div className="mt-5 border-2 border-base-300 bg-base-200 p-4">
           <p className="text-xs font-bold uppercase tracking-[0.15em] text-base-content/50">
@@ -135,4 +170,11 @@ export function SectionBuilderForm({
       </button>
     </form>
   );
+}
+
+function parseManualNames(value: string) {
+  return value
+    .split(/\r?\n/)
+    .map((name) => name.trim())
+    .filter(Boolean);
 }
