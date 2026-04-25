@@ -70,6 +70,11 @@ export function BookHeroEditor({
     );
   }
 
+  async function submitBookUpdate(formData: FormData) {
+    await updateBookAction(formData);
+    setIsEditing(false);
+  }
+
   return (
     <div className="max-w-3xl space-y-4">
       <form action={submitUpdate} className="space-y-4">

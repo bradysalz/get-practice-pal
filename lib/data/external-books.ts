@@ -2,6 +2,21 @@ import { requireSupabaseClient, requireUser } from "@/lib/auth/session";
 import type { GoogleBooksCandidate } from "@/lib/data/google-books";
 import type { ExternalBook, ExternalBookUpsert } from "@/lib/data/types";
 
+export type ExternalBookSelection = Pick<
+  ExternalBook,
+  | "id"
+  | "title"
+  | "authors"
+  | "publishedYear"
+  | "isbn10"
+  | "isbn13"
+  | "coverThumbnailUrl"
+  | "coverSmallUrl"
+  | "coverMediumUrl"
+  | "coverLargeUrl"
+  | "canonicalUrl"
+>;
+
 type ExternalBookRow = {
   id: string;
   created_by_user_id: string | null;
@@ -54,6 +69,22 @@ function toExternalBook(row: ExternalBookRow): ExternalBook {
   };
 }
 
+export function toExternalBookSelection(book: ExternalBook): ExternalBookSelection {
+  return {
+    id: book.id,
+    title: book.title,
+    authors: book.authors,
+    publishedYear: book.publishedYear,
+    isbn10: book.isbn10,
+    isbn13: book.isbn13,
+    coverThumbnailUrl: book.coverThumbnailUrl,
+    coverSmallUrl: book.coverSmallUrl,
+    coverMediumUrl: book.coverMediumUrl,
+    coverLargeUrl: book.coverLargeUrl,
+    canonicalUrl: book.canonicalUrl,
+  };
+}
+
 function toExternalBookRow(input: ExternalBookUpsert) {
   return {
     provider: input.provider,
@@ -75,6 +106,10 @@ function toExternalBookRow(input: ExternalBookUpsert) {
     canonical_url: input.canonicalUrl ?? null,
     raw_metadata: input.rawMetadata ?? {},
   };
+}
+
+function toJsonObject(value: Record<string, unknown> | undefined) {
+  return value ? (JSON.parse(JSON.stringify(value)) as Record<string, unknown>) : {};
 }
 
 export async function upsertExternalBook(input: ExternalBookUpsert) {
@@ -146,6 +181,6 @@ export function externalBookUpsertFromGoogleBooksCandidate(
     coverMediumUrl: candidate.coverMediumUrl,
     coverLargeUrl: candidate.coverLargeUrl,
     canonicalUrl: candidate.canonicalUrl,
-    rawMetadata: candidate,
+    rawMetadata: toJsonObject(candidate),
   };
 }

@@ -23,6 +23,7 @@ import {
 } from "@/lib/data/library";
 import {
   externalBookUpsertFromGoogleBooksCandidate,
+  toExternalBookSelection,
   upsertExternalBook,
 } from "@/lib/data/external-books";
 import { type GoogleBooksCandidate, searchGoogleBooks } from "@/lib/data/google-books";
@@ -101,7 +102,7 @@ export async function saveBookMetadataSelectionAction(candidate: GoogleBooksCand
   );
 
   finishLibraryAction();
-  return externalBook;
+  return toExternalBookSelection(externalBook);
 }
 
 export async function createSectionAction(formData: FormData) {

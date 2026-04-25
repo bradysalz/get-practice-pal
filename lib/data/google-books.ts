@@ -142,6 +142,32 @@ function parsePublishedYear(publishedDate: string | null) {
   return match ? Number(match[0]) : null;
 }
 
+function coverScore(candidate: GoogleBooksCandidate) {
+  if (candidate.coverLargeUrl) return 4;
+  if (candidate.coverMediumUrl) return 3;
+  if (candidate.coverSmallUrl) return 2;
+  if (candidate.coverThumbnailUrl) return 1;
+  return 0;
+}
+
+function sortCandidatesByCoverPriority(candidates: GoogleBooksCandidate[]) {
+  return candidates
+    .map((candidate, index) => ({
+      candidate,
+      index,
+    }))
+    .sort((left, right) => {
+      const scoreDifference = coverScore(right.candidate) - coverScore(left.candidate);
+
+      if (scoreDifference !== 0) {
+        return scoreDifference;
+      }
+
+      return left.index - right.index;
+    })
+    .map(({ candidate }) => candidate);
+}
+
 export function normalizeGoogleBooksVolume(volume: GoogleBooksVolume): GoogleBooksCandidate | null {
   const volumeInfo = volume.volumeInfo;
   const title = cleanText(volumeInfo?.title);
@@ -212,9 +238,11 @@ export async function searchGoogleBooks(input: GoogleBooksSearchInput) {
     }
 
     const payload = (await response.json()) as GoogleBooksResponse;
-    const candidates = (payload.items ?? [])
+    const candidates = sortCandidatesByCoverPriority(
+      (payload.items ?? [])
       .map(normalizeGoogleBooksVolume)
-      .filter((item): item is GoogleBooksCandidate => Boolean(item));
+      .filter((item): item is GoogleBooksCandidate => Boolean(item)),
+    );
 
     if (candidates.length) {
       return candidates;

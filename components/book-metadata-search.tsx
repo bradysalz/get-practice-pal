@@ -5,8 +5,8 @@ import {
   saveBookMetadataSelectionAction,
   searchBookMetadataAction,
 } from "@/app/(app)/library/actions";
+import type { ExternalBookSelection } from "@/lib/data/external-books";
 import type { GoogleBooksCandidate } from "@/lib/data/google-books";
-import type { ExternalBook } from "@/lib/data/types";
 
 export type LinkedExternalBook = {
   id: string;
@@ -30,7 +30,7 @@ type BookMetadataSearchProps = {
   title?: string | null;
 };
 
-function externalBookFromSelection(book: ExternalBook): LinkedExternalBook {
+function externalBookFromSelection(book: ExternalBookSelection): LinkedExternalBook {
   return {
     id: book.id,
     title: book.title,
