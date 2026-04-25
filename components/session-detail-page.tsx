@@ -188,8 +188,8 @@ function SessionItemCard({
     : null;
 
   return (
-    <div className="relative overflow-hidden rounded-box border border-base-300 bg-base-100 p-4 transition-all hover:border-primary/40 hover:shadow-[3px_3px_0_#0a0a0a]">
-      {href ? <Link href={href} className="absolute inset-0 rounded-box" aria-label={`Open ${label}`} /> : null}
+    <div className="list-row relative overflow-hidden p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]">
+      {href ? <Link href={href} className="absolute inset-0" aria-label={`Open ${label}`} /> : null}
       <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           <SessionItemLabel label={label} lines={lines} />
@@ -202,7 +202,7 @@ function SessionItemCard({
         {canEditGoalTempo ? (
           <form
             action={updateSessionItemGoalTempoAction}
-            className="relative z-20 flex shrink-0 flex-col gap-2 rounded-box border border-base-300 bg-base-100/95 p-3"
+            className="relative z-20 flex shrink-0 flex-col gap-2 md:items-end"
           >
             <input type="hidden" name="sessionId" value={sessionId} />
             <input type="hidden" name="itemType" value={item.item_type} />
@@ -211,22 +211,24 @@ function SessionItemCard({
             <input type="hidden" name="libraryPath" value={href ?? ""} />
             <input type="hidden" name="title" value={exercise?.title ?? song?.title ?? ""} />
             <input type="hidden" name="position" value={exercise ? String(exercise.position ?? "") : ""} />
-            <label className="text-xs font-bold uppercase tracking-wide text-base-content/70">
+            <label className="text-xs font-bold uppercase tracking-wide text-base-content/70 md:text-right">
               Goal tempo
             </label>
-            <input
-              name="goalTempo"
-              type="number"
-              min={1}
-              defaultValue={goalTempo ?? ""}
-              placeholder="Set BPM"
-              className="input input-bordered input-sm w-28"
-            />
-            <FormSubmitButton
-              label="Save goal"
-              pendingLabel="Saving..."
-              className="btn btn-outline btn-sm"
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                name="goalTempo"
+                type="number"
+                min={1}
+                defaultValue={goalTempo ?? ""}
+                placeholder="Set BPM"
+                className="input input-bordered input-sm w-28 bg-base-100"
+              />
+              <FormSubmitButton
+                label="Save"
+                pendingLabel="Saving..."
+                className="btn btn-ghost btn-sm"
+              />
+            </div>
           </form>
         ) : null}
       </div>
