@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSetlist, replaceSetlistItems } from "@/lib/data/library";
+import { createSetlist, replaceSetlistItems, updateExercise, updateSong } from "@/lib/data/library";
 import {
   deleteSessionItem,
   endSession,
@@ -18,6 +18,11 @@ import {
 
 function revalidateSessions() {
   revalidatePath("/sessions");
+}
+
+function revalidateSessionDetail(sessionId: string) {
+  revalidateSessions();
+  revalidatePath(`/sessions/${sessionId}`);
 }
 
 function parseTempo(value: FormDataEntryValue | null) {
@@ -124,14 +129,41 @@ export async function updateSessionItemAction(formData: FormData) {
   revalidateSessions();
 }
 
+export async function updateSessionItemGoalTempoAction(formData: FormData) {
+  const sessionId = String(formData.get("sessionId") ?? "").trim();
+  const itemType = String(formData.get("itemType") ?? "").trim();
+  const libraryPath = String(formData.get("libraryPath") ?? "").trim();
+  const goalTempo = parseOptionalTempo(formData.get("goalTempo"));
+
+  if (itemType === "song") {
+    await updateSong(String(formData.get("songId") ?? "").trim(), {
+      title: String(formData.get("title") ?? "").trim(),
+      goalTempo,
+    });
+  } else {
+    await updateExercise(String(formData.get("exerciseId") ?? "").trim(), {
+      title: String(formData.get("title") ?? "").trim(),
+      position: Number(String(formData.get("position") ?? "0")),
+      goalTempo,
+    });
+  }
+
+  revalidateSessionDetail(sessionId);
+  revalidatePath("/library");
+
+  if (libraryPath) {
+    revalidatePath(libraryPath);
+  }
+}
+
 export async function deleteSessionItemAction(formData: FormData) {
   await deleteSessionItem(String(formData.get("sessionItemId") ?? ""));
-  revalidateSessions();
+  revalidateSessionDetail(String(formData.get("sessionId") ?? ""));
 }
 
 export async function reorderSessionItemsAction(sessionId: string, itemIds: string[]) {
   await reorderSessionItems(sessionId, itemIds);
-  revalidateSessions();
+  revalidateSessionDetail(sessionId);
 }
 
 export async function createSetlistFromSessionAction(formData: FormData) {

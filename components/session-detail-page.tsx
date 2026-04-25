@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { createSetlistFromSessionAction } from "@/app/(app)/sessions/actions";
+import {
+  createSetlistFromSessionAction,
+  updateSessionItemGoalTempoAction,
+} from "@/app/(app)/sessions/actions";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { EmptyState, PageHero, PagePanel, StatCard } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
@@ -80,20 +83,7 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
         <div className="mt-5 space-y-3">
           {sortedItems.length ? (
             sortedItems.map((item) => (
-              <div key={item.id} className="list-row p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <SessionItemLabel
-                      label={labelSessionItem(item, itemMaps)}
-                      lines={sessionItemPathLines(item, itemMaps)}
-                    />
-                    <p className="mt-2 text-sm text-base-content/80">
-                      {item.item_type === "exercise" ? "Exercise" : "Song"}
-                    </p>
-                  </div>
-                  {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
-                </div>
-              </div>
+              <SessionItemCard key={item.id} item={item} itemMaps={itemMaps} sessionId={session.id} />
             ))
           ) : (
             <EmptyState label="No logged items in this session." />
@@ -121,6 +111,115 @@ function labelSessionItem(
   }
 
   return "Unknown item";
+}
+
+function goalTempoValue(
+  item: {
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+  },
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>,
+) {
+  if (item.item_type === "exercise" && item.exercise_id) {
+    return itemMaps.exerciseMap.get(item.exercise_id)?.goalTempo ?? null;
+  }
+
+  if (item.item_type === "song" && item.song_id) {
+    return itemMaps.songMap.get(item.song_id)?.goalTempo ?? null;
+  }
+
+  return null;
+}
+
+function sessionItemHref(
+  item: {
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+  },
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>,
+) {
+  if (item.item_type === "exercise" && item.exercise_id) {
+    return itemMaps.exerciseMap.get(item.exercise_id)?.href ?? null;
+  }
+
+  if (item.item_type === "song" && item.song_id) {
+    return itemMaps.songMap.get(item.song_id)?.href ?? null;
+  }
+
+  return null;
+}
+
+function SessionItemCard({
+  item,
+  itemMaps,
+  sessionId,
+}: {
+  item: {
+    id: string;
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+    tempo: number | null;
+    display_order: number;
+  };
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>;
+  sessionId: string;
+}) {
+  const label = labelSessionItem(item, itemMaps);
+  const lines = sessionItemPathLines(item, itemMaps);
+  const href = sessionItemHref(item, itemMaps);
+  const goalTempo = goalTempoValue(item, itemMaps);
+  const exercise = item.item_type === "exercise" && item.exercise_id
+    ? itemMaps.exerciseMap.get(item.exercise_id)
+    : null;
+  const song = item.item_type === "song" && item.song_id
+    ? itemMaps.songMap.get(item.song_id)
+    : null;
+
+  return (
+    <div className="relative overflow-hidden rounded-box border border-base-300 bg-base-100 p-4 transition-all hover:border-primary/40 hover:shadow-[3px_3px_0_#0a0a0a]">
+      {href ? <Link href={href} className="absolute inset-0 rounded-box" aria-label={`Open ${label}`} /> : null}
+      <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <SessionItemLabel label={label} lines={lines} />
+          <div className="mt-2 flex flex-wrap gap-2 text-sm text-base-content/80">
+            <span>{item.item_type === "exercise" ? "Exercise" : "Song"}</span>
+            {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM logged</span> : null}
+          </div>
+        </div>
+        <form
+          action={updateSessionItemGoalTempoAction}
+          className="relative z-20 flex shrink-0 flex-col gap-2 rounded-box border border-base-300 bg-base-100/95 p-3"
+        >
+          <input type="hidden" name="sessionId" value={sessionId} />
+          <input type="hidden" name="itemType" value={item.item_type} />
+          <input type="hidden" name="exerciseId" value={item.exercise_id ?? ""} />
+          <input type="hidden" name="songId" value={item.song_id ?? ""} />
+          <input type="hidden" name="libraryPath" value={href ?? ""} />
+          <input type="hidden" name="title" value={exercise?.title ?? song?.title ?? ""} />
+          <input type="hidden" name="position" value={exercise ? String(exercise.position ?? "") : ""} />
+          <label className="text-xs font-bold uppercase tracking-wide text-base-content/70">
+            Goal tempo
+          </label>
+          <input
+            name="goalTempo"
+            type="number"
+            min={1}
+            defaultValue={goalTempo ?? ""}
+            placeholder="Set BPM"
+            className="input input-bordered input-sm w-28"
+          />
+          <FormSubmitButton
+            label="Save goal"
+            pendingLabel="Saving..."
+            className="btn btn-outline btn-sm"
+          />
+        </form>
+      </div>
+    </div>
+  );
 }
 
 function sessionItemPathLines(
