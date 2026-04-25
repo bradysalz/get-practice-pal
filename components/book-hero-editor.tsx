@@ -34,6 +34,11 @@ export function BookHeroEditor({
   const displayAuthor = composer || linkedBookAuthors(resolvedExternalBook);
   const publishedYear = linkedBookPublishedYear(resolvedExternalBook);
 
+  async function submitUpdate(formData: FormData) {
+    await updateBookAction(formData);
+    setIsEditing(false);
+  }
+
   if (!isEditing) {
     return (
       <div className="space-y-4">
@@ -72,7 +77,7 @@ export function BookHeroEditor({
 
   return (
     <div className="max-w-3xl space-y-4">
-      <form action={submitBookUpdate} className="space-y-4">
+      <form action={submitUpdate} className="space-y-4">
         <input type="hidden" name="bookId" value={bookId} />
         <div className="flex flex-wrap items-start justify-between gap-4">
           <TextInput

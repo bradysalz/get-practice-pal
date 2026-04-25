@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { BookDetailPage } from "@/components/library-detail-pages";
-import { getLibrarySnapshot } from "@/lib/data/library";
+import { getBookById } from "@/lib/data/library";
 import { getBookCompletion, getItemProgressSummaryMap } from "@/lib/data/stats";
 
 export default async function LibraryBookPage({
@@ -9,8 +9,7 @@ export default async function LibraryBookPage({
   params: Promise<{ bookId: string }>;
 }) {
   const { bookId } = await params;
-  const snapshot = await getLibrarySnapshot();
-  const book = snapshot.books.find((item) => item.id === bookId);
+  const book = await getBookById(bookId);
 
   if (!book) {
     notFound();

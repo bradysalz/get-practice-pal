@@ -83,7 +83,10 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
               <div key={item.id} className="list-row p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-medium text-base-content">{labelSessionItem(item, itemMaps)}</p>
+                    <SessionItemLabel
+                      label={labelSessionItem(item, itemMaps)}
+                      lines={sessionItemPathLines(item, itemMaps)}
+                    />
                     <p className="mt-2 text-sm text-base-content/80">
                       {item.item_type === "exercise" ? "Exercise" : "Song"}
                     </p>
@@ -118,6 +121,50 @@ function labelSessionItem(
   }
 
   return "Unknown item";
+}
+
+function sessionItemPathLines(
+  item: {
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+  },
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>,
+) {
+  if (item.item_type === "exercise" && item.exercise_id) {
+    const exercise = itemMaps.exerciseMap.get(item.exercise_id);
+    return exercise ? [exercise.bookTitle, exercise.sectionTitle, exercise.title] : ["Unknown exercise"];
+  }
+
+  if (item.item_type === "song" && item.song_id) {
+    const song = itemMaps.songMap.get(item.song_id);
+    return song ? [song.artistName, song.title] : ["Unknown song"];
+  }
+
+  return ["Unknown item"];
+}
+
+function SessionItemLabel({
+  label,
+  lines,
+}: {
+  label: string;
+  lines: string[];
+}) {
+  return (
+    <div className="min-w-0 space-y-1" title={label}>
+      {lines.map((line, index) => (
+        <p
+          key={`${line}-${index}`}
+          className={index === lines.length - 1
+            ? "truncate font-semibold leading-tight text-base-content"
+            : "truncate text-sm leading-tight text-base-content/80"}
+        >
+          {line}
+        </p>
+      ))}
+    </div>
+  );
 }
 
 function formatDateTime(value: string) {

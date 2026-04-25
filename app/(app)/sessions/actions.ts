@@ -12,6 +12,7 @@ import {
   resumeSession,
   startSession,
   updateSessionNotes,
+  updateSessionItemTempo,
   upsertSessionItem,
 } from "@/lib/data/sessions";
 
@@ -101,6 +102,13 @@ export async function addSessionItemAction(formData: FormData) {
 }
 
 export async function updateSessionItemAction(formData: FormData) {
+  const sessionItemId = String(formData.get("sessionItemId") ?? "").trim();
+  if (sessionItemId) {
+    await updateSessionItemTempo(sessionItemId, parseOptionalTempo(formData.get("tempo")));
+    revalidateSessions();
+    return;
+  }
+
   const itemType = String(formData.get("itemType") ?? "");
   const displayOrder = Number(String(formData.get("displayOrder") ?? "0"));
 

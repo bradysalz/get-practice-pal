@@ -27,7 +27,7 @@ import {
   upsertExternalBook,
 } from "@/lib/data/external-books";
 import { type GoogleBooksCandidate, searchGoogleBooks } from "@/lib/data/google-books";
-import { buildExerciseNames } from "@/lib/section-builder";
+import { buildExerciseNames, type ExerciseNamingType } from "@/lib/section-builder";
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
   const text = String(value ?? "").trim();
@@ -106,14 +106,16 @@ export async function saveBookMetadataSelectionAction(candidate: GoogleBooksCand
 }
 
 export async function createSectionAction(formData: FormData) {
-  await createSection({
-    bookId: String(formData.get("bookId") ?? ""),
+  const bookId = String(formData.get("bookId") ?? "");
+  const section = await createSection({
+    bookId,
     title: String(formData.get("title") ?? "").trim(),
     position: parseRequiredNumber(formData.get("position"), "Position"),
     defaultGoalTempo: parseOptionalNumber(formData.get("defaultGoalTempo")),
   });
 
   finishLibraryAction();
+  redirect(`/library/books/${bookId}/sections/${section.id}`);
 }
 
 export async function updateSectionAction(formData: FormData) {
@@ -224,8 +226,9 @@ export async function saveSectionBuilderAction(formData: FormData) {
   const position = parseRequiredNumber(formData.get("position"), "Position");
   const defaultGoalTempo = parseOptionalNumber(formData.get("defaultGoalTempo"));
   const exerciseCount = Math.max(0, parseRequiredNumber(formData.get("exerciseCount"), "Exercise count"));
-  const namingType = String(formData.get("namingType") ?? "numeric").trim();
+  const namingType = String(formData.get("namingType") ?? "numeric").trim() as ExerciseNamingType;
   const exercisePrefix = String(formData.get("exercisePrefix") ?? "").trim() || "Exercise";
+  const exerciseStartNumber = Math.max(1, parseRequiredNumber(formData.get("exerciseStartNumber"), "First exercise number"));
 
   const section = sectionId
     ? await updateSection(sectionId, {
@@ -242,7 +245,9 @@ export async function saveSectionBuilderAction(formData: FormData) {
 
   if (exerciseCount > 0) {
     const existingCount = Number(String(formData.get("existingExerciseCount") ?? "0")) || 0;
-    const names = buildExerciseNames(exerciseCount, namingType as "alpha" | "numeric" | "roman", exercisePrefix);
+    const names = namingType === "manual"
+      ? parseManualExerciseNames(formData.get("manualExerciseNames"))
+      : buildExerciseNames(exerciseCount, namingType, exercisePrefix, exerciseStartNumber);
 
     await createExercisesBatch(
       names.map((exerciseTitle, index) => ({
@@ -254,9 +259,19 @@ export async function saveSectionBuilderAction(formData: FormData) {
   }
 
   finishLibraryAction();
+  if (!sectionId) {
+    redirect(`/library/books/${bookId}/sections/${section.id}`);
+  }
 }
 
 export async function reorderBookSectionsAction(bookId: string, sectionIds: string[]) {
   await reorderBookSections(bookId, sectionIds);
   finishLibraryAction();
+}
+
+function parseManualExerciseNames(value: FormDataEntryValue | null) {
+  return String(value ?? "")
+    .split(/\r?\n/)
+    .map((name) => name.trim())
+    .filter(Boolean);
 }
