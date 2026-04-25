@@ -193,44 +193,43 @@ function SessionItemCard({
       <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           <SessionItemLabel label={label} lines={lines} />
-          <div className="mt-2 flex flex-wrap gap-2 text-sm text-base-content/80">
-            <span>{item.item_type === "exercise" ? "Exercise" : "Song"}</span>
-            {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM logged</span> : null}
-            {goalTempo ? <span className="chip">Goal {goalTempo} BPM</span> : null}
-          </div>
         </div>
-        {canEditGoalTempo ? (
-          <form
-            action={updateSessionItemGoalTempoAction}
-            className="relative z-20 flex shrink-0 flex-col gap-2 md:items-end"
-          >
-            <input type="hidden" name="sessionId" value={sessionId} />
-            <input type="hidden" name="itemType" value={item.item_type} />
-            <input type="hidden" name="exerciseId" value={item.exercise_id ?? ""} />
-            <input type="hidden" name="songId" value={item.song_id ?? ""} />
-            <input type="hidden" name="libraryPath" value={href ?? ""} />
-            <input type="hidden" name="title" value={exercise?.title ?? song?.title ?? ""} />
-            <input type="hidden" name="position" value={exercise ? String(exercise.position ?? "") : ""} />
-            <label className="text-xs font-bold uppercase tracking-wide text-base-content/70 md:text-right">
-              Goal tempo
-            </label>
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                name="goalTempo"
-                type="number"
-                min={1}
-                defaultValue={goalTempo ?? ""}
-                placeholder="Set BPM"
-                className="input input-bordered input-sm w-28 bg-base-100"
-              />
-              <FormSubmitButton
-                label="Save"
-                pendingLabel="Saving..."
-                className="btn btn-ghost btn-sm"
-              />
-            </div>
-          </form>
-        ) : null}
+        <div className="relative z-20 flex shrink-0 flex-col gap-2 md:items-end">
+          {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
+          {goalTempo ? <span className="chip">Goal {goalTempo} BPM</span> : null}
+          {canEditGoalTempo ? (
+            <form
+              action={updateSessionItemGoalTempoAction}
+              className="flex flex-col gap-2 md:items-end"
+            >
+              <input type="hidden" name="sessionId" value={sessionId} />
+              <input type="hidden" name="itemType" value={item.item_type} />
+              <input type="hidden" name="exerciseId" value={item.exercise_id ?? ""} />
+              <input type="hidden" name="songId" value={item.song_id ?? ""} />
+              <input type="hidden" name="libraryPath" value={href ?? ""} />
+              <input type="hidden" name="title" value={exercise?.title ?? song?.title ?? ""} />
+              <input type="hidden" name="position" value={exercise ? String(exercise.position ?? "") : ""} />
+              <label className="text-xs font-bold uppercase tracking-wide text-base-content/70 md:text-right">
+                Goal tempo
+              </label>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  name="goalTempo"
+                  type="number"
+                  min={1}
+                  defaultValue={goalTempo ?? ""}
+                  placeholder="Set BPM"
+                  className="input input-bordered input-sm w-28 bg-base-100"
+                />
+                <FormSubmitButton
+                  label="Save"
+                  pendingLabel="Saving..."
+                  className="btn btn-ghost btn-sm"
+                />
+              </div>
+            </form>
+          ) : null}
+        </div>
       </div>
     </div>
   );
