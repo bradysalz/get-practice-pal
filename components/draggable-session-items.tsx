@@ -24,17 +24,23 @@ import {
   deleteSessionItemAction,
   reorderSessionItemsAction,
   updateSessionItemAction,
+  updateSessionItemGoalTempoAction,
 } from "@/app/(app)/sessions/actions";
 import { DragHandle, Field, TextInput } from "@/components/ui/primitives";
 
 type SessionItemRow = {
   exerciseId: string | null;
+  goalTempo: number | null;
   id: string;
   itemType: "exercise" | "song";
   label: string;
+  lastPlayedAt: string | null;
+  libraryPath: string | null;
   pathLines: string[];
+  position: number | null;
   songId: string | null;
   tempo: number | null;
+  title: string;
 };
 
 type DraggableSessionItemsProps = {
@@ -80,9 +86,12 @@ function SortableSessionRow({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <SessionItemLabel label={item.label} pathLines={item.pathLines} />
+            <p className="mt-2 text-sm text-base-content/80">
+              Last played {formatLastPlayed(item.lastPlayedAt)}
+            </p>
           </div>
           <div className="flex flex-col gap-3 lg:items-end">
-            <div className="grid gap-3 sm:grid-cols-[8rem_auto] sm:items-end">
+            <div className="grid gap-3 sm:grid-cols-[8rem_8rem_auto] sm:items-end">
               <form action={updateSessionItemAction} className="contents">
                 <input type="hidden" name="sessionItemId" value={item.id} />
                 <input type="hidden" name="sessionId" value={sessionId} />
@@ -109,12 +118,40 @@ function SortableSessionRow({
                   />
                 </Field>
               </form>
+              <form action={updateSessionItemGoalTempoAction} className="contents">
+                <input type="hidden" name="sessionId" value={sessionId} />
+                <input type="hidden" name="itemType" value={item.itemType} />
+                <input type="hidden" name="exerciseId" value={item.exerciseId ?? ""} />
+                <input type="hidden" name="songId" value={item.songId ?? ""} />
+                <input type="hidden" name="libraryPath" value={item.libraryPath ?? ""} />
+                <input type="hidden" name="title" value={item.title} />
+                <input type="hidden" name="position" value={item.position != null ? String(item.position) : ""} />
+                <Field label="Goal">
+                  <TextInput
+                    name="goalTempo"
+                    type="number"
+                    min={1}
+                    defaultValue={item.goalTempo ?? ""}
+                    onBlur={(event) => {
+                      const nextFocus = event.relatedTarget;
+                      const isMovingToRemove = nextFocus instanceof HTMLElement
+                        ? Boolean(nextFocus.closest(`[data-session-delete-for="${item.id}"]`))
+                        : false;
+
+                      if (!isMovingToRemove && event.currentTarget.value !== String(item.goalTempo ?? "")) {
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                  />
+                </Field>
+              </form>
               <form
                 action={deleteSessionItemAction}
                 className="sm:mb-[0.15rem]"
                 data-session-delete-for={item.id}
               >
                 <input type="hidden" name="sessionItemId" value={item.id} />
+                <input type="hidden" name="sessionId" value={sessionId} />
                 <RemoveSessionItemButton label={`Remove ${item.label}`} />
               </form>
             </div>
@@ -164,6 +201,18 @@ function RemoveSessionItemButton({ label }: { label: string }) {
       <span aria-hidden="true" className="text-sm leading-none">{pending ? "…" : "×"}</span>
     </button>
   );
+}
+
+function formatLastPlayed(value: string | null) {
+  if (!value) {
+    return "never";
+  }
+
+  return new Date(value).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export function DraggableSessionItems({

@@ -13,6 +13,7 @@ type RawTempoEntry = {
 type RawItemRow = {
   tempo: number | null;
   created_at: string;
+  practice_session_id: string;
   exercise_id: string | null;
   song_id: string | null;
 };
@@ -104,6 +105,7 @@ export async function getProgressToGoal(input: {
 export async function getItemProgressSummaryMap(input: {
   itemType: PracticeItemType;
   items: Array<{ id: string; goalTempo: number | null }>;
+  excludeSessionId?: string | null;
   range?: TimeRange;
 }) {
   const client = await requireSupabaseClient();
@@ -133,7 +135,7 @@ export async function getItemProgressSummaryMap(input: {
   for (const idBatch of chunkArray(ids, ID_BATCH_SIZE)) {
     let query = client
       .from("practice_session_items")
-      .select("tempo, created_at, exercise_id, song_id")
+      .select("tempo, created_at, practice_session_id, exercise_id, song_id")
       .eq("user_id", user.id)
       .eq("item_type", input.itemType)
       .not("tempo", "is", null)
@@ -146,6 +148,10 @@ export async function getItemProgressSummaryMap(input: {
 
     if (rangeStart) {
       query = query.gte("created_at", rangeStart.toISOString());
+    }
+
+    if (input.excludeSessionId) {
+      query = query.neq("practice_session_id", input.excludeSessionId);
     }
 
     const { data, error } = await query;
