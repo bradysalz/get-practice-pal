@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   createSetlistFromSessionAction,
   updateSessionItemGoalTempoAction,
+  updateSessionItemAction,
   updateSessionItemReferenceAction,
 } from "@/app/(app)/sessions/actions";
 import { ActionModal } from "@/components/action-modal";
@@ -202,23 +203,44 @@ function SessionItemCard({
         </div>
         <div className="relative z-20 flex shrink-0 flex-col gap-2 md:items-end">
           {!canEditGoalTempo ? (
-            <ActionModal
-              triggerLabel="Change item"
-              triggerAriaLabel="Change item"
-              triggerContent={<span aria-hidden="true" className="text-sm leading-none">✎</span>}
-              triggerClassName="btn btn-ghost btn-xs h-7 min-h-0 w-7 px-0"
-              submitFormId={`change-session-item-${item.id}`}
-              submitLabel="Save item"
-              title="Change logged item"
-              description="Replace this logged session entry with the correct exercise or song."
-              panelClassName="max-w-5xl"
-            >
-              <form id={`change-session-item-${item.id}`} action={updateSessionItemReferenceAction}>
-                <input type="hidden" name="sessionId" value={sessionId} />
-                <input type="hidden" name="sessionItemId" value={item.id} />
-                <PracticeItemPicker snapshot={snapshot} selectionMode="single" />
-              </form>
-            </ActionModal>
+            <div className="flex flex-col gap-2 md:items-end">
+              <div className="flex items-center gap-2">
+                <form action={updateSessionItemAction} className="flex items-center gap-2">
+                  <input type="hidden" name="sessionItemId" value={item.id} />
+                  <input type="hidden" name="sessionId" value={sessionId} />
+                  <input
+                    name="tempo"
+                    type="number"
+                    min={1}
+                    defaultValue={item.tempo ?? ""}
+                    placeholder="Tempo"
+                    className="input input-bordered input-xs w-24 bg-base-100"
+                  />
+                  <FormSubmitButton
+                    label="Save"
+                    pendingLabel="Saving..."
+                    className="btn btn-ghost btn-xs"
+                  />
+                </form>
+                <ActionModal
+                  triggerLabel="Change item"
+                  triggerAriaLabel="Change item"
+                  triggerContent={<span aria-hidden="true" className="text-sm leading-none">✎</span>}
+                  triggerClassName="btn btn-ghost btn-xs h-7 min-h-0 w-7 px-0"
+                  submitFormId={`change-session-item-${item.id}`}
+                  submitLabel="Save item"
+                  title="Change logged item"
+                  description="Replace this logged session entry with the correct exercise or song."
+                  panelClassName="max-w-5xl"
+                >
+                  <form id={`change-session-item-${item.id}`} action={updateSessionItemReferenceAction}>
+                    <input type="hidden" name="sessionId" value={sessionId} />
+                    <input type="hidden" name="sessionItemId" value={item.id} />
+                    <PracticeItemPicker snapshot={snapshot} selectionMode="single" />
+                  </form>
+                </ActionModal>
+              </div>
+            </div>
           ) : null}
           {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
           {goalTempo ? <span className="chip">Goal {goalTempo} BPM</span> : null}
