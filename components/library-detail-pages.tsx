@@ -550,9 +550,6 @@ function TempoProgressGraph({
         <span className="font-medium text-base-content">Tempo</span>
         <span>{lastLabel}</span>
       </div>
-      {goalTempo ? (
-        <p className="text-sm text-base-content/75">Dashed line marks the goal tempo at {goalTempo} BPM.</p>
-      ) : null}
     </div>
   );
 }
