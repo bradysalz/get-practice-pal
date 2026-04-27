@@ -227,7 +227,12 @@ export function SongDetailPage({
           </div>
           {filteredEntries.length ? (
             <div className="mt-5 space-y-4">
-              <TempoProgressGraph entries={filteredEntries} goalTempo={song.goal_tempo} />
+              <TempoProgressGraph
+                entries={filteredEntries}
+                fullEntries={itemProgress.entries}
+                goalTempo={song.goal_tempo}
+                range={selectedRange}
+              />
             </div>
           ) : (
             <div className="mt-5">
@@ -375,7 +380,12 @@ export function ExerciseDetailPage({
           </div>
           {filteredEntries.length ? (
             <div className="mt-5 space-y-4">
-              <TempoProgressGraph entries={filteredEntries} goalTempo={exercise.goal_tempo} />
+              <TempoProgressGraph
+                entries={filteredEntries}
+                fullEntries={itemProgress.entries}
+                goalTempo={exercise.goal_tempo}
+                range={selectedRange}
+              />
             </div>
           ) : (
             <div className="mt-5">
@@ -433,36 +443,46 @@ const PROGRESS_RANGE_OPTIONS: Array<{ label: string; value: ProgressRange }> = [
 
 function TempoProgressGraph({
   entries,
+  fullEntries,
   goalTempo,
+  range,
 }: {
   entries: Array<{
     recordedAt: string;
     tempo: number;
   }>;
+  fullEntries: Array<{
+    recordedAt: string;
+    tempo: number;
+  }>;
   goalTempo?: number | null;
+  range: ProgressRange;
 }) {
   const width = 640;
   const height = 240;
   const padding = { top: 20, right: 16, bottom: 34, left: 42 };
   const innerWidth = width - padding.left - padding.right;
   const innerHeight = height - padding.top - padding.bottom;
+  const domain = getProgressDomain(fullEntries, range);
+  const domainSpan = Math.max(domain.end - domain.start, 1);
   const maxTempo = Math.max(goalTempo ?? 0, ...entries.map((entry) => entry.tempo));
   const tempoCeiling = Math.max(Math.ceil(maxTempo / 10) * 10, 10);
-  const xStep = entries.length > 1 ? innerWidth / (entries.length - 1) : 0;
-  const points = entries.map((entry, index) => {
-    const x = padding.left + (entries.length > 1 ? index * xStep : innerWidth / 2);
+  const points = entries.map((entry) => {
+    const recordedAt = new Date(entry.recordedAt).getTime();
+    const x = padding.left + ((recordedAt - domain.start) / domainSpan) * innerWidth;
     const y = padding.top + innerHeight - (entry.tempo / tempoCeiling) * innerHeight;
 
     return {
       ...entry,
+      recordedAtMs: recordedAt,
       x,
       y,
     };
   });
   const linePath = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
   const goalY = goalTempo ? padding.top + innerHeight - (goalTempo / tempoCeiling) * innerHeight : null;
-  const firstLabel = formatDate(entries[0].recordedAt);
-  const lastLabel = formatDate(entries[entries.length - 1].recordedAt);
+  const firstLabel = formatDate(domain.start);
+  const lastLabel = formatDate(domain.end);
 
   return (
     <div className="space-y-3">
@@ -599,7 +619,32 @@ function filterTempoEntries(entries: TempoHistory["entries"], range: ProgressRan
   return entries.filter((entry) => new Date(entry.recordedAt).getTime() >= cutoff);
 }
 
-function formatDate(value: string) {
+function getProgressDomain(entries: TempoHistory["entries"], range: ProgressRange) {
+  const now = Date.now();
+
+  if (range === "1m") {
+    return {
+      start: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()).getTime(),
+      end: now,
+    };
+  }
+
+  if (range === "1y") {
+    return {
+      start: new Date(new Date().getFullYear() - 1, new Date().getMonth(), new Date().getDate()).getTime(),
+      end: now,
+    };
+  }
+
+  const oldest = entries.length ? new Date(entries[0].recordedAt).getTime() : now;
+
+  return {
+    start: oldest,
+    end: now,
+  };
+}
+
+function formatDate(value: string | number) {
   return new Date(value).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
