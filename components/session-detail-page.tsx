@@ -204,7 +204,9 @@ function SessionItemCard({
           {!canEditGoalTempo ? (
             <ActionModal
               triggerLabel="Change item"
-              triggerClassName="btn btn-ghost btn-sm"
+              triggerAriaLabel="Change item"
+              triggerContent={<span aria-hidden="true" className="text-sm leading-none">✎</span>}
+              triggerClassName="btn btn-ghost btn-xs h-7 min-h-0 w-7 px-0"
               submitFormId={`change-session-item-${item.id}`}
               submitLabel="Save item"
               title="Change logged item"
