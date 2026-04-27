@@ -6,6 +6,7 @@ import {
   updateSessionItemReferenceAction,
 } from "@/app/(app)/sessions/actions";
 import { ActionModal } from "@/components/action-modal";
+import { AutoSubmitNumberInput } from "@/components/auto-submit-number-input";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { PracticeItemPicker } from "@/components/practice-item-picker";
 import { EmptyState, PageHero, PagePanel, StatCard } from "@/components/ui/primitives";
@@ -208,23 +209,14 @@ function SessionItemCard({
                 <form action={updateSessionItemAction} className="flex items-center gap-2">
                   <input type="hidden" name="sessionItemId" value={item.id} />
                   <input type="hidden" name="sessionId" value={sessionId} />
-                  <input
+                  <AutoSubmitNumberInput
                     name="tempo"
-                    type="number"
                     min={1}
                     defaultValue={item.tempo ?? ""}
+                    initialValue={item.tempo}
                     placeholder="Tempo"
                     className="input input-bordered input-xs w-24 bg-base-100"
-                    onBlur={(event) => {
-                      const nextFocus = event.relatedTarget;
-                      const isMovingToChangeItem = nextFocus instanceof HTMLElement
-                        ? Boolean(nextFocus.closest("button[aria-label='Change item']"))
-                        : false;
-
-                      if (!isMovingToChangeItem && event.currentTarget.value !== String(item.tempo ?? "")) {
-                        event.currentTarget.form?.requestSubmit();
-                      }
-                    }}
+                    ignoreBlurSubmitSelector="button[aria-label='Change item']"
                   />
                 </form>
                 <ActionModal
