@@ -215,11 +215,16 @@ function SessionItemCard({
                     defaultValue={item.tempo ?? ""}
                     placeholder="Tempo"
                     className="input input-bordered input-xs w-24 bg-base-100"
-                  />
-                  <FormSubmitButton
-                    label="Save"
-                    pendingLabel="Saving..."
-                    className="btn btn-ghost btn-xs"
+                    onBlur={(event) => {
+                      const nextFocus = event.relatedTarget;
+                      const isMovingToChangeItem = nextFocus instanceof HTMLElement
+                        ? Boolean(nextFocus.closest("button[aria-label='Change item']"))
+                        : false;
+
+                      if (!isMovingToChangeItem && event.currentTarget.value !== String(item.tempo ?? "")) {
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
                   />
                 </form>
                 <ActionModal
