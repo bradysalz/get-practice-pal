@@ -13,6 +13,7 @@ import { FormSubmitButton } from "@/components/form-submit-button";
 import { PracticeItemPicker } from "@/components/practice-item-picker";
 import { EmptyState, Field, FormActions, PageHero, PagePanel, TextInput, Textarea } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
+import type { ItemProgressSummary } from "@/lib/data/stats";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
 
 type SessionDetail = {
@@ -119,10 +120,14 @@ export function SessionsDashboard({
 
 export function ActiveSessionPage({
   currentSession,
+  exerciseProgressMap,
   librarySnapshot,
+  songProgressMap,
 }: {
   currentSession: SessionDetail;
+  exerciseProgressMap: Map<string, ItemProgressSummary>;
   librarySnapshot: LibrarySnapshot;
+  songProgressMap: Map<string, ItemProgressSummary>;
 }) {
   const itemMaps = buildLibraryItemMaps(librarySnapshot);
 
@@ -180,12 +185,30 @@ export function ActiveSessionPage({
                 .sort((left, right) => left.display_order - right.display_order)
                 .map((item) => ({
                   exerciseId: item.exercise_id,
+                  goalTempo: item.item_type === "exercise"
+                    ? (item.exercise_id ? itemMaps.exerciseMap.get(item.exercise_id)?.goalTempo ?? null : null)
+                    : (item.song_id ? itemMaps.songMap.get(item.song_id)?.goalTempo ?? null : null),
                   id: item.id,
                   itemType: item.item_type,
                   label: labelSessionItem(item, itemMaps),
+                  lastPlayedAt: item.item_type === "exercise"
+                    ? (item.exercise_id ? exerciseProgressMap.get(item.exercise_id)?.lastRecordedAt ?? null : null)
+                    : (item.song_id ? songProgressMap.get(item.song_id)?.lastRecordedAt ?? null : null),
+                  lastPlayedTempo: item.item_type === "exercise"
+                    ? (item.exercise_id ? exerciseProgressMap.get(item.exercise_id)?.lastTempo ?? null : null)
+                    : (item.song_id ? songProgressMap.get(item.song_id)?.lastTempo ?? null : null),
+                  libraryPath: item.item_type === "exercise"
+                    ? (item.exercise_id ? itemMaps.exerciseMap.get(item.exercise_id)?.href ?? null : null)
+                    : (item.song_id ? itemMaps.songMap.get(item.song_id)?.href ?? null : null),
                   pathLines: sessionItemPathLines(item, itemMaps),
+                  position: item.item_type === "exercise"
+                    ? (item.exercise_id ? itemMaps.exerciseMap.get(item.exercise_id)?.position ?? null : null)
+                    : null,
                   songId: item.song_id,
                   tempo: item.tempo,
+                  title: item.item_type === "exercise"
+                    ? (item.exercise_id ? itemMaps.exerciseMap.get(item.exercise_id)?.title ?? "Unknown exercise" : "Unknown exercise")
+                    : (item.song_id ? itemMaps.songMap.get(item.song_id)?.title ?? "Unknown song" : "Unknown song"),
                 }))}
               sessionId={currentSession.id}
             />

@@ -6,6 +6,7 @@ import type { LibrarySnapshot } from "@/lib/data/library";
 
 type PracticeItemPickerProps = {
   inputName?: string;
+  selectionMode?: "multiple" | "single";
   snapshot: Pick<LibrarySnapshot, "artists" | "books">;
 };
 
@@ -34,6 +35,7 @@ const ROOT_VIEW: PickerView = { type: "root" };
 
 export function PracticeItemPicker({
   inputName = "itemKey",
+  selectionMode = "multiple",
   snapshot,
 }: PracticeItemPickerProps) {
   const [query, setQuery] = useState("");
@@ -108,7 +110,9 @@ export function PracticeItemPicker({
     setSelection((current) => {
       const baseKeys = current.scope === scope ? current.keys : [];
       const keys = checked
-        ? Array.from(new Set([...baseKeys, key]))
+        ? selectionMode === "single"
+          ? [key]
+          : Array.from(new Set([...baseKeys, key]))
         : baseKeys.filter((selectedKey) => selectedKey !== key);
 
       return {

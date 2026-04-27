@@ -1,6 +1,14 @@
 import Link from "next/link";
-import { createSetlistFromSessionAction } from "@/app/(app)/sessions/actions";
+import {
+  createSetlistFromSessionAction,
+  updateSessionItemGoalTempoAction,
+  updateSessionItemAction,
+  updateSessionItemReferenceAction,
+} from "@/app/(app)/sessions/actions";
+import { ActionModal } from "@/components/action-modal";
+import { AutoSubmitNumberInput } from "@/components/auto-submit-number-input";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { PracticeItemPicker } from "@/components/practice-item-picker";
 import { EmptyState, PageHero, PagePanel, StatCard } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
@@ -32,6 +40,7 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
   const sortedItems = (session.session_items ?? [])
     .slice()
     .sort((left, right) => left.display_order - right.display_order);
+  const canEditGoalTempo = !session.ended_at;
 
   return (
     <div className="space-y-6">
@@ -80,20 +89,14 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
         <div className="mt-5 space-y-3">
           {sortedItems.length ? (
             sortedItems.map((item) => (
-              <div key={item.id} className="list-row p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <SessionItemLabel
-                      label={labelSessionItem(item, itemMaps)}
-                      lines={sessionItemPathLines(item, itemMaps)}
-                    />
-                    <p className="mt-2 text-sm text-base-content/80">
-                      {item.item_type === "exercise" ? "Exercise" : "Song"}
-                    </p>
-                  </div>
-                  {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
-                </div>
-              </div>
+              <SessionItemCard
+                key={item.id}
+                item={item}
+                itemMaps={itemMaps}
+                snapshot={snapshot}
+                sessionId={session.id}
+                canEditGoalTempo={canEditGoalTempo}
+              />
             ))
           ) : (
             <EmptyState label="No logged items in this session." />
@@ -121,6 +124,159 @@ function labelSessionItem(
   }
 
   return "Unknown item";
+}
+
+function goalTempoValue(
+  item: {
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+  },
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>,
+) {
+  if (item.item_type === "exercise" && item.exercise_id) {
+    return itemMaps.exerciseMap.get(item.exercise_id)?.goalTempo ?? null;
+  }
+
+  if (item.item_type === "song" && item.song_id) {
+    return itemMaps.songMap.get(item.song_id)?.goalTempo ?? null;
+  }
+
+  return null;
+}
+
+function sessionItemHref(
+  item: {
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+  },
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>,
+) {
+  if (item.item_type === "exercise" && item.exercise_id) {
+    return itemMaps.exerciseMap.get(item.exercise_id)?.href ?? null;
+  }
+
+  if (item.item_type === "song" && item.song_id) {
+    return itemMaps.songMap.get(item.song_id)?.href ?? null;
+  }
+
+  return null;
+}
+
+function SessionItemCard({
+  canEditGoalTempo,
+  item,
+  itemMaps,
+  snapshot,
+  sessionId,
+}: {
+  canEditGoalTempo: boolean;
+  item: {
+    id: string;
+    item_type: "exercise" | "song";
+    exercise_id: string | null;
+    song_id: string | null;
+    tempo: number | null;
+    display_order: number;
+  };
+  itemMaps: ReturnType<typeof buildLibraryItemMaps>;
+  snapshot: Pick<LibrarySnapshot, "artists" | "books">;
+  sessionId: string;
+}) {
+  const label = labelSessionItem(item, itemMaps);
+  const lines = sessionItemPathLines(item, itemMaps);
+  const href = sessionItemHref(item, itemMaps);
+  const goalTempo = goalTempoValue(item, itemMaps);
+  const exercise = item.item_type === "exercise" && item.exercise_id
+    ? itemMaps.exerciseMap.get(item.exercise_id)
+    : null;
+  const song = item.item_type === "song" && item.song_id
+    ? itemMaps.songMap.get(item.song_id)
+    : null;
+
+  return (
+    <div className="list-row relative overflow-hidden p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]">
+      {href ? <Link href={href} className="absolute inset-0" aria-label={`Open ${label}`} /> : null}
+      <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <SessionItemLabel label={label} lines={lines} />
+        </div>
+        <div className="relative z-20 flex shrink-0 flex-col gap-2 md:items-end">
+          {!canEditGoalTempo ? (
+            <div className="flex flex-col gap-2 md:items-end">
+              <div className="flex items-center gap-2">
+                <form action={updateSessionItemAction} className="flex items-center gap-2">
+                  <input type="hidden" name="sessionItemId" value={item.id} />
+                  <input type="hidden" name="sessionId" value={sessionId} />
+                  <AutoSubmitNumberInput
+                    name="tempo"
+                    min={1}
+                    defaultValue={item.tempo ?? ""}
+                    initialValue={item.tempo}
+                    placeholder="Tempo"
+                    className="input input-bordered input-xs w-24 bg-base-100"
+                    ignoreBlurSubmitSelector="button[aria-label='Change item']"
+                  />
+                </form>
+                <ActionModal
+                  triggerLabel="Change item"
+                  triggerAriaLabel="Change item"
+                  triggerContent={<span aria-hidden="true" className="text-sm leading-none">✎</span>}
+                  triggerClassName="btn btn-ghost btn-xs h-7 min-h-0 w-7 px-0"
+                  submitFormId={`change-session-item-${item.id}`}
+                  submitLabel="Save item"
+                  title="Change logged item"
+                  description="Replace this logged session entry with the correct exercise or song."
+                  panelClassName="max-w-5xl"
+                >
+                  <form id={`change-session-item-${item.id}`} action={updateSessionItemReferenceAction}>
+                    <input type="hidden" name="sessionId" value={sessionId} />
+                    <input type="hidden" name="sessionItemId" value={item.id} />
+                    <PracticeItemPicker snapshot={snapshot} selectionMode="single" />
+                  </form>
+                </ActionModal>
+              </div>
+            </div>
+          ) : null}
+          {canEditGoalTempo && item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
+          {goalTempo ? <span className="chip">Goal {goalTempo} BPM</span> : null}
+          {canEditGoalTempo ? (
+            <form
+              action={updateSessionItemGoalTempoAction}
+              className="flex flex-col gap-2 md:items-end"
+            >
+              <input type="hidden" name="sessionId" value={sessionId} />
+              <input type="hidden" name="itemType" value={item.item_type} />
+              <input type="hidden" name="exerciseId" value={item.exercise_id ?? ""} />
+              <input type="hidden" name="songId" value={item.song_id ?? ""} />
+              <input type="hidden" name="libraryPath" value={href ?? ""} />
+              <input type="hidden" name="title" value={exercise?.title ?? song?.title ?? ""} />
+              <input type="hidden" name="position" value={exercise ? String(exercise.position ?? "") : ""} />
+              <label className="text-xs font-bold uppercase tracking-wide text-base-content/70 md:text-right">
+                Goal tempo
+              </label>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  name="goalTempo"
+                  type="number"
+                  min={1}
+                  defaultValue={goalTempo ?? ""}
+                  placeholder="Set BPM"
+                  className="input input-bordered input-sm w-28 bg-base-100"
+                />
+                <FormSubmitButton
+                  label="Save"
+                  pendingLabel="Saving..."
+                  className="btn btn-ghost btn-sm"
+                />
+              </div>
+            </form>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function sessionItemPathLines(
