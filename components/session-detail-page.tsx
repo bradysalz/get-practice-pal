@@ -242,7 +242,7 @@ function SessionItemCard({
               </div>
             </div>
           ) : null}
-          {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
+          {canEditGoalTempo && item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
           {goalTempo ? <span className="chip">Goal {goalTempo} BPM</span> : null}
           {canEditGoalTempo ? (
             <form
