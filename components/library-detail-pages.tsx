@@ -497,6 +497,19 @@ function TempoProgressGraph({
             strokeLinejoin="round"
             strokeDasharray="12 8"
           />
+          {points.map((point) => (
+            <circle
+              key={`${point.recordedAt}-${point.tempo}`}
+              cx={point.x}
+              cy={point.y}
+              r="4.5"
+              fill="#dc2626"
+              stroke="white"
+              strokeWidth="1.5"
+            >
+              <title>{`${formatDate(point.recordedAt)}: ${point.tempo} BPM`}</title>
+            </circle>
+          ))}
           <text x={padding.left - 10} y={padding.top + 4} textAnchor="end" fontSize="12" fill="currentColor" opacity="0.7">
             {tempoCeiling}
           </text>
