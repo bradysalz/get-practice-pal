@@ -35,6 +35,7 @@ type SessionItemRow = {
   itemType: "exercise" | "song";
   label: string;
   lastPlayedAt: string | null;
+  lastPlayedTempo: number | null;
   libraryPath: string | null;
   pathLines: string[];
   position: number | null;
@@ -86,9 +87,11 @@ function SortableSessionRow({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <SessionItemLabel label={item.label} pathLines={item.pathLines} />
-            <p className="mt-2 text-sm text-base-content/80">
-              Last played {formatLastPlayed(item.lastPlayedAt)}
-            </p>
+            {item.lastPlayedAt && item.lastPlayedTempo ? (
+              <p className="mt-2 text-sm text-base-content/80">
+                Last played {item.lastPlayedTempo} BPM · {formatLastPlayed(item.lastPlayedAt)}
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-col gap-3 lg:items-end">
             <div className="grid gap-3 sm:grid-cols-[8rem_8rem_auto] sm:items-end">
@@ -203,11 +206,7 @@ function RemoveSessionItemButton({ label }: { label: string }) {
   );
 }
 
-function formatLastPlayed(value: string | null) {
-  if (!value) {
-    return "never";
-  }
-
+function formatLastPlayed(value: string) {
   return new Date(value).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",

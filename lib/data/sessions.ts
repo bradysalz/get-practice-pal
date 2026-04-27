@@ -188,6 +188,33 @@ export async function updateSessionItemTempo(sessionItemId: string, tempo: numbe
   return data;
 }
 
+export async function updateSessionItemReference(input: {
+  sessionItemId: string;
+  itemType: "exercise" | "song";
+  exerciseId?: string | null;
+  songId?: string | null;
+}) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+
+  assertPracticeItemReference(input);
+
+  const { data, error } = await client
+    .from("practice_session_items")
+    .update({
+      item_type: input.itemType,
+      exercise_id: input.exerciseId ?? null,
+      song_id: input.songId ?? null,
+    })
+    .eq("id", input.sessionItemId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteSessionItem(sessionItemId: string) {
   const client = await requireSupabaseClient();
   const user = await requireUser();

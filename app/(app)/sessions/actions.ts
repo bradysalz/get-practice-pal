@@ -12,6 +12,7 @@ import {
   resumeSession,
   startSession,
   updateSessionNotes,
+  updateSessionItemReference,
   updateSessionItemTempo,
   upsertSessionItem,
 } from "@/lib/data/sessions";
@@ -154,6 +155,26 @@ export async function updateSessionItemGoalTempoAction(formData: FormData) {
   if (libraryPath) {
     revalidatePath(libraryPath);
   }
+}
+
+export async function updateSessionItemReferenceAction(formData: FormData) {
+  const sessionId = String(formData.get("sessionId") ?? "").trim();
+  const selectedItem = String(formData.get("itemKey") ?? "").trim();
+
+  if (!selectedItem) {
+    throw new Error("Select one exercise or song.");
+  }
+
+  const [itemType, itemId] = selectedItem.split(":");
+
+  await updateSessionItemReference({
+    sessionItemId: String(formData.get("sessionItemId") ?? "").trim(),
+    itemType: itemType === "song" ? "song" : "exercise",
+    exerciseId: itemType === "exercise" ? itemId : null,
+    songId: itemType === "song" ? itemId : null,
+  });
+
+  revalidateSessionDetail(sessionId);
 }
 
 export async function deleteSessionItemAction(formData: FormData) {

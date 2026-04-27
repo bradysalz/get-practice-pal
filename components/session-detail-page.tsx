@@ -2,8 +2,11 @@ import Link from "next/link";
 import {
   createSetlistFromSessionAction,
   updateSessionItemGoalTempoAction,
+  updateSessionItemReferenceAction,
 } from "@/app/(app)/sessions/actions";
+import { ActionModal } from "@/components/action-modal";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { PracticeItemPicker } from "@/components/practice-item-picker";
 import { EmptyState, PageHero, PagePanel, StatCard } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
 import { buildLibraryItemMaps } from "@/lib/data/view-models";
@@ -88,6 +91,7 @@ export function SessionDetailPage({ session, snapshot }: SessionDetailPageProps)
                 key={item.id}
                 item={item}
                 itemMaps={itemMaps}
+                snapshot={snapshot}
                 sessionId={session.id}
                 canEditGoalTempo={canEditGoalTempo}
               />
@@ -162,6 +166,7 @@ function SessionItemCard({
   canEditGoalTempo,
   item,
   itemMaps,
+  snapshot,
   sessionId,
 }: {
   canEditGoalTempo: boolean;
@@ -174,6 +179,7 @@ function SessionItemCard({
     display_order: number;
   };
   itemMaps: ReturnType<typeof buildLibraryItemMaps>;
+  snapshot: Pick<LibrarySnapshot, "artists" | "books">;
   sessionId: string;
 }) {
   const label = labelSessionItem(item, itemMaps);
@@ -195,6 +201,23 @@ function SessionItemCard({
           <SessionItemLabel label={label} lines={lines} />
         </div>
         <div className="relative z-20 flex shrink-0 flex-col gap-2 md:items-end">
+          {!canEditGoalTempo ? (
+            <ActionModal
+              triggerLabel="Change item"
+              triggerClassName="btn btn-ghost btn-sm"
+              submitFormId={`change-session-item-${item.id}`}
+              submitLabel="Save item"
+              title="Change logged item"
+              description="Replace this logged session entry with the correct exercise or song."
+              panelClassName="max-w-5xl"
+            >
+              <form id={`change-session-item-${item.id}`} action={updateSessionItemReferenceAction}>
+                <input type="hidden" name="sessionId" value={sessionId} />
+                <input type="hidden" name="sessionItemId" value={item.id} />
+                <PracticeItemPicker snapshot={snapshot} selectionMode="single" />
+              </form>
+            </ActionModal>
+          ) : null}
           {item.tempo ? <span className="chip chip-neutral">{item.tempo} BPM</span> : null}
           {goalTempo ? <span className="chip">Goal {goalTempo} BPM</span> : null}
           {canEditGoalTempo ? (

@@ -27,6 +27,7 @@ export type ItemProgressSummary = {
   completed: boolean;
   entryCount: number;
   lastRecordedAt: string | null;
+  lastTempo: number | null;
 };
 
 export async function getItemTempoHistory(input: {
@@ -123,6 +124,7 @@ export async function getItemProgressSummaryMap(input: {
       completed: false,
       entryCount: 0,
       lastRecordedAt: null,
+      lastTempo: null,
     });
   }
 
@@ -188,6 +190,7 @@ export async function getItemProgressSummaryMap(input: {
       completed: goalTempo ? currentMaxTempo >= goalTempo : false,
       entryCount: current.entryCount + 1,
       lastRecordedAt: row.created_at,
+      lastTempo: row.tempo,
     });
   }
 

@@ -194,6 +194,9 @@ export function ActiveSessionPage({
                   lastPlayedAt: item.item_type === "exercise"
                     ? (item.exercise_id ? exerciseProgressMap.get(item.exercise_id)?.lastRecordedAt ?? null : null)
                     : (item.song_id ? songProgressMap.get(item.song_id)?.lastRecordedAt ?? null : null),
+                  lastPlayedTempo: item.item_type === "exercise"
+                    ? (item.exercise_id ? exerciseProgressMap.get(item.exercise_id)?.lastTempo ?? null : null)
+                    : (item.song_id ? songProgressMap.get(item.song_id)?.lastTempo ?? null : null),
                   libraryPath: item.item_type === "exercise"
                     ? (item.exercise_id ? itemMaps.exerciseMap.get(item.exercise_id)?.href ?? null : null)
                     : (item.song_id ? itemMaps.songMap.get(item.song_id)?.href ?? null : null),
