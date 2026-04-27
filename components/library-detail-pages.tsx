@@ -177,18 +177,12 @@ export function SongDetailPage({
   song,
 }: {
   artist: LibrarySnapshot["artists"][number];
-  itemProgress: {
-    currentMaxTempo: number;
-    goalTempo: number;
-    progress: Array<{
-      recordedAt: string;
-      maxTempo: number;
-      progressRatio: number;
-    }>;
-  } | null;
+  itemProgress: TempoHistory;
   song: NonNullable<LibrarySnapshot["artists"][number]["songs"]>[number];
 }) {
-  const progressPercent = itemProgress ? Math.min(Math.round((itemProgress.currentMaxTempo / itemProgress.goalTempo) * 100), 100) : 0;
+  const progressPercent = song.goal_tempo
+    ? Math.min(Math.round((itemProgress.currentMaxTempo / song.goal_tempo) * 100), 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -203,9 +197,9 @@ export function SongDetailPage({
         title=""
         stats={
           <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
-            <StatCard label="Goal" value={song.goal_tempo ? `${song.goal_tempo}` : "0"} />
-            <StatCard label="Max" value={String(itemProgress?.currentMaxTempo ?? 0)} />
-            <StatCard label="Progress" value={`${progressPercent}%`} />
+            <StatCard label="Goal" value={song.goal_tempo ? `${song.goal_tempo}` : "-"} />
+            <StatCard label="Max" value={String(itemProgress.currentMaxTempo)} />
+            <StatCard label="Progress" value={song.goal_tempo ? `${progressPercent}%` : "-"} />
           </div>
         }
       >
@@ -220,27 +214,13 @@ export function SongDetailPage({
       <section className="space-y-6">
         <PagePanel>
           <SectionHeader title="Progress" />
-          {itemProgress ? (
+          {itemProgress.entries.length ? (
             <div className="mt-5 space-y-4">
-              <progress className="progress progress-primary w-full" value={progressPercent} max={100} />
-              <div className="space-y-3">
-                {itemProgress.progress.length ? (
-                  itemProgress.progress.map((point) => (
-                    <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
-                        <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState label="No progress yet." className="mt-4" />
-                )}
-              </div>
+              <TempoProgressGraph entries={itemProgress.entries} goalTempo={song.goal_tempo} />
             </div>
           ) : (
             <div className="mt-5">
-              <EmptyState label="Set a goal tempo to track progress." />
+              <EmptyState label="No progress yet." />
             </div>
           )}
         </PagePanel>
@@ -334,22 +314,9 @@ export function ExerciseDetailPage({
   book: LibrarySnapshot["books"][number];
   section: NonNullable<LibrarySnapshot["books"][number]["sections"]>[number];
   exercise: NonNullable<NonNullable<LibrarySnapshot["books"][number]["sections"]>[number]["exercises"]>[number];
-  itemProgress: {
-    currentMaxTempo: number;
-    goalTempo?: number | null;
-    progress?: Array<{
-      recordedAt: string;
-      maxTempo: number;
-      progressRatio: number;
-    }>;
-    entries?: Array<{
-      recordedAt: string;
-      tempo: number;
-    }>;
-  } | null;
+  itemProgress: TempoHistory;
 }) {
-  const hasGoal = Boolean(exercise.goal_tempo);
-  const progressPercent = itemProgress && exercise.goal_tempo
+  const progressPercent = exercise.goal_tempo
     ? Math.min(Math.round((itemProgress.currentMaxTempo / exercise.goal_tempo) * 100), 100)
     : 0;
 
@@ -366,9 +333,9 @@ export function ExerciseDetailPage({
         title=""
         stats={
           <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
-            <StatCard label="Goal" value={exercise.goal_tempo ? `${exercise.goal_tempo}` : "0"} />
-            <StatCard label="Max" value={String(itemProgress?.currentMaxTempo ?? 0)} />
-            <StatCard label="Progress" value={`${progressPercent}%`} />
+            <StatCard label="Goal" value={exercise.goal_tempo ? `${exercise.goal_tempo}` : "-"} />
+            <StatCard label="Max" value={String(itemProgress.currentMaxTempo)} />
+            <StatCard label="Progress" value={exercise.goal_tempo ? `${progressPercent}%` : "-"} />
           </div>
         }
       >
@@ -385,27 +352,13 @@ export function ExerciseDetailPage({
       <section className="space-y-6">
         <PagePanel>
           <SectionHeader title="Progress" />
-          {hasGoal && itemProgress ? (
+          {itemProgress.entries.length ? (
             <div className="mt-5 space-y-4">
-              <progress className="progress progress-primary w-full" value={progressPercent} max={100} />
-              <div className="space-y-3">
-                {(itemProgress.progress ?? []).length ? (
-                  (itemProgress.progress ?? []).map((point) => (
-                    <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
-                        <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState label="No progress yet." className="mt-4" />
-                )}
-              </div>
+              <TempoProgressGraph entries={itemProgress.entries} goalTempo={exercise.goal_tempo} />
             </div>
           ) : (
             <div className="mt-5">
-              <EmptyState label="Set a goal tempo to track progress." />
+              <EmptyState label="No progress yet." />
             </div>
           )}
         </PagePanel>
@@ -436,6 +389,110 @@ function SongProgressRow({
           value={Math.min(Math.round((progress?.completionRatio ?? 0) * 100), 100)}
           max={100}
         />
+      ) : null}
+    </div>
+  );
+}
+
+type TempoHistory = {
+  currentMaxTempo: number;
+  entries: Array<{
+    recordedAt: string;
+    tempo: number;
+  }>;
+};
+
+function TempoProgressGraph({
+  entries,
+  goalTempo,
+}: {
+  entries: Array<{
+    recordedAt: string;
+    tempo: number;
+  }>;
+  goalTempo?: number | null;
+}) {
+  const width = 640;
+  const height = 240;
+  const padding = { top: 20, right: 16, bottom: 34, left: 42 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const maxTempo = Math.max(goalTempo ?? 0, ...entries.map((entry) => entry.tempo));
+  const tempoCeiling = Math.max(Math.ceil(maxTempo / 10) * 10, 10);
+  const xStep = entries.length > 1 ? innerWidth / (entries.length - 1) : 0;
+  const points = entries.map((entry, index) => {
+    const x = padding.left + (entries.length > 1 ? index * xStep : innerWidth / 2);
+    const y = padding.top + innerHeight - (entry.tempo / tempoCeiling) * innerHeight;
+
+    return {
+      ...entry,
+      x,
+      y,
+    };
+  });
+  const linePath = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+  const goalY = goalTempo ? padding.top + innerHeight - (goalTempo / tempoCeiling) * innerHeight : null;
+  const firstLabel = formatDate(entries[0].recordedAt);
+  const lastLabel = formatDate(entries[entries.length - 1].recordedAt);
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-[1.5rem] border border-base-300 bg-base-100/80 p-4">
+        <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label="Tempo progress over time">
+          <line x1={padding.left} y1={padding.top} x2={padding.left} y2={height - padding.bottom} stroke="currentColor" strokeOpacity="0.18" />
+          <line
+            x1={padding.left}
+            y1={height - padding.bottom}
+            x2={width - padding.right}
+            y2={height - padding.bottom}
+            stroke="currentColor"
+            strokeOpacity="0.18"
+          />
+          {goalY != null ? (
+            <line
+              x1={padding.left}
+              y1={goalY}
+              x2={width - padding.right}
+              y2={goalY}
+              stroke="currentColor"
+              strokeOpacity="0.6"
+              strokeDasharray="8 8"
+            />
+          ) : null}
+          <path
+            d={linePath}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="1 10"
+          />
+          {points.map((point) => (
+            <circle key={`${point.recordedAt}-${point.tempo}`} cx={point.x} cy={point.y} r="4.5" fill="currentColor" />
+          ))}
+          <text x={padding.left - 10} y={padding.top + 4} textAnchor="end" fontSize="12" fill="currentColor" opacity="0.7">
+            {tempoCeiling}
+          </text>
+          <text
+            x={padding.left - 10}
+            y={height - padding.bottom + 4}
+            textAnchor="end"
+            fontSize="12"
+            fill="currentColor"
+            opacity="0.7"
+          >
+            0
+          </text>
+        </svg>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-base-content/75">
+        <span>{firstLabel}</span>
+        <span className="font-medium text-base-content">Tempo</span>
+        <span>{lastLabel}</span>
+      </div>
+      {goalTempo ? (
+        <p className="text-sm text-base-content/75">Dashed line marks the goal tempo at {goalTempo} BPM.</p>
       ) : null}
     </div>
   );

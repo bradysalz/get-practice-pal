@@ -76,33 +76,6 @@ export async function getItemTempoHistory(input: {
   };
 }
 
-export async function getProgressToGoal(input: {
-  itemType: PracticeItemType;
-  exerciseId?: string | null;
-  songId?: string | null;
-  goalTempo: number;
-  range?: TimeRange;
-}) {
-  const history = await getItemTempoHistory(input);
-  let runningMax = 0;
-
-  const progress = history.entries.map((entry) => {
-    runningMax = Math.max(runningMax, entry.tempo);
-
-    return {
-      recordedAt: entry.recordedAt,
-      maxTempo: runningMax,
-      progressRatio: input.goalTempo > 0 ? runningMax / input.goalTempo : 0,
-    };
-  });
-
-  return {
-    currentMaxTempo: history.currentMaxTempo,
-    goalTempo: input.goalTempo,
-    progress,
-  };
-}
-
 export async function getItemProgressSummaryMap(input: {
   itemType: PracticeItemType;
   items: Array<{ id: string; goalTempo: number | null }>;

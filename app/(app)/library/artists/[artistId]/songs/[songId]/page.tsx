@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { SongDetailPage } from "@/components/library-detail-pages";
 import { getLibrarySnapshot } from "@/lib/data/library";
-import { getProgressToGoal } from "@/lib/data/stats";
+import { getItemTempoHistory } from "@/lib/data/stats";
 
 export default async function LibrarySongPage({
   params,
@@ -22,13 +22,10 @@ export default async function LibrarySongPage({
     notFound();
   }
 
-  const itemProgress = song.goal_tempo
-    ? await getProgressToGoal({
-        itemType: "song",
-        songId: song.id,
-        goalTempo: song.goal_tempo,
-      })
-    : null;
+  const itemProgress = await getItemTempoHistory({
+    itemType: "song",
+    songId: song.id,
+  });
 
   return <SongDetailPage artist={artist} itemProgress={itemProgress} song={song} />;
 }
