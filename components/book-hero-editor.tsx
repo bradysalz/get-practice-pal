@@ -18,6 +18,7 @@ type BookHeroEditorProps = {
   composer: string | null;
   externalBook: LinkedExternalBook | LinkedExternalBook[] | null;
   externalBookId: string | null;
+  onEditingChange?: (isEditing: boolean) => void;
   title: string;
 };
 
@@ -26,6 +27,7 @@ export function BookHeroEditor({
   composer,
   externalBook,
   externalBookId,
+  onEditingChange,
   title,
 }: BookHeroEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -37,6 +39,7 @@ export function BookHeroEditor({
   async function submitUpdate(formData: FormData) {
     await updateBookAction(formData);
     setIsEditing(false);
+    onEditingChange?.(false);
   }
 
   if (!isEditing) {
@@ -62,19 +65,20 @@ export function BookHeroEditor({
               </p>
             </div>
           </div>
-          <button type="button" className="btn btn-outline" onClick={() => setIsEditing(true)}>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => {
+              setIsEditing(true);
+              onEditingChange?.(true);
+            }}
+          >
             Edit
           </button>
         </div>
       </div>
     );
   }
-
-  async function submitBookUpdate(formData: FormData) {
-    await updateBookAction(formData);
-    setIsEditing(false);
-  }
-
   return (
     <div className="max-w-3xl space-y-4">
       <form action={submitUpdate} className="space-y-4">
@@ -85,7 +89,14 @@ export function BookHeroEditor({
             name="title"
             defaultValue={title}
           />
-          <button type="button" className="btn btn-outline" onClick={() => setIsEditing(false)}>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => {
+              setIsEditing(false);
+              onEditingChange?.(false);
+            }}
+          >
             Cancel
           </button>
         </div>

@@ -18,13 +18,15 @@ export async function getLibrarySnapshot() {
   const [books, artists, setlists] = await Promise.all([
     client
       .from("books")
-      .select("id, title, composer, external_book_id, created_at, external_book:external_books(id, provider, provider_book_id, isbn_10, isbn_13, title, subtitle, authors, published_year, published_date, cover_thumbnail_url, cover_small_url, cover_medium_url, cover_large_url, canonical_url), sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
+      .select("id, title, composer, external_book_id, created_at, updated_at, external_book:external_books(id, provider, provider_book_id, isbn_10, isbn_13, title, subtitle, authors, published_year, published_date, cover_thumbnail_url, cover_small_url, cover_medium_url, cover_large_url, canonical_url), sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
       .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
       .order("title"),
     client
       .from("artists")
-      .select("id, name, songs(id, title, goal_tempo)")
+      .select("id, name, created_at, updated_at, songs(id, title, goal_tempo)")
       .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
       .order("name"),
     client
       .from("setlists")
@@ -49,7 +51,7 @@ export async function getBookById(bookId: string) {
   const user = await requireUser();
   const { data, error } = await client
     .from("books")
-    .select("id, title, composer, external_book_id, created_at, external_book:external_books(id, provider, provider_book_id, isbn_10, isbn_13, title, subtitle, authors, published_year, published_date, cover_thumbnail_url, cover_small_url, cover_medium_url, cover_large_url, canonical_url), sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
+    .select("id, title, composer, external_book_id, created_at, updated_at, external_book:external_books(id, provider, provider_book_id, isbn_10, isbn_13, title, subtitle, authors, published_year, published_date, cover_thumbnail_url, cover_small_url, cover_medium_url, cover_large_url, canonical_url), sections:book_sections(id, title, position, default_goal_tempo, exercises(id, title, position, goal_tempo))")
     .eq("id", bookId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -474,6 +476,22 @@ export async function reorderBookSections(bookId: string, sectionIds: string[]) 
         .update({ position: index + 1 })
         .eq("id", sectionId)
         .eq("book_id", bookId)
+        .eq("user_id", user.id),
+    ),
+  );
+}
+
+export async function reorderSectionExercises(sectionId: string, exerciseIds: string[]) {
+  const client = await requireSupabaseClient();
+  const user = await requireUser();
+
+  await Promise.all(
+    exerciseIds.map((exerciseId, index) =>
+      client
+        .from("exercises")
+        .update({ position: index + 1 })
+        .eq("id", exerciseId)
+        .eq("section_id", sectionId)
         .eq("user_id", user.id),
     ),
   );

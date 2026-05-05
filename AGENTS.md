@@ -8,6 +8,7 @@
 - Open normal PRs, not draft PRs.
 - Do not commit directly to `master`; always use a branch and land changes through the PR flow.
 - Never merge UI changes unless the user explicitly approves the merge after reviewing them.
+- Do not run parallel `beans update` commands against the same bean, and do not put raw backticks in shell-passed `beans` text; update beans serially and use plain text or escaped quoting so tracker content does not get corrupted.
 - It is fine to group several related changes into one PR when they belong to the same milestone or workflow.
 - Keep local-only files such as editor swap files and private env files out of commits and PRs.
 

@@ -1,12 +1,9 @@
 import Link from "next/link";
-import {
-  reorderBookSectionsAction,
-} from "@/app/(app)/library/actions";
 import { ActionModal } from "@/components/action-modal";
 import { ArtistHeroEditor } from "@/components/artist-hero-editor";
-import { BookHeroEditor } from "@/components/book-hero-editor";
-import { DraggableBookSections } from "@/components/draggable-book-sections";
+import { BookDetailShell } from "@/components/book-detail-shell";
 import { ExerciseHeroEditor } from "@/components/exercise-hero-editor";
+import { SectionDetailShell } from "@/components/section-detail-shell";
 import { SectionHeroEditor } from "@/components/section-hero-editor";
 import { SongHeroEditor } from "@/components/song-hero-editor";
 import {
@@ -48,71 +45,31 @@ export function BookDetailPage({
     (sum, section) => sum + (section.exercises?.length ?? 0),
     0,
   );
+  const sectionItems = (book.sections ?? [])
+    .slice()
+    .sort((left, right) => left.position - right.position)
+    .map((section) => ({
+      completionLabel:
+        sectionProgressMap.get(section.id)?.totalExercisesWithGoals
+          ? `${sectionProgressMap.get(section.id)?.completedExercises ?? 0}/${sectionProgressMap.get(section.id)?.totalExercisesWithGoals ?? 0} complete`
+          : "",
+      exerciseCount: section.exercises?.length ?? 0,
+      id: section.id,
+      title: section.title,
+    }));
 
   return (
-    <div className="space-y-6">
-      <PageHero
-        backHref="/library"
-        backLabel="Back to library"
-        eyebrow="Book"
-        title=""
-        stats={
-          <div className="grid grid-cols-3 gap-2 md:min-w-[26rem] md:gap-3">
-            <StatCard compact label="Sections" value={String(sectionCount)} />
-            <StatCard compact label="Exercises" value={String(exerciseCount)} />
-            <StatCard
-              compact
-              label="Completion"
-              value={`${Math.round(bookCompletion.completionRatio * 100)}%`}
-            />
-          </div>
-        }
-      >
-        <BookHeroEditor
-          bookId={book.id}
-          composer={book.composer}
-          externalBook={book.external_book}
-          externalBookId={book.external_book_id}
-          title={book.title}
-        />
-      </PageHero>
-
-      <section className="space-y-6">
-        <PagePanel>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <SectionHeader
-              title="Sections"
-            />
-            <Link href={`/library/books/${book.id}/sections/new`} className="btn btn-primary">
-              Add section
-            </Link>
-          </div>
-
-          <div className="mt-5">
-            {sectionCount ? (
-              <DraggableBookSections
-                bookId={book.id}
-                onReorder={reorderBookSectionsAction}
-                sections={(book.sections ?? [])
-                  .slice()
-                  .sort((left, right) => left.position - right.position)
-                  .map((section) => ({
-                    completionLabel:
-                      sectionProgressMap.get(section.id)?.totalExercisesWithGoals
-                        ? `${sectionProgressMap.get(section.id)?.completedExercises ?? 0}/${sectionProgressMap.get(section.id)?.totalExercisesWithGoals ?? 0} complete`
-                        : "",
-                    exerciseCount: section.exercises?.length ?? 0,
-                    id: section.id,
-                    title: section.title,
-                  }))}
-              />
-            ) : (
-              <EmptyState label="No sections yet. Add your first section." />
-            )}
-          </div>
-        </PagePanel>
-      </section>
-    </div>
+    <BookDetailShell
+      bookId={book.id}
+      composer={book.composer}
+      externalBook={book.external_book}
+      externalBookId={book.external_book_id}
+      sectionCount={sectionCount}
+      sectionItems={sectionItems}
+      title={book.title}
+      totalCompletionPercent={Math.round(bookCompletion.completionRatio * 100)}
+      totalExerciseCount={exerciseCount}
+    />
   );
 }
 
@@ -257,66 +214,49 @@ export function SectionDetailPage({
   const exercises = section?.exercises ?? [];
   const completedExercises = exercises.filter((exercise) => exerciseProgressMap?.get(exercise.id)?.completed).length;
   const completionPercent = exercises.length ? Math.round((completedExercises / exercises.length) * 100) : 0;
+  const exerciseItems = exercises
+    .slice()
+    .sort((left, right) => left.position - right.position)
+    .map((exercise) => ({
+      goalTempo: exercise.goal_tempo,
+      href: `/library/books/${book.id}/sections/${section?.id}/exercises/${exercise.id}`,
+      id: exercise.id,
+      maxTempo: exerciseProgressMap?.get(exercise.id)?.currentMaxTempo ?? 0,
+      position: exercise.position,
+      title: exercise.title,
+    }));
 
   return (
     <div className="space-y-6">
-      <PageHero
-        backHref={`/library/books/${book.id}`}
-        backLabel={
-          <>
-            Back to <em className="normal-case">{book.title}</em>
-          </>
-        }
-        eyebrow="Section"
-        title=""
-        stats={
-          section ? (
-            <div className="grid grid-cols-2 gap-2 md:min-w-[14rem] md:gap-3">
-              <StatCard compact label="Exercises" value={String(exercises.length)} />
-              <StatCard compact label="Completion" value={`${completionPercent}%`} />
-            </div>
-          ) : undefined
-        }
-      >
-        <SectionHeroEditor
+      {section ? (
+        <SectionDetailShell
           bookId={book.id}
-          section={section}
-          title={section ? section.title : "New section"}
+          bookTitle={book.title}
+          completionPercent={completionPercent}
+          defaultGoalTempo={section.default_goal_tempo}
+          exercises={exerciseItems}
+          sectionId={section.id}
+          sectionPosition={section.position}
+          sectionTitle={section.title}
         />
-      </PageHero>
-
-      <section className="space-y-6">
-        {section ? (
-          <PagePanel>
-            <SectionHeader
-              title="Current Exercises"
-            />
-            <div className="mt-5 space-y-3">
-              {section.exercises?.length ? (
-                section.exercises.map((exercise) => (
-                  <Link
-                    key={exercise.id}
-                    href={`/library/books/${book.id}/sections/${section.id}/exercises/${exercise.id}`}
-                    className="list-row block p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="font-medium text-base-content">{exercise.title}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {exercise.goal_tempo ? <span className="chip">Goal {exercise.goal_tempo} BPM</span> : null}
-                        <span className="chip chip-neutral">
-                          Max {exerciseProgressMap?.get(exercise.id)?.currentMaxTempo ?? 0} BPM
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <EmptyState label="No exercises yet for this section." />
-              )}
-            </div>
-          </PagePanel>
-        ) : null}
-      </section>
+      ) : (
+        <PageHero
+          backHref={`/library/books/${book.id}`}
+          backLabel={
+            <>
+              Back to <em className="normal-case">{book.title}</em>
+            </>
+          }
+          eyebrow="Section"
+          title=""
+        >
+          <SectionHeroEditor
+            bookId={book.id}
+            section={section}
+            title="New section"
+          />
+        </PageHero>
+      )}
     </div>
   );
 }
