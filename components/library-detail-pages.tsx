@@ -16,6 +16,7 @@ import {
   StatCard,
 } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
+import type { TimeRange } from "@/lib/data/types";
 import type { ItemProgressSummary } from "@/lib/data/stats";
 import {
   CreateSongForm,
@@ -174,21 +175,19 @@ export function ArtistDetailPage({
 export function SongDetailPage({
   artist,
   itemProgress,
+  selectedRange,
   song,
 }: {
   artist: LibrarySnapshot["artists"][number];
-  itemProgress: {
-    currentMaxTempo: number;
-    goalTempo: number;
-    progress: Array<{
-      recordedAt: string;
-      maxTempo: number;
-      progressRatio: number;
-    }>;
-  } | null;
+  itemProgress: TempoHistory;
+  selectedRange: ProgressRange;
   song: NonNullable<LibrarySnapshot["artists"][number]["songs"]>[number];
 }) {
-  const progressPercent = itemProgress ? Math.min(Math.round((itemProgress.currentMaxTempo / itemProgress.goalTempo) * 100), 100) : 0;
+  const filteredEntries = filterTempoEntries(itemProgress.entries, selectedRange);
+  const rangeMaxTempo = filteredEntries.reduce((max, entry) => Math.max(max, entry.tempo), 0);
+  const progressPercent = song.goal_tempo
+    ? Math.min(Math.round((rangeMaxTempo / song.goal_tempo) * 100), 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -203,9 +202,9 @@ export function SongDetailPage({
         title=""
         stats={
           <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
-            <StatCard label="Goal" value={song.goal_tempo ? `${song.goal_tempo}` : "0"} />
-            <StatCard label="Max" value={String(itemProgress?.currentMaxTempo ?? 0)} />
-            <StatCard label="Progress" value={`${progressPercent}%`} />
+            <StatCard label="Goal" value={song.goal_tempo ? `${song.goal_tempo}` : "-"} />
+            <StatCard label="Max" value={String(rangeMaxTempo)} />
+            <StatCard label="Progress" value={song.goal_tempo ? `${progressPercent}%` : "-"} />
           </div>
         }
       >
@@ -219,28 +218,25 @@ export function SongDetailPage({
 
       <section className="space-y-6">
         <PagePanel>
-          <SectionHeader title="Progress" />
-          {itemProgress ? (
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <SectionHeader title="Progress" />
+            <ProgressRangeSelector
+              currentRange={selectedRange}
+              hrefBase={`/library/artists/${artist.id}/songs/${song.id}`}
+            />
+          </div>
+          {filteredEntries.length ? (
             <div className="mt-5 space-y-4">
-              <progress className="progress progress-primary w-full" value={progressPercent} max={100} />
-              <div className="space-y-3">
-                {itemProgress.progress.length ? (
-                  itemProgress.progress.map((point) => (
-                    <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
-                        <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState label="No progress yet." className="mt-4" />
-                )}
-              </div>
+              <TempoProgressGraph
+                entries={filteredEntries}
+                fullEntries={itemProgress.entries}
+                goalTempo={song.goal_tempo}
+                range={selectedRange}
+              />
             </div>
           ) : (
             <div className="mt-5">
-              <EmptyState label="Set a goal tempo to track progress." />
+              <EmptyState label="No progress yet." />
             </div>
           )}
         </PagePanel>
@@ -330,27 +326,18 @@ export function ExerciseDetailPage({
   section,
   exercise,
   itemProgress,
+  selectedRange,
 }: {
   book: LibrarySnapshot["books"][number];
   section: NonNullable<LibrarySnapshot["books"][number]["sections"]>[number];
   exercise: NonNullable<NonNullable<LibrarySnapshot["books"][number]["sections"]>[number]["exercises"]>[number];
-  itemProgress: {
-    currentMaxTempo: number;
-    goalTempo?: number | null;
-    progress?: Array<{
-      recordedAt: string;
-      maxTempo: number;
-      progressRatio: number;
-    }>;
-    entries?: Array<{
-      recordedAt: string;
-      tempo: number;
-    }>;
-  } | null;
+  itemProgress: TempoHistory;
+  selectedRange: ProgressRange;
 }) {
-  const hasGoal = Boolean(exercise.goal_tempo);
-  const progressPercent = itemProgress && exercise.goal_tempo
-    ? Math.min(Math.round((itemProgress.currentMaxTempo / exercise.goal_tempo) * 100), 100)
+  const filteredEntries = filterTempoEntries(itemProgress.entries, selectedRange);
+  const rangeMaxTempo = filteredEntries.reduce((max, entry) => Math.max(max, entry.tempo), 0);
+  const progressPercent = exercise.goal_tempo
+    ? Math.min(Math.round((rangeMaxTempo / exercise.goal_tempo) * 100), 100)
     : 0;
 
   return (
@@ -366,9 +353,9 @@ export function ExerciseDetailPage({
         title=""
         stats={
           <div className="grid grid-cols-3 gap-3 md:min-w-[18rem]">
-            <StatCard label="Goal" value={exercise.goal_tempo ? `${exercise.goal_tempo}` : "0"} />
-            <StatCard label="Max" value={String(itemProgress?.currentMaxTempo ?? 0)} />
-            <StatCard label="Progress" value={`${progressPercent}%`} />
+            <StatCard label="Goal" value={exercise.goal_tempo ? `${exercise.goal_tempo}` : "-"} />
+            <StatCard label="Max" value={String(rangeMaxTempo)} />
+            <StatCard label="Progress" value={exercise.goal_tempo ? `${progressPercent}%` : "-"} />
           </div>
         }
       >
@@ -384,28 +371,25 @@ export function ExerciseDetailPage({
 
       <section className="space-y-6">
         <PagePanel>
-          <SectionHeader title="Progress" />
-          {hasGoal && itemProgress ? (
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <SectionHeader title="Progress" />
+            <ProgressRangeSelector
+              currentRange={selectedRange}
+              hrefBase={`/library/books/${book.id}/sections/${section.id}/exercises/${exercise.id}`}
+            />
+          </div>
+          {filteredEntries.length ? (
             <div className="mt-5 space-y-4">
-              <progress className="progress progress-primary w-full" value={progressPercent} max={100} />
-              <div className="space-y-3">
-                {(itemProgress.progress ?? []).length ? (
-                  (itemProgress.progress ?? []).map((point) => (
-                    <div key={`${point.recordedAt}-${point.maxTempo}`} className="list-row p-4">
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="text-base-content/75">{formatDate(point.recordedAt)}</span>
-                        <span className="font-medium text-base-content">{point.maxTempo} BPM</span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState label="No progress yet." className="mt-4" />
-                )}
-              </div>
+              <TempoProgressGraph
+                entries={filteredEntries}
+                fullEntries={itemProgress.entries}
+                goalTempo={exercise.goal_tempo}
+                range={selectedRange}
+              />
             </div>
           ) : (
             <div className="mt-5">
-              <EmptyState label="Set a goal tempo to track progress." />
+              <EmptyState label="No progress yet." />
             </div>
           )}
         </PagePanel>
@@ -441,7 +425,223 @@ function SongProgressRow({
   );
 }
 
-function formatDate(value: string) {
+type TempoHistory = {
+  currentMaxTempo: number;
+  entries: Array<{
+    recordedAt: string;
+    tempo: number;
+  }>;
+};
+
+type ProgressRange = Extract<TimeRange, "1m" | "1y" | "all">;
+
+const PROGRESS_RANGE_OPTIONS: Array<{ label: string; value: ProgressRange }> = [
+  { label: "Last month", value: "1m" },
+  { label: "Last year", value: "1y" },
+  { label: "All time", value: "all" },
+];
+
+function TempoProgressGraph({
+  entries,
+  fullEntries,
+  goalTempo,
+  range,
+}: {
+  entries: Array<{
+    recordedAt: string;
+    tempo: number;
+  }>;
+  fullEntries: Array<{
+    recordedAt: string;
+    tempo: number;
+  }>;
+  goalTempo?: number | null;
+  range: ProgressRange;
+}) {
+  const width = 640;
+  const height = 240;
+  const padding = { top: 20, right: 16, bottom: 34, left: 42 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const domain = getProgressDomain(fullEntries, range);
+  const domainSpan = Math.max(domain.end - domain.start, 1);
+  const maxTempo = Math.max(goalTempo ?? 0, ...entries.map((entry) => entry.tempo));
+  const tempoCeiling = Math.max(Math.ceil(maxTempo / 10) * 10, 10);
+  const points = entries.map((entry) => {
+    const recordedAt = new Date(entry.recordedAt).getTime();
+    const x = padding.left + ((recordedAt - domain.start) / domainSpan) * innerWidth;
+    const y = padding.top + innerHeight - (entry.tempo / tempoCeiling) * innerHeight;
+
+    return {
+      ...entry,
+      recordedAtMs: recordedAt,
+      x,
+      y,
+    };
+  });
+  const linePath = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+  const goalY = goalTempo ? padding.top + innerHeight - (goalTempo / tempoCeiling) * innerHeight : null;
+  const firstLabel = formatDate(domain.start);
+  const lastLabel = formatDate(domain.end);
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-[1.5rem] border border-base-300 bg-base-100/80 p-4">
+        <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label="Tempo progress over time">
+          <line x1={padding.left} y1={padding.top} x2={padding.left} y2={height - padding.bottom} stroke="currentColor" strokeOpacity="0.18" />
+          <line
+            x1={padding.left}
+            y1={height - padding.bottom}
+            x2={width - padding.right}
+            y2={height - padding.bottom}
+            stroke="currentColor"
+            strokeOpacity="0.18"
+          />
+          {goalY != null ? (
+            <line
+              x1={padding.left}
+              y1={goalY}
+              x2={width - padding.right}
+              y2={goalY}
+              stroke="#b91c1c"
+              strokeOpacity="0.85"
+              strokeDasharray="8 8"
+            />
+          ) : null}
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#dc2626"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="12 8"
+          />
+          {points.map((point) => (
+            <circle
+              key={`${point.recordedAt}-${point.tempo}`}
+              cx={point.x}
+              cy={point.y}
+              r="4.5"
+              fill="#dc2626"
+              stroke="white"
+              strokeWidth="1.5"
+            >
+              <title>{`${formatDate(point.recordedAt)}: ${point.tempo} BPM`}</title>
+            </circle>
+          ))}
+          <text x={padding.left - 10} y={padding.top + 4} textAnchor="end" fontSize="12" fill="currentColor" opacity="0.7">
+            {tempoCeiling}
+          </text>
+          <text
+            x={padding.left - 10}
+            y={height - padding.bottom + 4}
+            textAnchor="end"
+            fontSize="12"
+            fill="currentColor"
+            opacity="0.7"
+          >
+            0
+          </text>
+        </svg>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-base-content/75">
+        <span>{firstLabel}</span>
+        <span className="font-medium text-base-content">Tempo</span>
+        <span>{lastLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+function ProgressRangeSelector({
+  currentRange,
+  hrefBase,
+}: {
+  currentRange: ProgressRange;
+  hrefBase: string;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {PROGRESS_RANGE_OPTIONS.map((option) => {
+        const isActive = option.value === currentRange;
+
+        return (
+          <Link
+            key={option.value}
+            href={`${hrefBase}?range=${option.value}`}
+            className={`chip transition-colors ${isActive ? "border-[#dc2626] bg-[#dc2626] text-white" : "chip-neutral"}`}
+          >
+            {option.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+export function resolveProgressRange(entries: TempoHistory["entries"], requestedRange?: string): ProgressRange {
+  if (requestedRange === "1m" || requestedRange === "1y" || requestedRange === "all") {
+    return requestedRange;
+  }
+
+  if (!entries.length) {
+    return "1m";
+  }
+
+  const oldestRecordedAt = new Date(entries[0].recordedAt).getTime();
+  const oneMonthStart = new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()).getTime();
+  const oneYearStart = new Date(new Date().getFullYear() - 1, new Date().getMonth(), new Date().getDate()).getTime();
+
+  if (oldestRecordedAt >= oneMonthStart) {
+    return "1m";
+  }
+
+  if (oldestRecordedAt >= oneYearStart) {
+    return "1y";
+  }
+
+  return "all";
+}
+
+function filterTempoEntries(entries: TempoHistory["entries"], range: ProgressRange) {
+  if (range === "all") {
+    return entries;
+  }
+
+  const cutoff = range === "1m"
+    ? new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()).getTime()
+    : new Date(new Date().getFullYear() - 1, new Date().getMonth(), new Date().getDate()).getTime();
+
+  return entries.filter((entry) => new Date(entry.recordedAt).getTime() >= cutoff);
+}
+
+function getProgressDomain(entries: TempoHistory["entries"], range: ProgressRange) {
+  const now = Date.now();
+
+  if (range === "1m") {
+    return {
+      start: new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()).getTime(),
+      end: now,
+    };
+  }
+
+  if (range === "1y") {
+    return {
+      start: new Date(new Date().getFullYear() - 1, new Date().getMonth(), new Date().getDate()).getTime(),
+      end: now,
+    };
+  }
+
+  const oldest = entries.length ? new Date(entries[0].recordedAt).getTime() : now;
+
+  return {
+    start: oldest,
+    end: now,
+  };
+}
+
+function formatDate(value: string | number) {
   return new Date(value).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",

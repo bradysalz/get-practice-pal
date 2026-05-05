@@ -1,14 +1,17 @@
 import { notFound } from "next/navigation";
-import { ExerciseDetailPage } from "@/components/library-detail-pages";
+import { ExerciseDetailPage, resolveProgressRange } from "@/components/library-detail-pages";
 import { getBookById } from "@/lib/data/library";
-import { getItemTempoHistory, getProgressToGoal } from "@/lib/data/stats";
+import { getItemTempoHistory } from "@/lib/data/stats";
 
 export default async function LibraryExercisePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ bookId: string; sectionId: string; exerciseId: string }>;
+  searchParams: Promise<{ range?: string }>;
 }) {
   const { bookId, sectionId, exerciseId } = await params;
+  const { range } = await searchParams;
   const book = await getBookById(bookId);
 
   if (!book) {
@@ -27,16 +30,11 @@ export default async function LibraryExercisePage({
     notFound();
   }
 
-  const itemProgress = exercise.goal_tempo
-    ? await getProgressToGoal({
-        itemType: "exercise",
-        exerciseId: exercise.id,
-        goalTempo: exercise.goal_tempo,
-      })
-    : await getItemTempoHistory({
-        itemType: "exercise",
-        exerciseId: exercise.id,
-      });
+  const itemProgress = await getItemTempoHistory({
+    itemType: "exercise",
+    exerciseId: exercise.id,
+  });
+  const selectedRange = resolveProgressRange(itemProgress.entries, range);
 
-  return <ExerciseDetailPage book={book} section={section} exercise={exercise} itemProgress={itemProgress} />;
+  return <ExerciseDetailPage book={book} section={section} exercise={exercise} itemProgress={itemProgress} selectedRange={selectedRange} />;
 }
