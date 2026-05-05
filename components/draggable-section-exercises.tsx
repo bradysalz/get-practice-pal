@@ -22,26 +22,25 @@ import Link from "next/link";
 import { type RefObject, useEffect, useRef, useState, useTransition } from "react";
 import { DragHandle } from "@/components/ui/primitives";
 
-type SectionItem = {
-  completionLabel?: string;
-  exerciseCount: number;
+type ExerciseItem = {
+  goalTempo: number | null;
+  href: string;
   id: string;
+  maxTempo: number;
   title: string;
 };
 
-type DraggableBookSectionsProps = {
-  bookId: string;
-  onReorder: (bookId: string, sectionIds: string[]) => Promise<void>;
-  sections: SectionItem[];
+type DraggableSectionExercisesProps = {
+  exercises: ExerciseItem[];
+  onReorder: (sectionId: string, exerciseIds: string[]) => Promise<void>;
+  sectionId: string;
 };
 
-function SortableSectionRow({
-  bookId,
-  section,
+function SortableExerciseRow({
+  exercise,
   suppressNavigationRef,
 }: {
-  bookId: string;
-  section: SectionItem;
+  exercise: ExerciseItem;
   suppressNavigationRef: RefObject<boolean>;
 }) {
   const {
@@ -51,7 +50,7 @@ function SortableSectionRow({
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: section.id });
+  } = useSortable({ id: exercise.id });
 
   return (
     <div
@@ -60,11 +59,11 @@ function SortableSectionRow({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`list-row min-h-32 p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px] ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+      className={`list-row p-4 transition-all hover:shadow-[3px_3px_0_#0a0a0a] hover:translate-x-[-1px] hover:translate-y-[-1px] ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
         <Link
-          href={`/library/books/${bookId}/sections/${section.id}`}
+          href={exercise.href}
           className="block min-w-0 flex-1"
           onClickCapture={(event) => {
             if (suppressNavigationRef.current) {
@@ -73,18 +72,16 @@ function SortableSectionRow({
             }
           }}
         >
-          <p className="font-semibold leading-tight text-base-content">{section.title}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <span className="chip chip-neutral">
-              {section.exerciseCount} exercise{section.exerciseCount === 1 ? "" : "s"}
-            </span>
-            {section.completionLabel ? (
-              <span className="chip">{section.completionLabel}</span>
-            ) : null}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="font-medium text-base-content">{exercise.title}</p>
+            <div className="flex flex-wrap gap-2">
+              {exercise.goalTempo ? <span className="chip">Goal {exercise.goalTempo} BPM</span> : null}
+              <span className="chip chip-neutral">Max {exercise.maxTempo} BPM</span>
+            </div>
           </div>
         </Link>
         <DragHandle
-          label={`Reorder ${section.title}`}
+          label={`Reorder ${exercise.title}`}
           {...attributes}
           {...listeners}
         />
@@ -93,12 +90,12 @@ function SortableSectionRow({
   );
 }
 
-export function DraggableBookSections({
-  bookId,
+export function DraggableSectionExercises({
+  exercises,
   onReorder,
-  sections,
-}: DraggableBookSectionsProps) {
-  const [orderedSections, setOrderedSections] = useState(sections);
+  sectionId,
+}: DraggableSectionExercisesProps) {
+  const [orderedExercises, setOrderedExercises] = useState(exercises);
   const [isPending, startTransition] = useTransition();
   const suppressNavigationRef = useRef(false);
   const sensors = useSensors(
@@ -108,16 +105,16 @@ export function DraggableBookSections({
   );
 
   useEffect(() => {
-    setOrderedSections(sections);
-  }, [sections]);
+    setOrderedExercises(exercises);
+  }, [exercises]);
 
-  function commit(next: SectionItem[], previous: SectionItem[]) {
-    setOrderedSections(next);
+  function commit(next: ExerciseItem[], previous: ExerciseItem[]) {
+    setOrderedExercises(next);
     startTransition(async () => {
       try {
-        await onReorder(bookId, next.map((item) => item.id));
+        await onReorder(sectionId, next.map((item) => item.id));
       } catch {
-        setOrderedSections(previous);
+        setOrderedExercises(previous);
       }
     });
   }
@@ -134,26 +131,25 @@ export function DraggableBookSections({
       return;
     }
 
-    const oldIndex = orderedSections.findIndex((item) => item.id === active.id);
-    const newIndex = orderedSections.findIndex((item) => item.id === over.id);
+    const oldIndex = orderedExercises.findIndex((item) => item.id === active.id);
+    const newIndex = orderedExercises.findIndex((item) => item.id === over.id);
 
     if (oldIndex < 0 || newIndex < 0) {
       return;
     }
 
-    const previous = orderedSections;
-    commit(arrayMove(orderedSections, oldIndex, newIndex), previous);
+    const previous = orderedExercises;
+    commit(arrayMove(orderedExercises, oldIndex, newIndex), previous);
   }
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={orderedSections.map((item) => item.id)} strategy={rectSortingStrategy}>
-        <div className={`grid gap-4 sm:grid-cols-2 xl:grid-cols-3 ${isPending ? "opacity-80" : ""}`}>
-          {orderedSections.map((section) => (
-            <SortableSectionRow
-              key={section.id}
-              bookId={bookId}
-              section={section}
+      <SortableContext items={orderedExercises.map((item) => item.id)} strategy={rectSortingStrategy}>
+        <div className={`space-y-3 ${isPending ? "opacity-80" : ""}`}>
+          {orderedExercises.map((exercise) => (
+            <SortableExerciseRow
+              key={exercise.id}
+              exercise={exercise}
               suppressNavigationRef={suppressNavigationRef}
             />
           ))}

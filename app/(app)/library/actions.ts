@@ -15,6 +15,7 @@ import {
   deleteSection,
   deleteSong,
   reorderBookSections,
+  reorderSectionExercises,
   updateArtist,
   updateBook,
   updateExercise,
@@ -266,6 +267,11 @@ export async function saveSectionBuilderAction(formData: FormData) {
 
 export async function reorderBookSectionsAction(bookId: string, sectionIds: string[]) {
   await reorderBookSections(bookId, sectionIds);
+  finishLibraryAction();
+}
+
+export async function reorderSectionExercisesAction(sectionId: string, exerciseIds: string[]) {
+  await reorderSectionExercises(sectionId, exerciseIds);
   finishLibraryAction();
 }
 

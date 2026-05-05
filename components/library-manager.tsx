@@ -17,14 +17,8 @@ import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { FormSubmitButton } from "@/components/form-submit-button";
 import { ActionModal } from "@/components/action-modal";
 import { BookMetadataSearch } from "@/components/book-metadata-search";
+import { ArtistOverviewGrid, BookOverviewGrid } from "@/components/library-overview-grids";
 import {
-  linkedBookAuthors,
-  linkedBookCoverUrl,
-  linkedBookPublishedYear,
-  resolveLinkedBook,
-} from "@/components/linked-book-metadata";
-import {
-  CardLink,
   EmptyState,
   Field,
   FormActions,
@@ -61,50 +55,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
             />
             <div className="mt-5">
               {snapshot.books.length ? (
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {snapshot.books.map((book) => {
-                    const sectionCount = book.sections?.length ?? 0;
-                    const bookExerciseCount = (book.sections ?? []).reduce(
-                      (sum, section) => sum + (section.exercises?.length ?? 0),
-                      0,
-                    );
-                    const externalBook = resolveLinkedBook(book.external_book);
-                    const coverUrl = linkedBookCoverUrl(externalBook);
-                    const displayTitle = externalBook?.title ?? book.title;
-                    const displayAuthor = linkedBookAuthors(externalBook) ?? book.composer;
-                    const publishedYear = linkedBookPublishedYear(externalBook);
-
-                    return (
-                      <CardLink key={book.id} href={`/library/books/${book.id}`} className="h-full">
-                        <div className="flex h-full gap-4">
-                          {coverUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              alt=""
-                              className="h-24 w-16 shrink-0 rounded object-cover"
-                              src={coverUrl}
-                            />
-                          ) : null}
-                          <div className="flex min-w-0 flex-1 flex-col">
-                            <h2 className="text-lg font-bold leading-tight text-base-content">{displayTitle}</h2>
-                            <p className="mt-2 text-sm text-base-content/80">
-                              {displayAuthor || "No composer set"}
-                              {publishedYear ? ` · ${publishedYear}` : ""}
-                            </p>
-                            <div className="mt-auto flex flex-wrap gap-2 pt-4">
-                              <span className="chip chip-neutral ">
-                                {sectionCount} section{sectionCount === 1 ? "" : "s"}
-                              </span>
-                              <span className="chip chip-neutral ">
-                                {bookExerciseCount} exercise{bookExerciseCount === 1 ? "" : "s"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </CardLink>
-                    );
-                  })}
-                </div>
+                <BookOverviewGrid books={snapshot.books} />
               ) : (
                 <EmptyState label="No books yet." />
               )}
@@ -122,24 +73,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
             />
             <div className="mt-5">
               {snapshot.artists.length ? (
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  {snapshot.artists.map((artist) => {
-                    const artistSongCount = artist.songs?.length ?? 0;
-
-                    return (
-                      <CardLink key={artist.id} href={`/library/artists/${artist.id}`} className="h-full">
-                        <div className="flex h-full flex-col">
-                          <h2 className="text-lg font-bold leading-tight text-base-content">{artist.name}</h2>
-                          <div className="mt-auto flex flex-wrap gap-2 pt-4">
-                            <span className="chip chip-neutral ">
-                              {artistSongCount} song{artistSongCount === 1 ? "" : "s"}
-                            </span>
-                          </div>
-                        </div>
-                      </CardLink>
-                    );
-                  })}
-                </div>
+                <ArtistOverviewGrid artists={snapshot.artists} />
               ) : (
                 <EmptyState label="No artists yet." />
               )}

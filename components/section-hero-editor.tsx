@@ -7,6 +7,7 @@ import { SectionBuilderForm } from "@/components/section-builder-form";
 
 type SectionHeroEditorProps = {
   bookId: string;
+  onEditingChange?: (isEditing: boolean) => void;
   title: string;
   section?: {
     id: string;
@@ -22,7 +23,7 @@ type SectionHeroEditorProps = {
   };
 };
 
-export function SectionHeroEditor({ bookId, section, title }: SectionHeroEditorProps) {
+export function SectionHeroEditor({ bookId, onEditingChange, section, title }: SectionHeroEditorProps) {
   const [isEditing, setIsEditing] = useState(!section);
 
   if (!section || isEditing) {
@@ -33,7 +34,14 @@ export function SectionHeroEditor({ bookId, section, title }: SectionHeroEditorP
             {title}
           </h1>
           {section ? (
-            <button type="button" className="btn btn-outline" onClick={() => setIsEditing(false)}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => {
+                setIsEditing(false);
+                onEditingChange?.(false);
+              }}
+            >
               Close
             </button>
           ) : null}
@@ -67,7 +75,14 @@ export function SectionHeroEditor({ bookId, section, title }: SectionHeroEditorP
       <h1 className="font-display text-3xl font-semibold tracking-tight text-base-content md:text-5xl">
         {title}
       </h1>
-      <button type="button" className="btn btn-outline" onClick={() => setIsEditing(true)}>
+      <button
+        type="button"
+        className="btn btn-outline"
+        onClick={() => {
+          setIsEditing(true);
+          onEditingChange?.(true);
+        }}
+      >
         Edit
       </button>
     </div>
