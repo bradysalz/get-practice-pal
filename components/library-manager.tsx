@@ -29,12 +29,49 @@ import {
   TextInput,
 } from "@/components/ui/primitives";
 import type { LibrarySnapshot } from "@/lib/data/library";
+import type { ItemProgressSummary } from "@/lib/data/stats";
 
 type LibraryManagerProps = {
+  exerciseProgressMap: Map<string, ItemProgressSummary>;
+  songProgressMap: Map<string, ItemProgressSummary>;
   snapshot: LibrarySnapshot;
 };
 
-export function LibraryManager({ snapshot }: LibraryManagerProps) {
+function mostRecentPractice(values: Array<string | null | undefined>) {
+  return values.reduce<string | null>((latest, value) => {
+    if (!value) {
+      return latest;
+    }
+
+    if (!latest) {
+      return value;
+    }
+
+    return new Date(value).getTime() > new Date(latest).getTime() ? value : latest;
+  }, null);
+}
+
+export function LibraryManager({ exerciseProgressMap, snapshot, songProgressMap }: LibraryManagerProps) {
+  const lastPracticedByBookId = Object.fromEntries(
+    snapshot.books.map((book) => [
+      book.id,
+      mostRecentPractice(
+        (book.sections ?? []).flatMap((section) =>
+          (section.exercises ?? []).map((exercise) => exerciseProgressMap.get(exercise.id)?.lastRecordedAt),
+        ),
+      ),
+    ]),
+  );
+
+  const lastPracticedByArtistId = Object.fromEntries(
+    snapshot.artists.map((artist) => [
+      artist.id,
+      mostRecentPractice(
+        (artist.songs ?? []).map((song) => songProgressMap.get(song.id)?.lastRecordedAt),
+      ),
+    ]),
+  );
+
   return (
     <div className="space-y-6">
       <PageHero
@@ -55,7 +92,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
             />
             <div className="mt-5">
               {snapshot.books.length ? (
-                <BookOverviewGrid books={snapshot.books} />
+                <BookOverviewGrid books={snapshot.books} lastPracticedByBookId={lastPracticedByBookId} />
               ) : (
                 <EmptyState label="No books yet." />
               )}
@@ -73,7 +110,7 @@ export function LibraryManager({ snapshot }: LibraryManagerProps) {
             />
             <div className="mt-5">
               {snapshot.artists.length ? (
-                <ArtistOverviewGrid artists={snapshot.artists} />
+                <ArtistOverviewGrid artists={snapshot.artists} lastPracticedByArtistId={lastPracticedByArtistId} />
               ) : (
                 <EmptyState label="No artists yet." />
               )}

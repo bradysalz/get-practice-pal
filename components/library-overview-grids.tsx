@@ -28,22 +28,47 @@ function compareNewestFirst(left: string, right: string) {
   return new Date(right).getTime() - new Date(left).getTime();
 }
 
-export function BookOverviewGrid({ books }: { books: BookItem[] }) {
+function compareRecentPractice(left: string | null | undefined, right: string | null | undefined) {
+  if (left && right) {
+    return compareNewestFirst(left, right);
+  }
+
+  if (left) {
+    return -1;
+  }
+
+  if (right) {
+    return 1;
+  }
+
+  return 0;
+}
+
+export function BookOverviewGrid({
+  books,
+  lastPracticedByBookId,
+}: {
+  books: BookItem[];
+  lastPracticedByBookId: Record<string, string | null>;
+}) {
   const [sortMode, setSortMode] = useState<BookSortMode>("recent");
   const sortedBooks = useMemo(() => {
     const next = books.slice();
 
     next.sort((left, right) => {
       if (sortMode === "recent") {
-        const updatedAtDiff = compareNewestFirst(left.updated_at, right.updated_at);
-        return updatedAtDiff || compareStrings(left.title, right.title);
+        const recentPracticeDiff = compareRecentPractice(
+          lastPracticedByBookId[left.id],
+          lastPracticedByBookId[right.id],
+        );
+        return recentPracticeDiff || compareStrings(left.title, right.title);
       }
 
       return compareStrings(left.title, right.title);
     });
 
     return next;
-  }, [books, sortMode]);
+  }, [books, lastPracticedByBookId, sortMode]);
 
   return (
     <div className="space-y-4">
@@ -104,22 +129,31 @@ export function BookOverviewGrid({ books }: { books: BookItem[] }) {
   );
 }
 
-export function ArtistOverviewGrid({ artists }: { artists: ArtistItem[] }) {
+export function ArtistOverviewGrid({
+  artists,
+  lastPracticedByArtistId,
+}: {
+  artists: ArtistItem[];
+  lastPracticedByArtistId: Record<string, string | null>;
+}) {
   const [sortMode, setSortMode] = useState<ArtistSortMode>("recent");
   const sortedArtists = useMemo(() => {
     const next = artists.slice();
 
     next.sort((left, right) => {
       if (sortMode === "recent") {
-        const updatedAtDiff = compareNewestFirst(left.updated_at, right.updated_at);
-        return updatedAtDiff || compareStrings(left.name, right.name);
+        const recentPracticeDiff = compareRecentPractice(
+          lastPracticedByArtistId[left.id],
+          lastPracticedByArtistId[right.id],
+        );
+        return recentPracticeDiff || compareStrings(left.name, right.name);
       }
 
       return compareStrings(left.name, right.name);
     });
 
     return next;
-  }, [artists, sortMode]);
+  }, [artists, lastPracticedByArtistId, sortMode]);
 
   return (
     <div className="space-y-4">
